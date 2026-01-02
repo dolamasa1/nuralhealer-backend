@@ -1,0 +1,19 @@
+package com.neuralhealer.backend.repository;
+
+import com.neuralhealer.backend.model.entity.EngagementVerificationToken;
+import com.neuralhealer.backend.model.enums.TokenStatus;
+import com.neuralhealer.backend.model.enums.VerificationType;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+public interface EngagementVerificationTokenRepository extends JpaRepository<EngagementVerificationToken, UUID> {
+
+    Optional<EngagementVerificationToken> findByToken(String token);
+
+    Optional<EngagementVerificationToken> findByEngagementIdAndVerificationTypeAndStatus(
+            UUID engagementId, VerificationType type, TokenStatus status);
+}

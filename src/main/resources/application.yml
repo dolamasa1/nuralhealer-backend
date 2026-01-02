@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: neuralhealer-backend
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/neuralhealer
+    username: postgres
+    password: aaa
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+  
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+    open-in-view: false
+  sql:
+    init:
+      mode: always
+      separator: ;;
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  error:
+    include-message: always
+    include-binding-errors: always
+
+jwt:
+  secret: ${JWT_SECRET:bmV1cmFsaGVhbGVyLXNlY3JldC1rZXktZm9yLWp3dC10b2tlbi1nZW5lcmF0aW9uLTI1Ni1iaXRz}
+  expiration: 86400000
+
+springdoc:
+  api-docs:
+    path: /docs
+  swagger-ui:
+    path: /swagger
+    operations-sorter: method
+
+logging:
+  level:
+    com.neuralhealer.backend: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG

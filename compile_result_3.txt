@@ -1,0 +1,78 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.neuralhealer:backend >----------------------
+[INFO] Building neuralhealer-backend 0.1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ backend ---
+[INFO] Deleting F:\documents\Nuralhealer-main\Nuralhealer\backend\backend\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ backend ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 52 source files with javac [debug release 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[38,19] cannot find symbol
+  symbol:   method getRole()
+  location: variable doctor of type com.neuralhealer.backend.model.entity.User
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[45,20] cannot find symbol
+  symbol:   method getRole()
+  location: variable patient of type com.neuralhealer.backend.model.entity.User
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[61,41] cannot find symbol
+  symbol:   variable PENDING
+  location: class com.neuralhealer.backend.model.enums.EngagementStatus
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[87,46] cannot find symbol
+  symbol:   variable ACTIVE
+  location: class com.neuralhealer.backend.model.enums.EngagementStatus
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[101,55] cannot find symbol
+  symbol:   variable ACTIVE
+  location: class com.neuralhealer.backend.model.enums.EngagementStatus
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[125,46] cannot find symbol
+  symbol:   variable ENDED
+  location: class com.neuralhealer.backend.model.enums.EngagementStatus
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[145,17] cannot find symbol
+  symbol:   method getRole()
+  location: variable user of type com.neuralhealer.backend.model.entity.User
+[INFO] 7 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  12.908 s
+[INFO] Finished at: 2026-01-02T05:12:21+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project backend: Compilation failure: Compilation failure: 
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[38,19] cannot find symbol
+[ERROR]   symbol:   method getRole()
+[ERROR]   location: variable doctor of type com.neuralhealer.backend.model.entity.User
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[45,20] cannot find symbol
+[ERROR]   symbol:   method getRole()
+[ERROR]   location: variable patient of type com.neuralhealer.backend.model.entity.User
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[61,41] cannot find symbol
+[ERROR]   symbol:   variable PENDING
+[ERROR]   location: class com.neuralhealer.backend.model.enums.EngagementStatus
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[87,46] cannot find symbol
+[ERROR]   symbol:   variable ACTIVE
+[ERROR]   location: class com.neuralhealer.backend.model.enums.EngagementStatus
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[101,55] cannot find symbol
+[ERROR]   symbol:   variable ACTIVE
+[ERROR]   location: class com.neuralhealer.backend.model.enums.EngagementStatus
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[125,46] cannot find symbol
+[ERROR]   symbol:   variable ENDED
+[ERROR]   location: class com.neuralhealer.backend.model.enums.EngagementStatus
+[ERROR] /F:/documents/Nuralhealer-main/Nuralhealer/backend/backend/src/main/java/com/neuralhealer/backend/service/EngagementService.java:[145,17] cannot find symbol
+[ERROR]   symbol:   method getRole()
+[ERROR]   location: variable user of type com.neuralhealer.backend.model.entity.User
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
