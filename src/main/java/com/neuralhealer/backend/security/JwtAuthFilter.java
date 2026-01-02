@@ -41,19 +41,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        // Get Authorization header
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String userEmail;
+        String jwt = null;
+        String userEmail = null;
 
-        // Skip if no Authorization header or not Bearer token
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        // 1. Try to get JWT from cookie
+        if (request.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                if ("neuralhealer_token".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        // 2. Fallback to Authorization header
+        final String authHeader = request.getHeader("Authorization");
+        if (jwt == null && authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
+        }
+
+        // If no token found, continue without authentication
+        if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        // Extract token (remove "Bearer " prefix)
-        jwt = authHeader.substring(7);
 
         try {
             // Extract email from token

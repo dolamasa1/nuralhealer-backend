@@ -56,7 +56,7 @@ public class AuthService {
      * @throws IllegalArgumentException if email already exists
      */
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request, jakarta.servlet.http.HttpServletResponse response) {
         // Check if email already exists
         if (userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email already registered");
@@ -98,8 +98,16 @@ public class AuthService {
         // Generate JWT token
         String token = jwtService.generateToken(user);
 
+        // Set HTTPOnly cookie
+        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("neuralhealer_token", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); // TODO: Set to true in production
+        cookie.setPath("/api");
+        cookie.setMaxAge(86400); // 24 hours
+        response.addCookie(cookie);
+
         return AuthResponse.of(
-                token,
+                null, // Token not returned in body
                 user.getId(),
                 user.getEmail(),
                 user.getFirstName(),
@@ -116,7 +124,7 @@ public class AuthService {
      * @throws BadCredentialsException if credentials are invalid
      */
     @Transactional
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request, jakarta.servlet.http.HttpServletResponse response) {
         // Authenticate using Spring Security
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -137,10 +145,18 @@ public class AuthService {
         // Generate JWT token
         String token = jwtService.generateToken(user);
 
+        // Set HTTPOnly cookie
+        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("neuralhealer_token", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); // TODO: Set to true in production
+        cookie.setPath("/api");
+        cookie.setMaxAge(86400); // 24 hours
+        response.addCookie(cookie);
+
         log.info("User logged in: {}", user.getEmail());
 
         return AuthResponse.of(
-                token,
+                null, // Token not returned in body
                 user.getId(),
                 user.getEmail(),
                 user.getFirstName(),
