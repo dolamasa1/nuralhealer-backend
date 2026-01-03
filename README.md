@@ -1,7 +1,7 @@
 # NeuralHealer Backend
 
 **Version:** 0.2.0  
-**Status:** In Development (Phase 4 Security & Phase 3 Engagement Completed)
+**Status:** In Development (Phase 4 Security, Engagement & Real-Time WebSockets Completed)
 
 ## 📋 Overview
 
@@ -11,7 +11,7 @@ This repository contains the monolithic backend service which manages:
 - User Authentication & Authorization (HTTPOnly Cookie Security)
 - Profile Management (Doctor & Patient)
 - Engagement Lifecycle (Initiation, 2FA, Cancellation)
-- Secure Messaging with Access Control
+- **Real-Time Secure Messaging (WebSocket/STOMP)**
 
 ---
 
@@ -21,6 +21,7 @@ This repository contains the monolithic backend service which manages:
 - **Java 21**: Core language.
 - **Spring Boot 3.2.5**: Application framework.
 - **Spring Security 6**: Authentication & Authorization (Cookie-based).
+- **Spring WebSocket**: Real-time bidirectional communication.
 - **Spring Data JPA**: Database abstraction.
 
 ### Database
@@ -47,6 +48,14 @@ A regulated workflow for doctor-patient interactions:
 4.  **Secure Messaging**: Restricted to active participants.
 5.  **Termination**: Controlled ending with retention policy enforcement.
 
+### 3. Real-Time Communication (WebSockets) ✅
+- **Protocol**: STOMP over WebSocket (with SockJS fallback).
+- **Security**: JWT-based authentication via Authorization Header or Cookies.
+- **Features**:
+    - **Live Chat**: Instant message delivery.
+    - **Typing Indicators**: Real-time "User is typing..." status.
+    - **Status Updates**: Live notifications for Engagement Start/End/Cancel.
+
 ---
 
 ## 🔌 API Documentation
@@ -68,10 +77,21 @@ Base URL: `http://localhost:8080/api`
 | :--- | :--- | :--- | :--- |
 | `POST` | `/engagements/initiate` | Doctor starts engagement. Returns Token. | **Yes (Doctor)** |
 | `POST` | `/engagements/verify-start` | Patient confirms start using Token. | **Yes (Patient)** |
-| `POST` | `/engagements/{id}/messages` | Send message in active engagement. | **Yes** |
+| `POST` | `/engagements/{id}/messages` | Send message (HTTP Fallback). | **Yes** |
 | `GET` | `/engagements/{id}/messages` | Get message history. | **Yes** |
 | `POST` | `/engagements/{id}/end-request` | Request to end engagement. Returns Token. | **Yes** |
 | `POST` | `/engagements/{id}/verify-end` | Confirm end using Token. | **Yes** |
+
+### WebSocket Endpoints
+
+**Connection URL**: `ws://localhost:8080/ws`
+
+| Type | Destination | Description |
+| :--- | :--- | :--- |
+| **Subscribe** | `/topic/engagement/{id}` | Receive chat messages & status updates |
+| **Subscribe** | `/topic/engagement/{id}/typing` | Receive typing indicators |
+| **Send** | `/app/engagement/{id}/message` | Send chat message |
+| **Send** | `/app/engagement/{id}/typing` | Send typing status |
 
 ---
 
@@ -98,22 +118,17 @@ docker-compose down
 
 ---
 
-## 🔮 Future Architecture & Golang Integration
+## 🔮 Future Architecture
 
-As NeuralHealer scales, high-throughput components are planned to be offloaded to **Go (Golang)** microservices to ensure low latency and high concurrency.
+As NeuralHealer scales, we plan to introduce:
 
-### Potential Integration Points
-
-1.  **Real-Time Chat Functionality (WebSocket Hub)**
-    *   **Current**: HTTP Polling (Java).
-    *   **Future (Go)**: A dedicated Go service handling WebSocket connections (`ws://`). Go's lightweight goroutines are ideal for maintaining thousands of persistent connections for live typing indicators and instant message delivery.
-
-2.  **AI Inference Gateway**
+1.  **AI Inference Gateway**
     *   **Purpose**: Processing patient data against AI models.
-    *   **Future (Go)**: A high-performance gateway that aggregates data from the Java backend and streams it to AI inference engines (Python/TensorFlow), handling timeouts and retries efficiently.
+    *   **Tech**: High-performance gateway aggregating data from Backend to AI engines.
 
-3.  **Audit Logging Sidecar**
+2.  **Audit Logging Sidecar**
     *   **Purpose**: Rapid ingestion of compliance logs.
+
     *   **Future (Go)**: Asynchronous log collector that writes to immutable storage / Blockchains without blocking the main Java thread.
 
 ### Proposed Architecture Change

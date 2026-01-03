@@ -11,8 +11,12 @@ import com.neuralhealer.backend.model.entity.*;
 import com.neuralhealer.backend.model.enums.EngagementStatus;
 import com.neuralhealer.backend.model.enums.UserRole;
 import com.neuralhealer.backend.model.enums.VerificationType;
+import com.neuralhealer.backend.model.enums.NotificationType;
+import com.neuralhealer.backend.model.dto.WebSocketMessage;
+import com.neuralhealer.backend.model.enums.WebSocketMessageType;
 import com.neuralhealer.backend.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +38,8 @@ public class EngagementService {
     private final PatientProfileRepository patientProfileRepository;
 
     private final VerificationService verificationService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final NotificationService notificationService;
 
     @Transactional
     public StartEngagementResponse initiateEngagement(User doctor, StartEngagementRequest request) {
@@ -99,6 +105,20 @@ public class EngagementService {
         // Update Doctor-Patient Relationship: Handled by DB trigger
         // 'update_relationship_status_on_engagement'
 
+        // Update Doctor-Patient Relationship: Handled by DB trigger
+        // 'update_relationship_status_on_engagement'
+
+        broadcastEngagementStatus(engagement.getId(), "active", "Engagement has been activated");
+
+        // Notify Doctor that Patient has verified/started
+        notificationService.notifyUser(
+                engagement.getDoctor().getUser().getId(),
+                NotificationType.ENGAGEMENT_STARTED,
+                "Engagement Activated",
+                "Patient " + engagement.getPatient().getUser().getFirstName()
+                        + " has verified and started the engagement.",
+                engagement.getId());
+
         return mapToResponse(engagement);
     }
 
@@ -135,6 +155,23 @@ public class EngagementService {
 
         // Update relationship: Handled by DB trigger
         // 'update_relationship_status_on_engagement'
+
+        // Update relationship: Handled by DB trigger
+        // 'update_relationship_status_on_engagement'
+
+        broadcastEngagementStatus(engagement.getId(), "ended", "Engagement has been ended");
+
+        // Notify other party
+        UUID otherPartyId = engagement.getDoctor().getUser().getId().equals(user.getId())
+                ? engagement.getPatient().getUser().getId()
+                : engagement.getDoctor().getUser().getId();
+
+        notificationService.notifyUser(
+                otherPartyId,
+                NotificationType.ENGAGEMENT_ENDED,
+                "Engagement Ended",
+                "The engagement has been ended.",
+                engagement.getId());
 
         return mapToResponse(engagement);
     }
@@ -200,6 +237,16 @@ public class EngagementService {
         engagement.setEndedBy(user);
         engagement.setTerminationReason("Cancelled by doctor before start");
         engagementRepository.save(engagement);
+
+        broadcastEngagementStatus(engagement.getId(), "cancelled", "Engagement has been cancelled");
+
+        // Notify Patient
+        notificationService.notifyUser(
+                engagement.getPatient().getUser().getId(),
+                NotificationType.ENGAGEMENT_CANCELLED,
+                "Engagement Cancelled",
+                "Dr. " + engagement.getDoctor().getUser().getLastName() + " has cancelled the pending engagement.",
+                engagement.getId());
     }
 
     // Helper for message service to validate access
@@ -208,5 +255,19 @@ public class EngagementService {
                 .map(e -> e.getDoctor().getUser().getId().equals(user.getId())
                         || e.getPatient().getUser().getId().equals(user.getId()))
                 .orElse(false);
+    }
+
+    private void broadcastEngagementStatus(UUID engagementId, String status, String message) {
+        WebSocketMessage wsMessage = WebSocketMessage.builder()
+                .type(WebSocketMessageType.ENGAGEMENT_STATUS)
+                .engagementId(engagementId)
+                .content(message)
+                .timestamp(LocalDateTime.now())
+                .metadata(status)
+                .build();
+
+        messagingTemplate.convertAndSend(
+                "/topic/engagement/" + engagementId,
+                wsMessage);
     }
 }

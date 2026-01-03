@@ -1,5 +1,7 @@
 package com.neuralhealer.backend.service;
 
+import com.neuralhealer.backend.model.enums.NotificationType;
+
 import com.neuralhealer.backend.exception.UnauthorizedException;
 import com.neuralhealer.backend.model.dto.MessageResponse;
 import com.neuralhealer.backend.model.dto.SendMessageRequest;
@@ -23,6 +25,7 @@ public class EngagementMessageService {
 
         private final EngagementMessageRepository messageRepository;
         private final EngagementRepository engagementRepository;
+        private final NotificationService notificationService;
         private final EngagementService engagementService; // To reuse access logic if needed, but repo is safer here
                                                            // for
                                                            // direct lookup
@@ -51,6 +54,15 @@ public class EngagementMessageService {
                                 .build();
 
                 message = messageRepository.save(message);
+
+                message = messageRepository.save(message);
+
+                notificationService.notifyUser(
+                                recipient.getId(),
+                                NotificationType.NEW_MESSAGE,
+                                "New Message",
+                                sender.getFirstName() + " sent you a message",
+                                engagement.getId());
 
                 return mapToResponse(message);
         }

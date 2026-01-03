@@ -59,6 +59,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints - no authentication required
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll() // WebSocket Handshake
                         .requestMatchers("/docs/**").permitAll()
                         .requestMatchers("/swagger/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
@@ -88,8 +89,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Allow React frontend origin
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        // Allow React frontend and potential WebSocket clients
+        configuration
+                .setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000", "http://localhost:8080"));
 
         // Allowed HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
@@ -100,7 +102,8 @@ public class SecurityConfig {
                 "Content-Type",
                 "Accept",
                 "Origin",
-                "X-Requested-With"));
+                "X-Requested-With",
+                "Access-Control-Allow-Origin"));
 
         // Expose Authorization header to frontend
         configuration.setExposedHeaders(List.of("Authorization"));
