@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/engagements")
+@RequestMapping("/engagements")
 @RequiredArgsConstructor
 @Tag(name = "Engagement", description = "Engagement management endpoints")
 @SecurityRequirement(name = "bearerAuth")
@@ -54,6 +54,15 @@ public class EngagementController {
             @AuthenticationPrincipal User user,
             @PathVariable UUID id) {
         return ResponseEntity.ok(engagementService.getEngagement(user, id));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Cancel a pending engagement (Doctor only)")
+    public ResponseEntity<Void> cancel(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id) {
+        engagementService.cancelEngagement(user, id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/end-request")

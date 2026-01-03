@@ -4,6 +4,8 @@ import com.neuralhealer.backend.model.enums.EngagementStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -38,25 +40,45 @@ public class Engagement {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
-    private User doctor;
+    private DoctorProfile doctor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
-    private User patient;
+    private PatientProfile patient;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "engagement_status")
     private EngagementStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "access_rule_name")
+    @JoinColumn(name = "access_rule_name", referencedColumnName = "rule_name")
     private EngagementAccessRule accessRule;
+
+    @Column(name = "engagement_type", length = 50)
+    private String engagementType;
 
     @Column(name = "start_at")
     private LocalDateTime startAt;
 
     @Column(name = "end_at")
     private LocalDateTime endAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ended_by")
+    private User endedBy;
+
+    @Column(name = "termination_reason", columnDefinition = "TEXT")
+    private String terminationReason;
+
+    @Column(name = "start_verified_at")
+    private LocalDateTime startVerifiedAt;
+
+    @Column(name = "end_verified_at")
+    private LocalDateTime endVerifiedAt;
+
+    @Column(columnDefinition = "TEXT")
+    private String notes;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -65,4 +87,26 @@ public class Engagement {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    // --- Lifecycle Helpers ---
+
+    /**
+     * Activates the engagement when patient verifies the token.
+     */
+    public void activate() {
+        this.status = EngagementStatus.active;
+        this.startAt = LocalDateTime.now();
+        this.startVerifiedAt = LocalDateTime.now();
+    }
+
+    /**
+     * Ends the engagement with a reason and record of who ended it.
+     */
+    public void end(User user, String reason) {
+        this.status = EngagementStatus.ended;
+        this.endAt = LocalDateTime.now();
+        this.endVerifiedAt = LocalDateTime.now();
+        this.endedBy = user;
+        this.terminationReason = reason;
+    }
 }

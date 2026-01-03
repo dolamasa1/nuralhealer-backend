@@ -1,16 +1,16 @@
 # NeuralHealer Backend
 
-**Version:** 0.1.0  
-**Status:** In Development (Phase 3 Completed)
+**Version:** 0.2.0  
+**Status:** In Development (Phase 4 Security & Phase 3 Engagement Completed)
 
 ## 📋 Overview
 
 NeuralHealer is an advanced healthcare platform designed to facilitate secure, regulated, and AI-enhanced engagements between doctors and patients. The backend is built with **Spring Boot 3**, leveraging a robust **PostgreSQL** database with complex PL/pgSQL triggers to handle business logic consistency at the data layer.
 
 This repository contains the monolithic backend service which manages:
-- User Authentication & Authorization (JWT)
+- User Authentication & Authorization (HTTPOnly Cookie Security)
 - Profile Management (Doctor & Patient)
-- Engagement Lifecycle (Initiation, 2FA Verification, Termination)
+- Engagement Lifecycle (Initiation, 2FA, Cancellation)
 - Secure Messaging with Access Control
 
 ---
@@ -20,35 +20,32 @@ This repository contains the monolithic backend service which manages:
 ### Core
 - **Java 21**: Core language.
 - **Spring Boot 3.2.5**: Application framework.
-- **Spring Security 6**: Authentication & Authorization.
+- **Spring Security 6**: Authentication & Authorization (Cookie-based).
 - **Spring Data JPA**: Database abstraction.
 
 ### Database
 - **PostgreSQL 15**: Primary data store.
-- **Liquibase / Schema.sql**: Database initialization (using `schema.sql` with PL/pgSQL support).
-- **Triggers**: Automated valid logic (e.g., `update_relationship_status_on_engagement`, `generate_engagement_id`).
-
-### Infrastructure & Tools
-- **Docker & Docker Compose**: Database containerization.
-- **Maven**: Build tool.
-- **OpenAPI / Swagger UI**: API documentation (`/api/swagger-ui/index.html`).
+- **Liquibase / Schema.sql**: Database initialization.
+- **Triggers**: Automated logic (`update_relationship_status_on_engagement`, `generate_engagement_id`, etc.).
 
 ---
 
 ## 🚀 Features & Modules
 
 ### 1. Authentication System ✅
-- **Role-Based Access**: `DOCTOR`, `PATIENT`, `ADMIN`.
-- **JWT Security**: Stateless authentication with bearer tokens.
-- **Registration**: Separate flows for Doctors (with professional details) and Patients (with medical history placeholders).
+- **Role-Based Access**: `DOCTOR`, `PATIENT`.
+- **Secure Sessions**: **HTTPOnly Cookies** prevent XSS token theft.
+- **Registration**: Separate flows for Doctors and Patients.
+- **Logout**: Secure cookie invalidation.
 
-### 2. Engagement System (Phase 3) ✅
+### 2. Engagement System ✅
 A regulated workflow for doctor-patient interactions:
-1.  **Initiation**: Doctor requests an engagement with a specific access rule (e.g., `FULL_ACCESS`).
-2.  **2FA Verification**: System generates a verification token. Patient verifies this token to Activate the engagement.
-3.  **Automated Updates**: Database triggers automatically update the `doctor_patients` relationship table when engagement status changes to `active`.
-4.  **Secure Messaging**: Messages can only be exchanged between parties with an active engagement or sufficient access rights.
-5.  **Termination**: Controlled ending of engagements with retention policy enforcement (e.g., reverting to `READ_ONLY_ACCESS`).
+1.  **Initiation**: Doctor requests engagement -> System returns **QR Code Data** (Deep Link).
+    *   *Note: The frontend is responsible for rendering this QR code/Link to the patient.*
+2.  **2FA Verification**: Patient verifies the token to Activate the engagement.
+3.  **Cancellation**: Doctors can immediately cancel pending engagements (undo/delete).
+4.  **Secure Messaging**: Restricted to active participants.
+5.  **Termination**: Controlled ending with retention policy enforcement.
 
 ---
 
@@ -60,8 +57,9 @@ Base URL: `http://localhost:8080/api`
 
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/auth/register` | Register new user (Doctor/Patient) | No |
-| `POST` | `/auth/login` | Login and receive JWT | No |
+| `POST` | `/auth/register` | Register new user | No |
+| `POST` | `/auth/login` | Login (Returns Cookie) | No |
+| `POST` | `/auth/logout` | Logout (Clears Cookie) | **Yes** |
 | `GET` | `/users/me` | Get current user profile | **Yes** |
 
 ### Engagement Endpoints

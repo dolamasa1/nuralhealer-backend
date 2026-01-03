@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface EngagementAccessRuleRepository extends JpaRepository<EngagementAccessRule, String> {
+public interface EngagementAccessRuleRepository extends JpaRepository<EngagementAccessRule, java.util.UUID> {
     Optional<EngagementAccessRule> findByRuleName(String ruleName);
 }

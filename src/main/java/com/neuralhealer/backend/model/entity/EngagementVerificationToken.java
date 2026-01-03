@@ -4,6 +4,8 @@ import com.neuralhealer.backend.model.enums.TokenStatus;
 import com.neuralhealer.backend.model.enums.VerificationType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -36,6 +38,7 @@ public class EngagementVerificationToken {
     private String token;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "verification_type", columnDefinition = "verification_type")
     private VerificationType verificationType;
 
@@ -43,6 +46,7 @@ public class EngagementVerificationToken {
     private String qrCodeData;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "token_status")
     private TokenStatus status;
 

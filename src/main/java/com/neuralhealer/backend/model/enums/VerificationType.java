@@ -5,6 +5,6 @@ package com.neuralhealer.backend.model.enums;
  * Defined in DB as enum 'verification_type'.
  */
 public enum VerificationType {
-    START,
-    END
+    start,
+    end
 }

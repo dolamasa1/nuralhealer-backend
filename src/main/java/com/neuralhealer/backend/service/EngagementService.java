@@ -30,6 +30,8 @@ public class EngagementService {
     private final EngagementAccessRuleRepository accessRuleRepository;
     private final DoctorPatientRepository doctorPatientRepository;
     private final UserRepository userRepository;
+    private final DoctorProfileRepository doctorProfileRepository;
+    private final PatientProfileRepository patientProfileRepository;
 
     private final VerificationService verificationService;
 
@@ -47,16 +49,23 @@ public class EngagementService {
         }
 
         // Check for existing active engagement
-        if (engagementRepository.findActiveEngagement(doctor.getId(), patient.getId()).isPresent()) {
+        if (engagementRepository.findActiveEngagement(doctor.getId(), patient.getId(),
+                List.of(EngagementStatus.pending, EngagementStatus.active)).isPresent()) {
             throw new InvalidVerificationException("An active or pending engagement already exists for this patient");
         }
 
         EngagementAccessRule rule = accessRuleRepository.findByRuleName(request.accessRuleName())
                 .orElseThrow(() -> new ResourceNotFoundException("Access rule not found"));
 
+        DoctorProfile doctorProfile = doctorProfileRepository.findByUserId(doctor.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor profile not found"));
+
+        PatientProfile patientProfile = patientProfileRepository.findByUserId(patient.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Patient profile not found"));
+
         Engagement engagement = Engagement.builder()
-                .doctor(doctor)
-                .patient(patient)
+                .doctor(doctorProfile)
+                .patient(patientProfile)
                 .accessRule(rule)
                 .status(EngagementStatus.pending)
                 .build();
@@ -79,13 +88,12 @@ public class EngagementService {
     public EngagementResponse verifyStart(User user, String tokenString) {
         EngagementVerificationToken token = verificationService.verifyToken(tokenString, user);
 
-        if (token.getVerificationType() != VerificationType.START) {
+        if (token.getVerificationType() != VerificationType.start) {
             throw new InvalidVerificationException("Invalid token type for start verification");
         }
 
         Engagement engagement = token.getEngagement();
-        engagement.setStatus(EngagementStatus.active);
-        engagement.setStartAt(LocalDateTime.now());
+        engagement.activate();
         engagementRepository.save(engagement);
 
         // Update Doctor-Patient Relationship: Handled by DB trigger
@@ -98,8 +106,8 @@ public class EngagementService {
     public StartEngagementResponse requestEnd(User user, UUID engagementId, String reason) {
         Engagement engagement = getEngagementIfAuthorized(engagementId, user);
 
-        if (engagement.getStatus() != EngagementStatus.active) {
-            throw new InvalidVerificationException("Engagement is not active");
+        if (engagement.getStatus() != EngagementStatus.active && engagement.getStatus() != EngagementStatus.pending) {
+            throw new InvalidVerificationException("Only active or pending engagements can be ended");
         }
 
         EngagementVerificationToken token = verificationService.generateEndToken(engagement);
@@ -117,14 +125,12 @@ public class EngagementService {
     public EngagementResponse verifyEnd(User user, String tokenString) {
         EngagementVerificationToken token = verificationService.verifyToken(tokenString, user);
 
-        if (token.getVerificationType() != VerificationType.END) {
+        if (token.getVerificationType() != VerificationType.end) {
             throw new InvalidVerificationException("Invalid token type for end verification");
         }
 
         Engagement engagement = token.getEngagement();
-        engagement.setStatus(EngagementStatus.ended); // Or ARCHIVED depending on logic, sticking to ENDED per
-                                                      // instructions
-        engagement.setEndAt(LocalDateTime.now());
+        engagement.end(user, "Verification completed via token");
         engagementRepository.save(engagement);
 
         // Update relationship: Handled by DB trigger
@@ -143,9 +149,9 @@ public class EngagementService {
     public List<EngagementResponse> getMyEngagements(User user) {
         List<Engagement> engagements;
         if (user.getRole() == UserRole.DOCTOR) {
-            engagements = engagementRepository.findByDoctorId(user.getId());
+            engagements = engagementRepository.findByDoctorUserId(user.getId());
         } else {
-            engagements = engagementRepository.findByPatientId(user.getId());
+            engagements = engagementRepository.findByPatientUserId(user.getId());
         }
         return engagements.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
@@ -154,31 +160,53 @@ public class EngagementService {
         Engagement engagement = engagementRepository.findById(engagementId)
                 .orElseThrow(() -> new EngagementNotFoundException("Engagement not found"));
 
-        if (!engagement.getDoctor().getId().equals(user.getId()) &&
-                !engagement.getPatient().getId().equals(user.getId())) {
+        if (!engagement.getDoctor().getUser().getId().equals(user.getId()) &&
+                !engagement.getPatient().getUser().getId().equals(user.getId())) {
             throw new UnauthorizedException("Not authorized to view this engagement");
         }
         return engagement;
     }
 
     private EngagementResponse mapToResponse(Engagement e) {
+        User docUser = e.getDoctor().getUser();
+        User patUser = e.getPatient().getUser();
+
         return new EngagementResponse(
                 e.getId(),
                 e.getEngagementId(),
                 e.getStatus().name(),
-                new EngagementResponse.UserSummary(e.getDoctor().getId(), e.getDoctor().getFirstName(),
-                        e.getDoctor().getLastName(), e.getDoctor().getEmail()),
-                new EngagementResponse.UserSummary(e.getPatient().getId(), e.getPatient().getFirstName(),
-                        e.getPatient().getLastName(), e.getPatient().getEmail()),
+                new EngagementResponse.UserSummary(docUser.getId(), docUser.getFirstName(),
+                        docUser.getLastName(), docUser.getEmail()),
+                new EngagementResponse.UserSummary(patUser.getId(), patUser.getFirstName(),
+                        patUser.getLastName(), patUser.getEmail()),
                 e.getAccessRule() != null ? e.getAccessRule().getRuleName() : null,
                 e.getStartAt(),
                 e.getEndAt());
     }
 
+    @Transactional
+    public void cancelEngagement(User user, UUID engagementId) {
+        Engagement engagement = getEngagementIfAuthorized(engagementId, user);
+
+        if (engagement.getStatus() != EngagementStatus.pending) {
+            throw new IllegalStateException("Only pending engagements can be cancelled without verification");
+        }
+
+        if (!engagement.getDoctor().getUser().getId().equals(user.getId())) {
+            throw new SecurityException("Only the initiating doctor can cancel a pending engagement");
+        }
+
+        engagement.setStatus(EngagementStatus.cancelled);
+        engagement.setEndedBy(user);
+        engagement.setTerminationReason("Cancelled by doctor before start");
+        engagementRepository.save(engagement);
+    }
+
     // Helper for message service to validate access
     public boolean canAccessEngagement(User user, UUID engagementId) {
         return engagementRepository.findById(engagementId)
-                .map(e -> e.getDoctor().getId().equals(user.getId()) || e.getPatient().getId().equals(user.getId()))
+                .map(e -> e.getDoctor().getUser().getId().equals(user.getId())
+                        || e.getPatient().getUser().getId().equals(user.getId()))
                 .orElse(false);
     }
 }

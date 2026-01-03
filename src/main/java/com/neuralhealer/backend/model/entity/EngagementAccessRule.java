@@ -1,14 +1,10 @@
 package com.neuralhealer.backend.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.data.annotation.Immutable;
+
+import java.util.UUID;
 
 /**
  * Rules defining what data a doctor can access after an engagement ends.
@@ -26,24 +22,37 @@ import org.springframework.data.annotation.Immutable;
 public class EngagementAccessRule {
 
     @Id
-    @Column(name = "rule_name", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = "rule_name", nullable = false, unique = true)
     private String ruleName;
 
-    @Column(name = "description")
-    private String description;
-
     @Column(name = "can_view_all_history")
-    private boolean canViewAllHistory;
+    private Boolean canViewAllHistory;
 
     @Column(name = "can_view_current_only")
-    private boolean canViewCurrentOnly;
+    private Boolean canViewCurrentOnly;
 
-    @Column(name = "can_view_demographics")
-    private boolean canViewDemographics;
+    @Column(name = "can_view_patient_profile")
+    private Boolean canViewPatientProfile;
 
-    @Column(name = "can_view_checkins")
-    private boolean canViewCheckins;
+    @Column(name = "can_modify_notes")
+    private Boolean canModifyNotes;
 
-    @Column(name = "retention_period_days")
-    private Integer retentionPeriodDays;
+    @Column(name = "can_message_patient")
+    private Boolean canMessagePatient;
+
+    // Retention after engagement ends
+    @Column(name = "retains_period_access")
+    private Boolean retainsPeriodAccess;
+
+    @Column(name = "retains_history_access")
+    private Boolean retainsHistoryAccess;
+
+    @Column(name = "retains_no_access")
+    private Boolean retainsNoAccess;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 }

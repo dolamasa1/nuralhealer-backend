@@ -25,154 +25,157 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    /**
-     * Handle validation errors from @Valid annotations.
-     * Returns field-level error messages.
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationErrors(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request) {
+        /**
+         * Handle validation errors from @Valid annotations.
+         * Returns field-level error messages.
+         */
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<ErrorResponse> handleValidationErrors(
+                        MethodArgumentNotValidException ex,
+                        HttpServletRequest request) {
 
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
+                Map<String, String> errors = new HashMap<>();
+                ex.getBindingResult().getAllErrors().forEach(error -> {
+                        String fieldName = ((FieldError) error).getField();
+                        String errorMessage = error.getDefaultMessage();
+                        errors.put(fieldName, errorMessage);
+                });
 
-        log.debug("Validation failed for request {}: {}", request.getRequestURI(), errors);
+                log.debug("Validation failed for request {}: {}", request.getRequestURI(), errors);
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Validation failed",
-                        request.getRequestURI(),
-                        errors));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.BAD_REQUEST.value(),
+                                                "Validation failed",
+                                                request.getRequestURI(),
+                                                errors));
+        }
 
-    /**
-     * Handle constraint violations from @Validated.
-     */
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolation(
-            ConstraintViolationException ex,
-            HttpServletRequest request) {
+        /**
+         * Handle constraint violations from @Validated.
+         */
+        @ExceptionHandler(ConstraintViolationException.class)
+        public ResponseEntity<ErrorResponse> handleConstraintViolation(
+                        ConstraintViolationException ex,
+                        HttpServletRequest request) {
 
-        Map<String, String> errors = new HashMap<>();
-        ex.getConstraintViolations().forEach(cv -> errors.put(cv.getPropertyPath().toString(), cv.getMessage()));
+                Map<String, String> errors = new HashMap<>();
+                ex.getConstraintViolations()
+                                .forEach(cv -> errors.put(cv.getPropertyPath().toString(), cv.getMessage()));
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Constraint violation",
-                        request.getRequestURI(),
-                        errors));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.BAD_REQUEST.value(),
+                                                "Constraint violation",
+                                                request.getRequestURI(),
+                                                errors));
+        }
 
-    /**
-     * Handle resource not found exceptions.
-     */
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFound(
-            ResourceNotFoundException ex,
-            HttpServletRequest request) {
+        /**
+         * Handle resource not found exceptions.
+         */
+        @ExceptionHandler(ResourceNotFoundException.class)
+        public ResponseEntity<ErrorResponse> handleResourceNotFound(
+                        ResourceNotFoundException ex,
+                        HttpServletRequest request) {
 
-        log.debug("Resource not found: {}", ex.getMessage());
+                log.debug("Resource not found: {}", ex.getMessage());
 
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ErrorResponse.of(
-                        HttpStatus.NOT_FOUND.value(),
-                        ex.getMessage(),
-                        request.getRequestURI()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.NOT_FOUND.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
 
-    /**
-     * Handle unauthorized exceptions.
-     */
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleUnauthorized(
-            UnauthorizedException ex,
-            HttpServletRequest request) {
+        /**
+         * Handle unauthorized exceptions.
+         */
+        @ExceptionHandler(UnauthorizedException.class)
+        public ResponseEntity<ErrorResponse> handleUnauthorized(
+                        UnauthorizedException ex,
+                        HttpServletRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(ErrorResponse.of(
-                        HttpStatus.UNAUTHORIZED.value(),
-                        ex.getMessage(),
-                        request.getRequestURI()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.UNAUTHORIZED)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.UNAUTHORIZED.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
 
-    /**
-     * Handle bad credentials (wrong password).
-     */
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentials(
-            BadCredentialsException ex,
-            HttpServletRequest request) {
+        /**
+         * Handle bad credentials (wrong password).
+         */
+        @ExceptionHandler(BadCredentialsException.class)
+        public ResponseEntity<ErrorResponse> handleBadCredentials(
+                        BadCredentialsException ex,
+                        HttpServletRequest request) {
 
-        log.debug("Bad credentials for request: {}", request.getRequestURI());
+                log.debug("Bad credentials for request: {}", request.getRequestURI());
 
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(ErrorResponse.of(
-                        HttpStatus.UNAUTHORIZED.value(),
-                        "Invalid email or password",
-                        request.getRequestURI()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.UNAUTHORIZED)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.UNAUTHORIZED.value(),
+                                                "Invalid email or password",
+                                                request.getRequestURI()));
+        }
 
-    /**
-     * Handle authentication exceptions.
-     */
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(
-            AuthenticationException ex,
-            HttpServletRequest request) {
+        /**
+         * Handle authentication exceptions.
+         */
+        @ExceptionHandler(AuthenticationException.class)
+        public ResponseEntity<ErrorResponse> handleAuthenticationException(
+                        AuthenticationException ex,
+                        HttpServletRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(ErrorResponse.of(
-                        HttpStatus.UNAUTHORIZED.value(),
-                        "Authentication failed",
-                        request.getRequestURI()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.UNAUTHORIZED)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.UNAUTHORIZED.value(),
+                                                "Authentication failed",
+                                                request.getRequestURI()));
+        }
 
-    /**
-     * Handle illegal argument exceptions.
-     */
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgument(
-            IllegalArgumentException ex,
-            HttpServletRequest request) {
+        /**
+         * Handle illegal argument exceptions.
+         */
+        @ExceptionHandler(IllegalArgumentException.class)
+        public ResponseEntity<ErrorResponse> handleIllegalArgument(
+                        IllegalArgumentException ex,
+                        HttpServletRequest request) {
 
-        log.warn("Illegal argument: {}", ex.getMessage());
+                log.warn("Illegal argument: {}", ex.getMessage());
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(
-                        HttpStatus.BAD_REQUEST.value(),
-                        ex.getMessage(),
-                        request.getRequestURI()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.BAD_REQUEST.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
 
-    /**
-     * Handle all other unexpected exceptions.
-     */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(
-            Exception ex,
-            HttpServletRequest request) {
+        /**
+         * Handle all other unexpected exceptions.
+         */
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ErrorResponse> handleGenericException(
+                        Exception ex,
+                        HttpServletRequest request) {
 
-        log.error("Unexpected error for request {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+                log.error("Unexpected error for request {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+                ex.printStackTrace(); // FORCE PRINT STACK TRACE FOR DEBUGGING
 
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorResponse.of(
-                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        "An unexpected error occurred. Please try again later.",
-                        request.getRequestURI()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                                "An unexpected error occurred: " + ex.getMessage(), // Include message
+                                                                                                    // for debug
+                                                request.getRequestURI()));
+        }
 }

@@ -35,11 +35,11 @@ public class DoctorPatient {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", insertable = false, updatable = false)
-    private User doctor;
+    private DoctorProfile doctor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", insertable = false, updatable = false)
-    private User patient;
+    private PatientProfile patient;
 
     @Column(name = "relationship_status", length = 50)
     private String relationshipStatus;

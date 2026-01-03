@@ -25,12 +25,12 @@ public class VerificationService {
 
     @Transactional
     public EngagementVerificationToken generateStartToken(Engagement engagement) {
-        return createToken(engagement, VerificationType.START);
+        return createToken(engagement, VerificationType.start);
     }
 
     @Transactional
     public EngagementVerificationToken generateEndToken(Engagement engagement) {
-        return createToken(engagement, VerificationType.END);
+        return createToken(engagement, VerificationType.end);
     }
 
     private EngagementVerificationToken createToken(Engagement engagement, VerificationType type) {
@@ -42,7 +42,7 @@ public class VerificationService {
                 .engagement(engagement)
                 .token(tokenString)
                 .verificationType(type)
-                .status(TokenStatus.PENDING)
+                .status(TokenStatus.pending)
                 .expiresAt(LocalDateTime.now().plusMinutes(EXPIRY_MINUTES))
                 .qrCodeData("neuralhealer://verify/" + type + "/" + tokenString)
                 .build();
@@ -55,26 +55,26 @@ public class VerificationService {
         EngagementVerificationToken token = tokenRepository.findByToken(tokenString)
                 .orElseThrow(() -> new InvalidVerificationException("Invalid token"));
 
-        if (token.getStatus() != TokenStatus.PENDING) {
+        if (token.getStatus() != TokenStatus.pending) {
             throw new InvalidVerificationException("Token is already " + token.getStatus());
         }
 
         if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
-            token.setStatus(TokenStatus.EXPIRED);
+            token.setStatus(TokenStatus.expired);
             tokenRepository.save(token);
             throw new InvalidVerificationException("Token has expired");
         }
 
         // Validate user participation (must be doctor or patient of the engagement)
         UUID userId = user.getId();
-        UUID doctorId = token.getEngagement().getDoctor().getId();
-        UUID patientId = token.getEngagement().getPatient().getId();
+        UUID doctorId = token.getEngagement().getDoctor().getUser().getId();
+        UUID patientId = token.getEngagement().getPatient().getUser().getId();
 
         if (!userId.equals(doctorId) && !userId.equals(patientId)) {
             throw new InvalidVerificationException("User not authorized to verify this engagement");
         }
 
-        token.setStatus(TokenStatus.VERIFIED);
+        token.setStatus(TokenStatus.verified);
         token.setVerifiedAt(LocalDateTime.now());
         return tokenRepository.save(token);
     }

@@ -15,12 +15,17 @@ import java.util.UUID;
 public interface EngagementRepository extends JpaRepository<Engagement, UUID> {
 
     // Find active engagement for a doctor-patient pair to enforce "One Active" rule
-    @Query("SELECT e FROM Engagement e WHERE e.doctor.id = :doctorId AND e.patient.id = :patientId AND e.status IN ('PENDING', 'ACTIVE')")
-    Optional<Engagement> findActiveEngagement(@Param("doctorId") UUID doctorId, @Param("patientId") UUID patientId);
+    @Query("SELECT e FROM Engagement e WHERE e.doctor.user.id = :doctorId AND e.patient.user.id = :patientId AND e.status IN :statuses")
+    Optional<Engagement> findActiveEngagement(@Param("doctorId") UUID doctorId, @Param("patientId") UUID patientId,
+            @Param("statuses") List<EngagementStatus> statuses);
 
-    List<Engagement> findByDoctorId(UUID doctorId);
+    @Query("SELECT e FROM Engagement e WHERE e.doctor.user.id = :doctorId")
+    List<Engagement> findByDoctorUserId(@Param("doctorId") UUID doctorId);
 
-    List<Engagement> findByPatientId(UUID patientId);
+    @Query("SELECT e FROM Engagement e WHERE e.patient.user.id = :patientId")
+    List<Engagement> findByPatientUserId(@Param("patientId") UUID patientId);
 
-    List<Engagement> findByDoctorIdAndStatus(UUID doctorId, EngagementStatus status);
+    @Query("SELECT e FROM Engagement e WHERE e.doctor.user.id = :doctorId AND e.status = :status")
+    List<Engagement> findByDoctorUserIdAndStatus(@Param("doctorId") UUID doctorId,
+            @Param("status") EngagementStatus status);
 }

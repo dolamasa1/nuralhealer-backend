@@ -40,6 +40,14 @@ jwt:
   secret: ${JWT_SECRET:bmV1cmFsaGVhbGVyLXNlY3JldC1rZXktZm9yLWp3dC10b2tlbi1nZW5lcmF0aW9uLTI1Ni1iaXRz}
   expiration: 86400000
 
+neuralhealer:
+  security:
+    cookie:
+      name: neuralhealer_token
+      secure: false # Set to true in production
+      same-site: Lax
+      max-age: 86400
+
 springdoc:
   api-docs:
     path: /docs
