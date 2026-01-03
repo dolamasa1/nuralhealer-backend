@@ -82,16 +82,12 @@ Base URL: `http://localhost:8080/api`
 | `POST` | `/engagements/{id}/end-request` | Request to end engagement. Returns Token. | **Yes** |
 | `POST` | `/engagements/{id}/verify-end` | Confirm end using Token. | **Yes** |
 
-### WebSocket Endpoints
-
-**Connection URL**: `ws://localhost:8080/ws`
-
-| Type | Destination | Description |
-| :--- | :--- | :--- |
-| **Subscribe** | `/topic/engagement/{id}` | Receive chat messages & status updates |
-| **Subscribe** | `/topic/engagement/{id}/typing` | Receive typing indicators |
-| **Send** | `/app/engagement/{id}/message` | Send chat message |
-| **Send** | `/app/engagement/{id}/typing` | Send typing status |
+## 🚀 Recent Updates (v0.3.0)
+- **Hybrid Notification System**: Combines WebSocket (Real-Time) and REST (History/Offline).
+- **Public Directory**: `GET /api/doctors` endpoint implemented.
+- **Documentation**: Added comprehensive `all_apis.md`.
+- **Engagement Management**: Full lifecycle (Start, End, Cancel) with pending states and cancellation.
+- **WebSockets**: Real-time chat, typing indicators, and status updates.
 
 ---
 
