@@ -1,44 +1,52 @@
 # NeuralHealer Backend
-
 **Version:** 0.2.0  
 **Status:** In Development (Phase 4 Security, Engagement & Real-Time WebSockets Completed)
-
+**Version:** 0.3.0 | **Tier:** 1 (Pre-production)  
+**Read Time:** ~15 min (Full Docs)
 ## 📋 Overview
-
+## 🎯 Overview
+NeuralHealer is a secure, regulated healthcare platform facilitating AI-enhanced engagements between doctors and patients. Built with **Spring Boot 3** and **PostgreSQL**, it prioritizes data integrity and real-time responsiveness.
 NeuralHealer is an advanced healthcare platform designed to facilitate secure, regulated, and AI-enhanced engagements between doctors and patients. The backend is built with **Spring Boot 3**, leveraging a robust **PostgreSQL** database with complex PL/pgSQL triggers to handle business logic consistency at the data layer.
-
 This repository contains the monolithic backend service which manages:
 - User Authentication & Authorization (HTTPOnly Cookie Security)
 - Profile Management (Doctor & Patient)
 - Engagement Lifecycle (Initiation, 2FA, Cancellation)
 - **Real-Time Secure Messaging (WebSocket/STOMP)**
-
 ---
-
 ## 🛠 Technology Stack
-
+## 🏗️ Architecture & Documentation
+We use a **3-Plane Architecture** (Control, Data, Real-Time) to ensure correctness and performance. Explore our detailed guides below:
 ### Core
 - **Java 21**: Core language.
 - **Spring Boot 3.2.5**: Application framework.
 - **Spring Security 6**: Authentication & Authorization (Cookie-based).
 - **Spring WebSocket**: Real-time bidirectional communication.
 - **Spring Data JPA**: Database abstraction.
-
+| Topic | File | Description |
+| :--- | :--- | :--- |
+| **Philosophy** | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | 3-Plane model, State Machines, & Workflows |
+| **Security** | [SECURITY.md](docs/SECURITY.md) | Auth (JWT/Cookies), Threat Model, & Compliance |
+| **API** | [API_REFERENCE.md](docs/API_REFERENCE.md) | REST Endpoints & WebSocket (STOMP) Topics |
+| **Future** | [MICROSERVICES_ROADMAP.md](docs/MICROSERVICES_ROADMAP.md) | Go Migration & Scaling Strategy |
+| **Setup** | [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Docker, Local Setup, & Production |
+| **Devs** | [CONTRIBUTING.md](docs/CONTRIBUTING.md) | Standards & Testing |
 ### Database
 - **PostgreSQL 15**: Primary data store.
 - **Liquibase / Schema.sql**: Database initialization.
 - **Triggers**: Automated logic (`update_relationship_status_on_engagement`, `generate_engagement_id`, etc.).
-
 ---
-
 ## 🚀 Features & Modules
-
+## ✨ Features (v0.3.0)
 ### 1. Authentication System ✅
 - **Role-Based Access**: `DOCTOR`, `PATIENT`.
 - **Secure Sessions**: **HTTPOnly Cookies** prevent XSS token theft.
 - **Registration**: Separate flows for Doctors and Patients.
 - **Logout**: Secure cookie invalidation.
-
+### ✅ Completed
+- **Secure Auth**: JWT via HTTPOnly Cookies (XSS protection).
+- **Engagement Lifecycle**: 2FA-verified initiation and activation.
+- **Real-Time Chat**: Immediate delivery via WebSocket/STOMP.
+- **Persistent Audit**: DB Triggers manage relationship consistency.
 ### 2. Engagement System ✅
 A regulated workflow for doctor-patient interactions:
 1.  **Initiation**: Doctor requests engagement -> System returns **QR Code Data** (Deep Link).
@@ -47,7 +55,9 @@ A regulated workflow for doctor-patient interactions:
 3.  **Cancellation**: Doctors can immediately cancel pending engagements (undo/delete).
 4.  **Secure Messaging**: Restricted to active participants.
 5.  **Termination**: Controlled ending with retention policy enforcement.
-
+### 🚧 In Progress
+- **AI Health Assistant**: Symptom analysis (Phase 5).
+- **Analytics Dashboard**: Engagement metrics (Phase 6).
 ### 3. Real-Time Communication (WebSockets) ✅
 - **Protocol**: STOMP over WebSocket (with SockJS fallback).
 - **Security**: JWT-based authentication via Authorization Header or Cookies.
@@ -55,24 +65,21 @@ A regulated workflow for doctor-patient interactions:
     - **Live Chat**: Instant message delivery.
     - **Typing Indicators**: Real-time "User is typing..." status.
     - **Status Updates**: Live notifications for Engagement Start/End/Cancel.
-
+### 📋 Planned
+- **Microservices**: Migration to Go for real-time services (Phase 8).
+- **Load Testing**: Security and performance audit (Phase 7).
 ---
-
 ## 🔌 API Documentation
-
+## 🚀 Quick Start
 Base URL: `http://localhost:8080/api`
-
 ### Authentication Endpoints
-
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/auth/register` | Register new user | No |
 | `POST` | `/auth/login` | Login (Returns Cookie) | No |
 | `POST` | `/auth/logout` | Logout (Clears Cookie) | **Yes** |
 | `GET` | `/users/me` | Get current user profile | **Yes** |
-
 ### Engagement Endpoints
-
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/engagements/initiate` | Doctor starts engagement. Returns Token. | **Yes (Doctor)** |
@@ -81,20 +88,15 @@ Base URL: `http://localhost:8080/api`
 | `GET` | `/engagements/{id}/messages` | Get message history. | **Yes** |
 | `POST` | `/engagements/{id}/end-request` | Request to end engagement. Returns Token. | **Yes** |
 | `POST` | `/engagements/{id}/verify-end` | Confirm end using Token. | **Yes** |
-
 ## 🚀 Recent Updates (v0.3.0)
 - **Hybrid Notification System**: Combines WebSocket (Real-Time) and REST (History/Offline).
 - **Public Directory**: `GET /api/doctors` endpoint implemented.
 - **Documentation**: Added comprehensive `all_apis.md`.
 - **Engagement Management**: Full lifecycle (Start, End, Cancel) with pending states and cancellation.
 - **WebSockets**: Real-time chat, typing indicators, and status updates.
-
 ---
-
 ## 🐳 Docker Integration
-
 The project currently uses Docker for the persistence layer.
-
 ### Current Setup
 - **File**: `docker-compose.yml`
 - **Services**:
@@ -102,31 +104,25 @@ The project currently uses Docker for the persistence layer.
     - **Port**: Maps host `5432` to container `5432`.
     - **Volume**: Persists data to `./data` (host) or Docker volume.
     - **Healthcheck**: Ensures DB is ready before app connection.
-
 ### Usage
 ```bash
 # Start Database
 docker-compose up -d
-
 # Stop Database
 docker-compose down
+# Run Application
+./mvnw spring-boot:run
 ```
-
+👉 **[Full Setup Guide](docs/DEPLOYMENT.md)**
 ---
-
 ## 🔮 Future Architecture
-
 As NeuralHealer scales, we plan to introduce:
-
 1.  **AI Inference Gateway**
     *   **Purpose**: Processing patient data against AI models.
     *   **Tech**: High-performance gateway aggregating data from Backend to AI engines.
-
 2.  **Audit Logging Sidecar**
     *   **Purpose**: Rapid ingestion of compliance logs.
-
     *   **Future (Go)**: Asynchronous log collector that writes to immutable storage / Blockchains without blocking the main Java thread.
-
 ### Proposed Architecture Change
 ```mermaid
 graph LR
@@ -137,38 +133,28 @@ graph LR
     Go_Chat_Service --> Redis[(Redis Pub/Sub)]
     Go_Chat_Service --> PostgresDB
 ```
-
 ---
-
 ## 🏃‍♂️ Setup & Installation
-
 ### Prerequisites
 - Java 21 SDK
 - Docker & Docker Compose
 - Maven (wrapper included)
-
 ### Steps
-
 1.  **Start Database**:
     ```bash
     docker-compose up -d
     ```
-
 2.  **Configure Environment**:
     Ensure `src/main/resources/application.yml` points to the correct DB credentials (default: `postgres`/`aaa`).
-
 3.  **Build & Run**:
     ```bash
     ./mvnw spring-boot:run
     ```
     *First run will initialize the database schema automatically via `schema.sql`.*
-
 4.  **Verify**:
     Access the health endpoint:
     ```bash
     curl http://localhost:8080/api/actuator/health
     ```
-
 ---
-
 **© 2026 NeuralHealer Team**
