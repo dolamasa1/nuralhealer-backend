@@ -1,6 +1,6 @@
 # NeuralHealer Backend
 
-**Version:** 0.3.0 | **Tier:** 1 (Pre-production) | **Read Time:** ~15 min
+**Version:** 0.4 | **Tier:** 1 (Pre-production) | **Read Time:** ~15 min
 
 ## 📋 Overview
 
@@ -310,7 +310,7 @@ curl http://localhost:8080/api/actuator/health
 
 ## ✨ Feature Status
 
-### ✅ Completed (v0.3.0)
+### ✅ Completed (v0.4)
 - Secure authentication (HTTPOnly cookies)
 - Full engagement lifecycle with 2FA
 - Real-time WebSocket messaging
@@ -318,6 +318,7 @@ curl http://localhost:8080/api/actuator/health
 - Engagement cancellation (pending state)
 - REST fallback for messages
 - Database trigger enforcement
+- **Optimized AI WebSocket (Raw, No constraints, Typing Stop support)**
 
 ### 🚧 In Progress
 - AI Health Assistant integration (Phase 5)

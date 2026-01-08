@@ -1,4 +1,5 @@
 # Architecture Guide - NeuralHealer
+**Version:** 0.4
 
 This document details the technical design of the NeuralHealer backend, focusing on the 3-Plane Architecture and the Engagement Lifecycle.
 

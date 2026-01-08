@@ -1,4 +1,5 @@
 # Deployment & Setup - NeuralHealer
+**Version:** 0.4
 
 This guide covers the requirements and steps to deploy NeuralHealer in various environments.
 

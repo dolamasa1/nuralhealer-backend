@@ -13,6 +13,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,21 +61,39 @@ public class AiSimpleWebSocketHandler extends TextWebSocketHandler {
                 // Clean response (Remove "Answer:" prefix if present)
                 String cleanAnswer = response.answer();
                 if (cleanAnswer != null) {
-                    cleanAnswer = cleanAnswer.replaceAll("^[\\s\\n]*(الإجابة|الأجابة)[:\\-]?\\s*", "");
+                    // Optimized regex to handle various prefix formats
+                    cleanAnswer = cleanAnswer.replaceAll("^[\\s\\n]*(الإجابة|الأجابة|الرد|الإجابة هي)[:\\-]?\\s*", "");
                 }
 
-                // 4. Send TYPING_STOP (Optional, but good for UI)
-                // sendJson(session, Map.of("type", "AI_TYPING_STOP"));
+                // Deduplicate sources and handle nulls
+                List<String> distinctSources = List.of();
+                if (response.sources() != null) {
+                    distinctSources = response.sources().stream()
+                            .filter(s -> s != null && !s.isBlank())
+                            .distinct()
+                            .toList();
+                }
+
+                // 4. Send TYPING_STOP
+                sendJson(session, Map.of(
+                        "type", "AI_TYPING_STOP",
+                        "senderName", "AI Assistant"));
 
                 // 5. Send RESPONSE
                 sendJson(session, Map.of(
                         "type", "AI_RESPONSE",
                         "senderName", "AI Assistant",
                         "content", cleanAnswer,
-                        "sources", response.sources()));
+                        "sources", distinctSources));
 
             } catch (Exception e) {
                 log.error("AI Error: {}", e.getMessage());
+
+                // Send TYPING_STOP before ERROR
+                sendJson(session, Map.of(
+                        "type", "AI_TYPING_STOP",
+                        "senderName", "AI Assistant"));
+
                 sendJson(session, Map.of(
                         "type", "AI_ERROR",
                         "senderName", "System",

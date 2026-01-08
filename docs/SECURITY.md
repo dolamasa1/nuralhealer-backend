@@ -1,4 +1,5 @@
 # Security Manual - NeuralHealer
+**Version:** 0.4
 
 This document provides a deep dive into the security architecture of the NeuralHealer platform.
 

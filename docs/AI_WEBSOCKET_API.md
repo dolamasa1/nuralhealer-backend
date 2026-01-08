@@ -1,4 +1,5 @@
 # AI WebSocket API Documentation
+**Version:** 0.4
 
 This document describes the interface for the NeuralHealer AI Chatbot WebSocket.
 
@@ -10,9 +11,9 @@ The AI Chat uses a **Raw WebSocket** connection (Text/JSON).
 
 ## Connection Details
 
-*   **Endpoint**: `ws://<host>:<port>/api/ai-ws`
-    *   *Localhost Example*: `ws://localhost:8080/api/ai-ws`
-    *   *Production Example*: `wss://api.neuralhealer.com/api/ai-ws`
+*   **Endpoint**: `ws://<host>:<port>/ai-ws`
+    *   *Localhost Example*: `ws://localhost:8080/ai-ws`
+    *   *Production Example*: `wss://api.neuralhealer.com/ai-ws`
 *   **Authentication**: Public / Anonymous. No headers required.
 
 ---
@@ -42,7 +43,18 @@ Indicates the AI is processing the request.
 }
 ```
 
-### 3. Server Sends Response
+### 3. Server Sends "Typing Stop" Event (Optional for UI)
+Indicates the AI has finished processing and is about to send the response.
+
+**Payload:**
+```json
+{
+  "type": "AI_TYPING_STOP",
+  "senderName": "AI Assistant"
+}
+```
+
+### 4. Server Sends Response
 Contains the final answer and source citations.
 *   **Note**: The server automatically cleans prefixes like "Answer:" or "الإجابة:" from the content.
 

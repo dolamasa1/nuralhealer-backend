@@ -1,4 +1,5 @@
 # API Reference - NeuralHealer
+**Version:** 0.4
 
 Base URL: `http://localhost:8080/api`
 
@@ -80,20 +81,8 @@ Absolute configuration values for AI integration.
 ```
 
 ### C. Ask Question (WebSocket)
-**1. Connect**
-*   **URL**: `ws://localhost:8080/api/ws`
-*   **Protocol**: STOMP
+The AI Chat uses a **Raw WebSocket** (no STOMP).
 
-**2. Listen (Subscribe)**
-*   **Destination**: `/user/queue/ai`
-*   *(Receives answers here)*
-
-**3. Send**
-*   **Destination**: `/app/ai/ask`
-*   **Body**:
-    ```json
-    {
-      "question": "Hello via WebSocket"
-    }
-    ```
+*   **Endpoint:** `ws://localhost:8080/ai-ws`
+*   **Documentation:** For full message flow and typing indicator details, see [AI_WEBSOCKET_API.md](AI_WEBSOCKET_API.md).
 

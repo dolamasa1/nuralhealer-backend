@@ -1,4 +1,5 @@
 # Contributing to NeuralHealer
+**Version:** 0.4
 
 Welcome! We are building a secure healthcare platform. Follow these standards to keep the codebase clean and safe.
 
