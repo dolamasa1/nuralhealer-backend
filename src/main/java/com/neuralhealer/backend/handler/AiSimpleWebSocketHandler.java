@@ -78,17 +78,21 @@ public class AiSimpleWebSocketHandler extends TextWebSocketHandler {
                             .toList();
                 }
 
+                // Log sources on server for reference
+                if (!distinctSources.isEmpty()) {
+                    log.info("AI Response sources for {}: {}", session.getId(), distinctSources);
+                }
+
                 // 4. Send TYPING_STOP
                 sendJson(session, Map.of(
                         "type", "AI_TYPING_STOP",
                         "senderName", "AI Assistant"));
 
-                // 5. Send RESPONSE
+                // 5. Send RESPONSE (Exclude sources per user request)
                 sendJson(session, Map.of(
                         "type", "AI_RESPONSE",
                         "senderName", "AI Assistant",
-                        "content", cleanAnswer,
-                        "sources", distinctSources));
+                        "content", cleanAnswer));
 
             } catch (Exception e) {
                 log.error("AI Error: {}", e.getMessage());

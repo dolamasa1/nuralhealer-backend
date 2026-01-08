@@ -63,11 +63,7 @@ Contains the final answer and source citations.
 {
   "type": "AI_RESPONSE",
   "senderName": "AI Assistant",
-  "content": "I am fine, thank you! How can I help you with your health today?",
-  "sources": [
-    "path/to/source1.md",
-    "path/to/source2.md"
-  ]
+  "content": "I am fine, thank you! How can I help you with your health today?"
 }
 ```
 
