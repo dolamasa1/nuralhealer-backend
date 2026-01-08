@@ -30,10 +30,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // Register raw WebSocket endpoint (compatible with Postman, standard clients)
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("http://localhost:3000", "http://localhost:5173", "http://localhost:8080",
-                        "*") // Allow Frontend + Bruno
-                .withSockJS(); // Fallback for browsers without WebSocket support
+                .setAllowedOriginPatterns("*");
+
+        // Optional: Add SockJS fallback if needed by legacy clients on a different path
+        // registry.addEndpoint("/ws-sockjs").setAllowedOriginPatterns("*").withSockJS();
     }
 
     @Override

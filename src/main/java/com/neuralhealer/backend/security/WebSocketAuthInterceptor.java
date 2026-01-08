@@ -29,11 +29,20 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
+        if (accessor != null) {
+            log.info("WS Interceptor: PreSend - Command: {}, SessionId: {}", accessor.getCommand(),
+                    accessor.getSessionId());
+        }
+
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
+            // 1. Check if user is already authenticated (e.g. from Cookie/Handshake)
+            if (accessor.getUser() != null) {
+                return message;
+            }
+
             String token = extractToken(accessor);
 
-            // JwtService.isTokenValid requires UserDetails, but we don't have it yet.
-            // We'll extract username first, then load user, then validate.
+            // 2. Try JWT Authentication if token exists
             if (token != null) {
                 try {
                     String email = jwtService.extractUsername(token);
@@ -55,8 +64,19 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 } catch (Exception e) {
                     log.warn("WebSocket authentication error: {}", e.getMessage());
                 }
-            } else {
-                log.warn("WebSocket authentication failed: Missing token");
+            }
+
+            // 3. Fallback: Allow anonymous access for AI WebSocket if still unauthenticated
+            if (accessor.getUser() == null) {
+                String guestId = "guest_" + accessor.getSessionId();
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        guestId,
+                        null,
+                        List.of());
+                SecurityContextHolder.getContext().setAuthentication(auth);
+                accessor.setUser(auth);
+
+                log.info("WebSocket connection authenticated as Anonymous Guest: {}", guestId);
             }
         }
 

@@ -2,6 +2,7 @@ package com.neuralhealer.backend.model.enums;
 
 public enum WebSocketMessageType {
     CHAT_MESSAGE, // Regular message
+    TYPING_INDICATOR, // Unified typing event
     TYPING_START, // User started typing
     TYPING_STOP, // User stopped typing
     USER_JOINED, // User connected to engagement

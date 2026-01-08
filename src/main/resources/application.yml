@@ -1,4 +1,7 @@
 spring:
+  cache:
+    type: simple
+    cache-names: aiHealthCache
   application:
     name: neuralhealer-backend
   
@@ -67,10 +70,5 @@ ai:
     base-url: https://unenticed-huong-creedless.ngrok-free.dev
     health-endpoint: /health
     ask-endpoint: /ask
-    timeout-seconds: 30
+    timeout-seconds: 90
 
-# Cache Configuration
-spring:
-  cache:
-    type: simple
-    cache-names: aiHealthCache

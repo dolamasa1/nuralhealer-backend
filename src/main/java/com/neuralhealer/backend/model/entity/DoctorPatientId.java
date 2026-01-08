@@ -1,6 +1,5 @@
 package com.neuralhealer.backend.model.entity;
 
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

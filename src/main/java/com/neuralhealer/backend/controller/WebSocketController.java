@@ -101,9 +101,9 @@ public class WebSocketController {
                     .engagementId(engagementId)
                     .senderId(user.getId())
                     .senderName(user.getFirstName() + " " + user.getLastName())
-                    .content(indicator.getIsTyping() ? "typing..." : "stopped")
+                    .content(indicator.isTyping() ? "typing..." : "stopped")
                     .timestamp(LocalDateTime.now())
-                    .metadata(indicator.getIsTyping()) // boolean state in metadata
+                    .metadata(indicator.isTyping()) // boolean state in metadata
                     .build();
 
             messagingTemplate.convertAndSend(

@@ -20,14 +20,16 @@ public class AiChatbotConfig {
     /**
      * RestTemplate bean for AI API communication.
      * - Connection timeout: 5 seconds
-     * - Read timeout: 30 seconds (AI processing time)
+     * - Read timeout: Configurable (default 90s)
      * - UTF-8 encoding for Arabic text support
      */
     @Bean
-    public RestTemplate aiRestTemplate(RestTemplateBuilder builder) {
+    public RestTemplate aiRestTemplate(
+            RestTemplateBuilder builder,
+            @org.springframework.beans.factory.annotation.Value("${ai.chatbot.timeout-seconds:300}") int timeoutSeconds) {
         return builder
                 .setConnectTimeout(Duration.ofSeconds(5))
-                .setReadTimeout(Duration.ofSeconds(30))
+                .setReadTimeout(Duration.ofSeconds(timeoutSeconds))
                 .additionalMessageConverters(
                         new StringHttpMessageConverter(
                                 java.util.Objects.requireNonNull(StandardCharsets.UTF_8)))

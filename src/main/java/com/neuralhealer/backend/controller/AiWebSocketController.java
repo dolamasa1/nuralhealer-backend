@@ -3,7 +3,7 @@ package com.neuralhealer.backend.controller;
 import com.neuralhealer.backend.model.dto.AiChatRequest;
 import com.neuralhealer.backend.model.dto.AiChatResponse;
 import com.neuralhealer.backend.model.dto.WebSocketMessage;
-import com.neuralhealer.backend.model.entity.User;
+
 import com.neuralhealer.backend.model.enums.WebSocketMessageType;
 import com.neuralhealer.backend.service.AiChatbotService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;
@@ -32,15 +32,16 @@ public class AiWebSocketController {
     @MessageMapping("/ai/ask")
     public void handleAiQuestion(
             @Payload AiChatRequest request,
-            @AuthenticationPrincipal User user) {
+            java.security.Principal principal) {
 
-        if (user == null) {
-            log.warn("Unauthenticated AI WebSocket request");
+        if (principal == null) {
+            log.warn("❌ Unauthenticated AI WebSocket request received at /app/ai/ask");
             return;
         }
 
-        String userId = user.getId().toString();
-        log.info("AI question received from user: {}", user.getEmail());
+        String userId = principal.getName();
+        log.info("✅ AI question received from user: {}", userId);
+        log.info("Payload: {}", request);
 
         try {
             // 1. Send AI_TYPING_START to user
@@ -60,7 +61,7 @@ public class AiWebSocketController {
                 // AI call failed - send AI_TYPING_STOP first
                 sendToUser(userId, WebSocketMessageType.AI_TYPING_STOP, "AI Assistant", null, null);
 
-                log.error("AI request failed for user {}: {}", user.getEmail(), aiException.getMessage());
+                log.error("AI request failed for user {}: {}", userId, aiException.getMessage());
 
                 String errorMessage = aiException.getMessage() != null && aiException.getMessage().contains("timeout")
                         ? "الذكاء الاصطناعي يستغرق وقتاً طويلاً. حاول مرة أخرى."
@@ -70,7 +71,7 @@ public class AiWebSocketController {
             }
 
         } catch (Exception e) {
-            log.error("Error handling AI WebSocket request for user {}", user.getEmail(), e);
+            log.error("Error handling AI WebSocket request for user {}", userId, e);
             sendError(userId, "حدث خطأ غير متوقع");
         }
     }

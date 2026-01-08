@@ -2,7 +2,7 @@
 # Tests the complete AI integration flow
 
 $baseUrl = "http://localhost:8080/api"
-$wsUrl = "ws://localhost:8080/ws"
+$wsUrl = "ws://localhost:8080/api/ws"
 
 Write-Host "=== AI Chatbot Integration Test ===" -ForegroundColor Cyan
 Write-Host ""
