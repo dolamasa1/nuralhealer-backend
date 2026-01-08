@@ -60,3 +60,17 @@ logging:
     com.neuralhealer.backend: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
+
+# AI Chatbot Configuration
+ai:
+  chatbot:
+    base-url: https://unenticed-huong-creedless.ngrok-free.dev
+    health-endpoint: /health
+    ask-endpoint: /ask
+    timeout-seconds: 30
+
+# Cache Configuration
+spring:
+  cache:
+    type: simple
+    cache-names: aiHealthCache

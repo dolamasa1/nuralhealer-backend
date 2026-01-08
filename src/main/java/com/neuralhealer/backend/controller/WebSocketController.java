@@ -3,6 +3,7 @@ package com.neuralhealer.backend.controller;
 import com.neuralhealer.backend.model.dto.*;
 import com.neuralhealer.backend.model.entity.User;
 import com.neuralhealer.backend.model.enums.WebSocketMessageType;
+
 import com.neuralhealer.backend.service.EngagementMessageService;
 import com.neuralhealer.backend.service.EngagementService;
 import lombok.RequiredArgsConstructor;
@@ -79,7 +80,7 @@ public class WebSocketController {
     /**
      * Handle typing indicators
      * Client sends to: /app/engagement/{engagementId}/typing
-     * Broadcast to: /topic/engagement/{engagementId}/typing
+     * Broadcast to: /topic/engagement/{engagementId} (Unified topic)
      */
     @MessageMapping("/engagement/{engagementId}/typing")
     public void handleTyping(
@@ -95,15 +96,23 @@ public class WebSocketController {
                 return;
             }
 
-            indicator.setUserId(user.getId());
-            indicator.setUserName(user.getFirstName() + " " + user.getLastName());
+            WebSocketMessage wsMessage = WebSocketMessage.builder()
+                    .type(WebSocketMessageType.TYPING_INDICATOR)
+                    .engagementId(engagementId)
+                    .senderId(user.getId())
+                    .senderName(user.getFirstName() + " " + user.getLastName())
+                    .content(indicator.getIsTyping() ? "typing..." : "stopped")
+                    .timestamp(LocalDateTime.now())
+                    .metadata(indicator.getIsTyping()) // boolean state in metadata
+                    .build();
 
             messagingTemplate.convertAndSend(
-                    "/topic/engagement/" + engagementId + "/typing",
-                    indicator);
+                    "/topic/engagement/" + engagementId,
+                    wsMessage);
 
         } catch (Exception e) {
             log.error("Error handling typing indicator", e);
         }
     }
+
 }
