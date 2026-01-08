@@ -30,6 +30,10 @@ public class AiSimpleWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
+        if (!aiChatbotService.isAiAvailable()) {
+            session.close(CloseStatus.SERVICE_OVERLOAD);
+            return;
+        }
         log.info("AI Chat Connected: {}", session.getId());
     }
 
