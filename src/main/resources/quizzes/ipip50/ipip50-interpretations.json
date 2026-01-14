@@ -1,0 +1,87 @@
+{
+  "Extraversion": {
+    "High": {
+      "Original": "Extraversion is marked by pronounced engagement with the external world. Extraverts enjoy being with people, are full of energy, and often experience positive emotions. They tend to be enthusiastic, action-oriented, individuals who are likely to say 'Yes!' or 'Let's go!' to opportunities for excitement. In groups they like to talk, assert themselves, and draw attention to themselves.",
+      "User_Friendly": "You have a pronounced engagement with the external world. You enjoy being with people, are full of energy, and often experience positive emotions. You tend to be an enthusiastic, action-oriented individual who is likely to say 'Yes!' or 'Let's go!' to opportunities for excitement. In groups you like to talk, assert yourself, and draw attention to yourself.",
+      "Arabic_User_Friendly": "تتميز بصفتك انبساطياً بالتفاعل الملحوظ مع العالم الخارجي؛ فأنت تستمتع بالتواجد مع الناس، وتتمتع بطاقة عالية، وغالباً ما تشعر بمشاعر إيجابية. تميل إلى أن تكون شخصاً متحمساً ومحباً للعمل، ومن المرجح أن تقول 'نعم!' أو 'لننطلق!' لاغتنام فرص الإثارة. وفي المجموعات، تحب التحدث، وإثبات وجودك، ولفت الانتباه إليك."
+    },
+    "Average": {
+      "Original": "Your score on Extraversion is average, indicating you are neither a subdued loner nor a jovial chatterbox. You enjoy time with others but also time alone.",
+      "User_Friendly": "Your score is average; you are neither a subdued loner nor a jovial chatterbox. You enjoy time with others but also time alone.",
+      "Arabic_User_Friendly": "درجتك في الانبساط متوسطة؛ فأنت لست شخصاً انطوائياً هادئاً ولا شخصاً ثرثاراً مرحاً بشكل مفرط. أنت تستمتع بقضاء الوقت مع الآخرين ولكنك تستمتع أيضاً بالبقاء بمفردك."
+    },
+    "Low": {
+      "Original": "Introverts lack the exuberance, energy, and activity levels of extraverts. They tend to be quiet, low-key, deliberate, and disengaged from the social world. Their lack of social involvement should not be interpreted as shyness or depression; the introvert simply needs less stimulation than an extravert and prefers to be alone. The independence and reserve of the introvert is sometimes mistaken as unfriendliness or arrogance.",
+      "User_Friendly": "You lack the exuberance, energy, and activity levels of extraverts. You tend to be quiet, low-key, deliberate, and disengaged from the social world. Your lack of social involvement is not shyness or depression; you simply need less stimulation and prefer to be alone. Your independence and reserve may sometimes be mistaken for unfriendliness.",
+      "Arabic_User_Friendly": "أنت تفتقر إلى الحيوية والطاقة ومستويات النشاط التي يتمتع بها الانبساطيون. تميل إلى الهدوء، والتحفظ، والتأني، والابتعاد عن العالم الاجتماعي. لا ينبغي تفسير قلة مشاركتك الاجتماعية على أنها خجل أو اكتئاب؛ فكل ما في الأمر أنك تحتاج إلى محفزات أقل وتفضل البقاء بمفردك. قد يُساء أحياناً فهم استقلاليتك وتحفظك على أنها عدم ودية أو غرور."
+    }
+  },
+  "Agreeableness": {
+    "High": {
+      "Original": "Agreeableness reflects individual differences in concern with cooperation and social harmony. Agreeable individuals value getting along with others. They are therefore considerate, friendly, generous, helpful, and willing to compromise their interests with others'. Agreeable people also have an optimistic view of human nature. They believe people are basically honest, decent, and trustworthy.",
+      "User_Friendly": "You value cooperation and social harmony. You are therefore considerate, friendly, generous, helpful, and willing to compromise your interests with others'. You have an optimistic view of human nature and believe people are basically honest, decent, and trustworthy.",
+      "Arabic_User_Friendly": "أنت تعكس اهتماماً كبيراً بالتعاون والانسجام الاجتماعي، وتولي أهمية كبيرة للتوافق مع الآخرين. ولذلك، فأنت مراعٍ لمشاعرهم، وودود، وكريم، ومستعد لمساعدة الآخرين، ولديك رغبة في تقديم تنازلات من أجل التوافق معهم. كما تملك نظرة متفائلة للطبيعة البشرية، وتعتقد أن الناس صادقون ولائقون وجديرون بالثقة في جوهرهم."
+    },
+    "Average": {
+      "Original": "Your score on Agreeableness is average, indicating you are generally warm and kind but can be competitive when necessary. You balance your own needs with the needs of others.",
+      "User_Friendly": "Your score is average; you are generally warm and kind but can be competitive when necessary. You balance your own needs with the needs of others.",
+      "Arabic_User_Friendly": "درجتك في المقبولية متوسطة؛ فأنت بشكل عام شخص دافئ ولطيف، ولكن يمكنك أن تكون تنافسياً عند الضرورة. أنت توازن بين احتياجاتك الخاصة واحتياجات الآخرين."
+    },
+    "Low": {
+      "Original": "Disagreeable individuals place self-interest above getting along with others. They are generally unconcerned with others' well-being, and therefore are unlikely to extend themselves for other people. Sometimes their skepticism about others' motives causes them to be suspicious, unfriendly, and uncooperative. Agreeableness is not useful in situations that require tough or absolute objective decisions.",
+      "User_Friendly": "Your score is low, indicating less concern with others' needs than with your own. You place self-interest above getting along with others. You are generally unconcerned with others' well-being. Sometimes your skepticism about others' motives causes you to be suspicious, unfriendly, and uncooperative.",
+      "Arabic_User_Friendly": "درجتك منخفضة، مما يشير إلى اهتمامك باحتياجاتك الخاصة أكثر من احتياجات الآخرين. أنت تضع مصلحتك الشخصية فوق التوافق معهم، ولا تهتم كثيراً لرفاهية الآخرين بشكل عام. أحياناً يؤدي شكك في دوافع الآخرين إلى جعل طباعك تبدو مرتابة، أو غير ودودة، أو غير متعاونة. يراك الناس حازماً، وناقداً، وغير متهاون."
+    }
+  },
+  "Conscientiousness": {
+    "High": {
+      "Original": "Conscientiousness concerns the way in which we control, regulate, and direct our impulses. Conscientious individuals avoid trouble and achieve high levels of success through purposeful planning and persistence. They are also positively regarded by others as intelligent and reliable. A hallmark of intelligence is the ability to think about future consequences before acting on an impulse.",
+      "User_Friendly": "You excel at controlling and directing your impulses. You avoid trouble and achieve high levels of success through purposeful planning and persistence. You are positively regarded by others as intelligent and reliable because you think about consequences before acting.",
+      "Arabic_User_Friendly": "أنت تتحكم في نزواتك وتوجهها بشكل فعال؛ فتتجنب المتاعب وتحقق مستويات عالية من النجاح من خلال التخطيط الهادف والمثابرة. كما ينظر إليك الآخرون نظرة إيجابية على أنك شخص ذكي وموثوق لأنك تفكر في العواقب المستقبلية قبل التصرف بناءً على الدافع اللحظي."
+    },
+    "Average": {
+      "Original": "Your score on Conscientiousness is average. This means you are reasonably reliable, organized, and self-controlled.",
+      "User_Friendly": "Your score is average; you are reasonably reliable, organized, and self-controlled.",
+      "Arabic_User_Friendly": "درجتك في اليقظة والضمير متوسطة؛ وهذا يعني أنك شخص موثوق، ومنظم، ومتحكم في ذاتك إلى حد معقول."
+    },
+    "Low": {
+      "Original": "Unconscientious people may be criticized for their unreliability, lack of ambition, and failure to stay within the lines, but they will experience many short-lived pleasures and they will never be called stuffy. Accomplishments of an impulsive person are often small, scattered, and inconsistent.",
+      "User_Friendly": "You may be criticized for unreliability, lack of ambition, and failure to stay within the lines, but you will experience many short-lived pleasures. You prefer spontaneity over organized planning, though this can make accomplishments feel scattered.",
+      "Arabic_User_Friendly": "قد تتعرض للانتقاد بسبب عدم الموثوقية، أو نقص الطموح، أو الفشل في الالتزام بالقواعد، ولكنك ستحظى بالعديد من المتع اللحظية ولن يصفك أحد بالجمود. قد تبدو إنجازاتك متفرقة أو غير متسقة بسبب تفضيلك للعفوية على التخطيط المنظم."
+    }
+  },
+  "Neuroticism": {
+    "High": {
+      "Original": "Neuroticism refers to the tendency to experience negative feelings. People high in neuroticism are emotionally reactive. They respond emotionally to events that would not affect most people, and their reactions tend to be more intense than normal. They are more likely to interpret ordinary situations as threatening, and minor frustrations as hopelessly difficult.",
+      "User_Friendly": "You have a tendency to be emotionally reactive and experience intense negative feelings. You respond emotionally to events that would not affect most people. You are more likely to interpret ordinary situations as threatening and minor frustrations as hopelessly difficult.",
+      "Arabic_User_Friendly": "تميل إلى التأثر العاطفي وتجربة مشاعر سلبية مكثفة. تستجيب عاطفياً للأحداث التي قد لا تؤثر في معظم الناس، وتميل ردود أفعالك إلى أن تكون أكثر حدة من المعتاد. من المرجح أن تفسر المواقف العادية على أنها تهديد، والإحباطات البسيطة على أنها صعبة بشكل ميؤوس منه."
+    },
+    "Average": {
+      "Original": "Your score on Neuroticism is average. You are generally calm but can feel stressed under pressure. Your emotional reactions are typical of most people.",
+      "User_Friendly": "Your score is average; you are generally calm but can feel stressed under pressure. Your emotional reactions are typical of most people.",
+      "Arabic_User_Friendly": "درجتك متوسطة؛ فأنت هادئ بشكل عام ولكنك قد تشعر بالتوتر تحت الضغط. ردود أفعالك العاطفية نمطية وتشبه معظم الناس."
+    },
+    "Low": {
+      "Original": "Individuals who score low in neuroticism are less easily upset and are less emotionally reactive. They tend to be calm, emotionally stable, and free from persistent negative feelings. They are exceptionally calm, composed and unflappable, even in situations that most people would describe as stressful.",
+      "User_Friendly": "You are exceptionally calm, composed, and unflappable. You are less easily upset and less emotionally reactive. You tend to remain emotionally stable and free from persistent negative feelings, even under stress.",
+      "Arabic_User_Friendly": "أنت هادئ للغاية، ورصين، ولا يسهل إرباكك. أنت أقل تأثراً بالعواطف ولا تنزعج بسهولة. تميل إلى البقاء مستقراً عاطفياً وخالياً من المشاعر السلبية المستمرة، حتى في المواقف التي قد يصفها معظم الناس بأنها مرهقة."
+    }
+  },
+  "Openness to Experience": {
+    "High": {
+      "Original": "Openness to Experience describes a dimension of cognitive style that distinguishes imaginative, creative people from down-to-earth, conventional people. Open people are intellectually curious, appreciative of art, and sensitive to beauty. They tend to think and act in individualistic and nonconforming ways. They are curious, imaginative, and creative.",
+      "User_Friendly": "You have an imaginative and creative cognitive style. You are intellectually curious, appreciative of art, and sensitive to beauty. You tend to think and act in individualistic and nonconforming ways. You enjoy novelty, variety, and change.",
+      "Arabic_User_Friendly": "أنت تتمتع بنمط معرفي مبدع وواسع الخيال يميزك عن الأشخاص التقليديين. أنت فضولي فكرياً، ومقدر للفنون، وحساس للجمال. تميل إلى التفكير والتصرف بطرق فردية وغير تقليدية، وتستمتع بالتجديد والتنوع والتغيير."
+    },
+    "Average": {
+      "Original": "Your score on Openness is average, indicating you balance a need for stability with a curiosity for new ideas. You are practical yet imaginative.",
+      "User_Friendly": "Your score is average; you balance a need for stability with a curiosity for new ideas. You are practical yet imaginative.",
+      "Arabic_User_Friendly": "درجتك متوسطة؛ مما يشير إلى أنك توازن بين الحاجة إلى الاستقرار والفضول للأفكار الجديدة. أنت شخص عملي ولكنك واسع الخيال في نفس الوقت."
+    },
+    "Low": {
+      "Original": "People with low scores on openness to experience tend to have narrow, common interests. They prefer the plain, straightforward, and obvious over the complex, ambiguous, and subtle. They may regard the arts and sciences with suspicion, regarding these endeavors as abstruse or of no practical use. Closed people prefer familiarity over novelty.",
+      "User_Friendly": "You tend to have narrow, common interests. You prefer the plain, straightforward, and obvious over the complex and subtle. You prefer familiarity over novelty and may see abstract arts or sciences as lacking practical use.",
+      "Arabic_User_Friendly": "تميل اهتماماتك إلى أن تكون محدودة وشائعة. تفضل الأمور البسيطة والمباشرة والواضحة على الأمور المعقدة أو الغامضة. تفضل المألوف على التجديد، وقد تنظر إلى الفنون أو العلوم المجردة على أنها غير عملية أو بالغة التعقيد."
+    }
+  }
+}

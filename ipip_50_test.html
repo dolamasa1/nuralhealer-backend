@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPIP-NEO Personality Test</title>
+    <style>
+        :root {
+            --primary: #9B59B6;
+            --secondary: #8E44AD;
+            --accent: #BB8FCE;
+            --bg-primary: #F8F9FA;
+            --bg-secondary: #FFFFFF;
+            --text-primary: #2C1A3F;
+            --text-secondary: #5D4E6D;
+            --border: #D5C7E8;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --error: #E74C3C;
+        }
+
+        :root.dark {
+            --bg-primary: #1A1625;
+            --bg-secondary: #1C1A2B;
+            --text-primary: #ECE8F5;
+            --text-secondary: #C5B8D9;
+            --border: #3F3651;
+        }
+
+        [dir="rtl"] {
+            direction: rtl;
+            text-align: right;
+        }
+
+        [dir="rtl"] .trait-insight {
+            border-left: none;
+            border-right: 4px solid var(--primary);
+        }
+
+        [dir="rtl"] .trait-insight::before {
+            left: auto;
+            right: 0;
+        }
+
+        [dir="rtl"] .trait-insight:hover {
+            transform: translateX(-4px);
+        }
+
+        [dir="rtl"] .trait-icon {
+            margin-right: 0;
+            margin-left: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        [dir="rtl"] .theme-toggle {
+            right: auto;
+            left: 20px;
+        }
+
+        .lang-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        [dir="rtl"] .lang-toggle {
+            left: auto;
+            right: 20px;
+        }
+
+        .lang-toggle:hover,
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            border-color: var(--primary);
+        }
+
+        .progress-bar {
+            background: var(--border);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .question-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 35px;
+            margin-bottom: 30px;
+            border: 2px solid var(--border);
+            box-shadow: 0 4px 6px rgba(155, 89, 182, 0.1);
+        }
+
+        .question-text {
+            font-size: 20px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .option {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: rgba(155, 89, 182, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .option-value {
+            display: block;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .option.selected .option-value {
+            color: white;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(155, 89, 182, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: rgba(155, 89, 182, 0.05);
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary:disabled:hover {
+            transform: none;
+            border-color: var(--border);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-item {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+            box-shadow: 0 4px 6px rgba(155, 89, 182, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .result-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(155, 89, 182, 0.15);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .result-score {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .result-bar {
+            background: var(--border);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 12px;
+            position: relative;
+            cursor: help;
+        }
+
+        .result-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: var(--bg-secondary);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: normal;
+            max-width: 280px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--text-primary);
+        }
+
+        .result-bar:hover .tooltip {
+            opacity: 1;
+        }
+
+        .narrative {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 35px;
+            border: 2px solid var(--border);
+            margin-top: 30px;
+            box-shadow: 0 4px 6px rgba(155, 89, 182, 0.1);
+        }
+
+        .narrative-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .narrative-content {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .trait-insight {
+            background: var(--bg-primary);
+            border-left: 4px solid var(--primary);
+            padding: 18px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trait-insight::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--accent));
+            transition: width 0.2s ease;
+        }
+
+        .trait-insight:hover {
+            background: rgba(155, 89, 182, 0.08);
+            transform: translateX(4px);
+        }
+
+        .trait-insight:hover::before {
+            width: 6px;
+        }
+
+        .trait-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+
+        .trait-text {
+            display: inline;
+            vertical-align: middle;
+        }
+
+        .test.hidden {
+            display: none;
+        }
+
+        .edit-hint {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .options {
+                flex-direction: column;
+            }
+
+            .option {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="lang-toggle" id="langToggle">
+        <span id="langText">العربية</span>
+    </div>
+
+    <div class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </div>
+
+    <div class="container">
+        <div class="test">
+            <h1>Personality Assessment</h1>
+
+            <div class="progress-text">
+                <span id="progressText">Question 1 of 3</span>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="question-card" id="questionCard">
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="options"></div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn-secondary" id="prevBtn" disabled>Previous</button>
+                <button class="btn-primary" id="nextBtn">Next</button>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h1>Your Results</h1>
+            <div id="resultsList"></div>
+            <div class="narrative" id="narrative"></div>
+            <div class="edit-hint">Click on any domain above to edit your answers</div>
+            <div class="nav-buttons" style="margin-top: 30px;">
+                <button class="btn-secondary" id="retakeBtn">Retake Test</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api/quizzes/ipip50';
+
+        const translations = {
+            en: {
+                title: "Personality Assessment",
+                questionOf: "Question",
+                of: "of",
+                complete: "complete",
+                previous: "Previous",
+                next: "Next",
+                viewResults: "View Results",
+                retake: "Retake Test",
+                yourResults: "Your Results",
+                yourProfile: "Your Personality Profile",
+                editHint: "Click on any domain above to edit your answers",
+                loading: "Loading...",
+                error: "An error occurred. Please try again.",
+                startingQuiz: "Starting quiz...",
+                savingResponse: "Saving...",
+                loadingResults: "Loading your results...",
+                options: [
+                    "Very Inaccurate",
+                    "Moderately Inaccurate",
+                    "Neither",
+                    "Moderately Accurate",
+                    "Very Accurate"
+                ]
+            },
+            ar: {
+                title: "تقييم الشخصية",
+                questionOf: "سؤال",
+                of: "من",
+                complete: "مكتمل",
+                previous: "السابق",
+                next: "التالي",
+                viewResults: "عرض النتائج",
+                retake: "إعادة الاختبار",
+                yourResults: "نتائجك",
+                yourProfile: "ملف شخصيتك",
+                editHint: "انقر على أي مجال أعلاه لتعديل إجاباتك",
+                loading: "جاري التحميل...",
+                error: "حدث خطأ. يرجى المحاولة مرة أخرى.",
+                startingQuiz: "بدء الاختبار...",
+                savingResponse: "جاري الحفظ...",
+                loadingResults: "جاري تحميل نتائجك...",
+                options: [
+                    "غير دقيق جداً",
+                    "غير دقيق إلى حد ما",
+                    "محايد",
+                    "دقيق إلى حد ما",
+                    "دقيق جداً"
+                ]
+            }
+        };
+
+        // Trait name mappings
+        const traitMappings = {
+            en: {
+                'Extraversion': 'Extraversion',
+                'Agreeableness': 'Agreeableness',
+                'Conscientiousness': 'Conscientiousness',
+                'Neuroticism': 'Neuroticism',
+                'Openness': 'Openness to Experience'
+            },
+            ar: {
+                'Extraversion': 'الانبساطية',
+                'Agreeableness': 'الوداعة',
+                'Conscientiousness': 'الضمير الحي',
+                'Neuroticism': 'العصابية',
+                'Openness': 'الانفتاح على التجارب'
+            }
+        };
+
+        let currentLang = 'en';
+        let currentQuestion = 0;
+        let sessionId = null;
+        let userId = 'user_' + Math.random().toString(36).substr(2, 9);
+        let totalQuestions = 50;
+        let allQuestions = [];
+        let answers = {};
+        let isDarkMode = false;
+        let isLoading = false;
+
+        const T = translations[currentLang];
+
+        // API Helper Functions
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                };
+
+                // Add session ID to headers if available
+                if (sessionId) {
+                    headers['X-Quiz-Session'] = sessionId;
+                }
+
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    ...options,
+                    credentials: 'include', // Important for cookie handling
+                    headers: headers
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                showError(translations[currentLang].error);
+                throw error;
+            }
+        }
+
+        async function startQuizSession() {
+            showLoading(translations[currentLang].startingQuiz);
+            try {
+                const data = await apiCall(`/start`, {
+                    method: 'POST'
+                });
+
+                sessionId = data.sessionId;
+                totalQuestions = data.totalQuestions;
+
+                // Load all questions
+                await loadAllQuestions();
+
+                hideLoading();
+                renderQuestion();
+            } catch (error) {
+                hideLoading();
+                console.error('Failed to start quiz session:', error);
+            }
+        }
+
+        async function loadAllQuestions() {
+            try {
+                // Load all questions in one request
+                allQuestions = await apiCall('/questions');
+
+                // Load saved responses
+                const savedData = await apiCall('/responses');
+                if (savedData.responses) {
+                    savedData.responses.forEach(resp => {
+                        answers[resp.questionId - 1] = resp.score;
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load questions:', error);
+                throw error;
+            }
+        }
+
+        async function loadQuestion(questionId) {
+            try {
+                const data = await apiCall(`/questions?questionId=${questionId}`);
+                return data;
+            } catch (error) {
+                console.error('Failed to load question:', error);
+                return null;
+            }
+        }
+
+        async function submitResponse(questionId, score) {
+            showLoading(translations[currentLang].savingResponse);
+            try {
+                const data = await apiCall('/submit-question', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        questionId: questionId,
+                        score: score
+                    })
+                });
+
+                hideLoading();
+                return data;
+            } catch (error) {
+                hideLoading();
+                console.error('Failed to submit response:', error);
+                return null;
+            }
+        }
+
+        async function getProgress() {
+            try {
+                const data = await apiCall('/progress');
+                return data;
+            } catch (error) {
+                console.error('Failed to get progress:', error);
+                return null;
+            }
+        }
+
+        async function submitQuiz() {
+            showLoading(translations[currentLang].loadingResults);
+            try {
+                const lang = currentLang === 'ar' ? 'ar' : 'en';
+                const data = await apiCall(`/submit-quiz?language=${lang}&userId=${userId}`, {
+                    method: 'POST'
+                });
+
+                hideLoading();
+                return data;
+            } catch (error) {
+                hideLoading();
+                console.error('Failed to submit quiz:', error);
+                return null;
+            }
+        }
+
+        async function resetSession() {
+            try {
+                const data = await apiCall('/reset', {
+                    method: 'DELETE'
+                });
+
+                sessionId = data.newSessionId;
+                answers = {};
+                currentQuestion = 0;
+
+                await loadAllQuestions();
+                return true;
+            } catch (error) {
+                console.error('Failed to reset session:', error);
+                return false;
+            }
+        }
+
+        // UI Helper Functions
+        function showLoading(message) {
+            isLoading = true;
+            const container = document.querySelector('.container');
+            const existingLoader = document.getElementById('loader');
+
+            if (existingLoader) {
+                existingLoader.querySelector('.loading-text').textContent = message;
+                return;
+            }
+
+            const loader = document.createElement('div');
+            loader.id = 'loader';
+            loader.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(26, 22, 37, 0.9);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+            loader.innerHTML = `
+                <div style="width: 50px; height: 50px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <div class="loading-text" style="margin-top: 20px; color: var(--text-primary); font-size: 16px;">${message}</div>
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                </style>
+            `;
+            document.body.appendChild(loader);
+        }
+
+        function hideLoading() {
+            isLoading = false;
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.remove();
+            }
+        }
+
+        function showError(message) {
+            alert(message); // You can replace this with a better error UI
+        }
+
+        // Language toggle
+        document.getElementById('langToggle').onclick = () => {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            document.getElementById('langText').textContent = currentLang === 'en' ? 'العربية' : 'English';
+            updateUILanguage();
+        };
+
+        // Theme toggle
+        document.getElementById('themeToggle').onclick = () => {
+            isDarkMode = !isDarkMode;
+            document.documentElement.classList.toggle('dark', isDarkMode);
+            document.body.classList.toggle('dark', isDarkMode);
+        };
+
+        function updateUILanguage() {
+            const T = translations[currentLang];
+
+            document.querySelector('.test h1').textContent = T.title;
+            document.getElementById('prevBtn').textContent = T.previous;
+
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentQuestion === allQuestions.length - 1) {
+                nextBtn.textContent = T.viewResults;
+            } else {
+                nextBtn.textContent = T.next;
+            }
+
+            document.getElementById('retakeBtn').textContent = T.retake;
+
+            if (document.getElementById('results').classList.contains('active')) {
+                document.querySelector('.results h1').textContent = T.yourResults;
+                document.querySelector('.edit-hint').textContent = T.editHint;
+            } else {
+                renderQuestion();
+            }
+        }
+
+        function renderQuestion() {
+            if (allQuestions.length === 0) return;
+
+            const T = translations[currentLang];
+            const question = allQuestions[currentQuestion];
+            document.getElementById('questionText').textContent = question.text;
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+
+            for (let i = 1; i <= 5; i++) {
+                const option = document.createElement('div');
+                option.className = 'option';
+                if (answers[currentQuestion] === i) {
+                    option.classList.add('selected');
+                }
+                option.innerHTML = `
+                    <span class="option-value">${i}</span>
+                    <span>${T.options[i - 1]}</span>
+                `;
+                option.onclick = () => selectOption(i);
+                optionsContainer.appendChild(option);
+            }
+
+            updateProgress();
+            updateButtons();
+        }
+
+        async function selectOption(value) {
+            if (isLoading) return;
+
+            answers[currentQuestion] = value;
+
+            // Submit response to backend
+            const questionId = currentQuestion + 1;
+            await submitResponse(questionId, value);
+
+            renderQuestion();
+        }
+
+        async function updateProgress() {
+            const progressData = await getProgress();
+            if (progressData) {
+                const T = translations[currentLang];
+                const percentage = progressData.percentage || 0;
+                document.getElementById('progressFill').style.width = percentage + '%';
+                document.getElementById('progressText').textContent = `${T.questionOf} ${currentQuestion + 1} ${T.of} ${totalQuestions} (${Math.round(percentage)}% ${T.complete})`;
+            }
+        }
+
+        function updateButtons() {
+            const T = translations[currentLang];
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentQuestion === allQuestions.length - 1) {
+                nextBtn.textContent = T.viewResults;
+            } else {
+                nextBtn.textContent = T.next;
+            }
+        }
+
+        document.getElementById('nextBtn').onclick = async () => {
+            if (isLoading) return;
+
+            const T = translations[currentLang];
+            if (currentQuestion < allQuestions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                await showResults();
+            }
+        };
+
+        document.getElementById('prevBtn').onclick = () => {
+            if (isLoading) return;
+
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        };
+
+        document.getElementById('retakeBtn').onclick = async () => {
+            if (isLoading) return;
+
+            const success = await resetSession();
+            if (success) {
+                currentQuestion = 0;
+                document.querySelector('.test').classList.remove('hidden');
+                document.getElementById('results').classList.remove('active');
+                renderQuestion();
+            }
+        };
+
+        // Theme toggle
+        document.getElementById('themeToggle').onclick = () => {
+            isDarkMode = !isDarkMode;
+            document.documentElement.classList.toggle('dark', isDarkMode);
+            document.body.classList.toggle('dark', isDarkMode);
+        };
+
+        const traitIcons = {
+            'Extraversion': '👥',
+            'Agreeableness': '🤝',
+            'Conscientiousness': '📋',
+            'Neuroticism': '🧘',
+            'Openness': '🎨'
+        };
+
+        const traitDescriptions = {
+            en: {
+                'Extraversion': "Reflects your preference for social interaction, activity level, and how you gain energy. Higher scores indicate outgoing, energetic individuals who thrive in social settings.",
+                'Agreeableness': "Measures your tendency to be cooperative, compassionate, and considerate of others. Higher scores suggest a warm, trusting, and helpful nature.",
+                'Conscientiousness': "Indicates your level of organization, dependability, and self-discipline. Higher scores reflect goal-oriented, organized individuals who plan ahead.",
+                'Neuroticism': "Represents emotional stability and how you respond to stress. Lower scores indicate calmness and resilience, while higher scores suggest sensitivity to stress.",
+                'Openness': "Reflects your appreciation for new experiences, creativity, and intellectual curiosity. Higher scores indicate imaginative, curious individuals who enjoy variety."
+            },
+            ar: {
+                'Extraversion': "يعكس تفضيلك للتفاعل الاجتماعي ومستوى النشاط وكيفية اكتسابك للطاقة. الدرجات الأعلى تشير إلى أفراد منفتحين ونشطين يزدهرون في البيئات الاجتماعية.",
+                'Agreeableness': "يقيس ميلك للتعاون والتعاطف والاهتمام بالآخرين. الدرجات الأعلى تشير إلى طبيعة دافئة وموثوقة ومتعاونة.",
+                'Conscientiousness': "يشير إلى مستوى التنظيم والموثوقية وانضباط الذات. الدرجات الأعلى تعكس أفراداً موجهين نحو الأهداف ومنظمين يخططون للمستقبل.",
+                'Neuroticism': "يمثل الاستقرار العاطفي وكيفية استجابتك للضغوط. الدرجات الأقل تشير إلى الهدوء والمرونة، بينما الدرجات الأعلى تشير إلى الحساسية تجاه التوتر.",
+                'Openness': "يعكس تقديرك للتجارب الجديدة والإبداع والفضول الفكري. الدرجات الأعلى تشير إلى أفراد مبدعين وفضوليين يستمتعون بالتنوع."
+            }
+        };
+
+        function goToQuestionForDomain(trait) {
+            // Find the first question for this trait/factor
+            const factorMap = {
+                'Extraversion': 1,
+                'Agreeableness': 2,
+                'Conscientiousness': 3,
+                'Neuroticism': 4,
+                'Openness': 5
+            };
+
+            const factor = factorMap[trait];
+            const questionIndex = allQuestions.findIndex(q => q.factor === factor);
+
+            if (questionIndex !== -1) {
+                currentQuestion = questionIndex;
+                document.getElementById('results').classList.remove('active');
+                document.querySelector('.test').classList.remove('hidden');
+                renderQuestion();
+            }
+        }
+
+        async function showResults() {
+            const T = translations[currentLang];
+
+            // Submit the quiz and get results
+            const resultData = await submitQuiz();
+
+            if (!resultData || !resultData.result) {
+                showError(T.error);
+                return;
+            }
+
+            document.querySelector('.test').classList.add('hidden');
+            document.getElementById('results').classList.add('active');
+
+            const results = resultData.result;
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = '';
+
+            // Display each trait score
+            results.scores.forEach(scoreData => {
+                const traitName = scoreData.trait;
+                const score = scoreData.score;
+                const description = currentLang === 'ar' ? scoreData.arabicDescription : scoreData.description;
+
+                const displayName = traitMappings[currentLang][traitName] || traitName;
+                const tooltipText = traitDescriptions[currentLang][traitName] || '';
+
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                item.onclick = () => goToQuestionForDomain(traitName);
+                item.innerHTML = `
+                    <div class="result-header">
+                        <span class="result-name">${displayName}</span>
+                        <span class="result-score">${score}</span>
+                    </div>
+                    <div class="result-bar">
+                        <div class="result-bar-fill" style="width: ${score}%"></div>
+                        <div class="tooltip">${tooltipText}</div>
+                    </div>
+                `;
+                resultsList.appendChild(item);
+            });
+
+            // Generate narrative from descriptions
+            const narrativeHTML = `
+                <div class="narrative-title">${T.yourProfile}</div>
+                <div class="narrative-content">
+                    ${results.scores.map(scoreData => {
+                const traitName = scoreData.trait;
+                const description = currentLang === 'ar' ? scoreData.arabicDescription : scoreData.description;
+                return `<div class="trait-insight">
+                            <span class="trait-icon">${traitIcons[traitName]}</span>
+                            <span class="trait-text">${description}</span>
+                        </div>`;
+            }).join('')}
+                </div>
+            `;
+            document.getElementById('narrative').innerHTML = narrativeHTML;
+
+            document.querySelector('.results h1').textContent = T.yourResults;
+            document.querySelector('.edit-hint').textContent = T.editHint;
+        }
+
+        // Initialize the quiz
+        window.addEventListener('DOMContentLoaded', async () => {
+            await startQuizSession();
+        });
+    </script>
+</body>
+
+</html>

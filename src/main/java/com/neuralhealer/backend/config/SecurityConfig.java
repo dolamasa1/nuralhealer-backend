@@ -65,6 +65,10 @@ public class SecurityConfig {
                         .requestMatchers("/swagger/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/quizzes/**").permitAll()
+                        .requestMatchers("/quizzes/**").permitAll() // Quiz endpoints (no auth)
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
                         // All other endpoints require authentication
                         .anyRequest().authenticated())
