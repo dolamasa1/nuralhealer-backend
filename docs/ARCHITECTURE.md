@@ -67,7 +67,8 @@ stateDiagram-v2
 | **cancelled** | Doctor calls `DELETE /{id}` | None |
 
 > [!NOTE]
-> **Implementation Detail**: Currently, `requestEnd()` generates a verification token but keeps the status as `active` until the other party verifies. A dedicated `end_requested` status is planned for v0.8.
+> **Implementation Detail**: Currently, `requestEnd()` generates a verification token but keeps the status as `active` until the other party verifies. 
+> For a detailed breakdown of the engagement state machine and API flows, see [ENGAGEMENT_LOGIC.md](ENGAGEMENT_LOGIC.md).
 
 ---
 
@@ -85,9 +86,9 @@ sequenceDiagram
     S->>S: Validate Doctor Role
     S->>DB: INSERT Engagement (status=pending)
     S->>S: Generate 2FA Token
-    S-->>D: Return QR Data & Token
+    S-->>D: Return Token
     
-    Note over D,P: Doctor shows QR to Patient
+    Note over D,P: Doctor shares Token with Patient
     
     P->>S: POST /verify-start {token}
     S->>S: Validate Token

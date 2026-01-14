@@ -104,9 +104,9 @@ sequenceDiagram
     D->>API: POST /engagements/initiate
     API->>DB: INSERT engagement (status=PENDING)
     DB-->>API: Return engagement + token
-    API-->>D: QR Code Data (token + deeplink)
+    API-->>D: Verification Token
     
-    Note over D,P: Doctor shares QR/Link with Patient
+    Note over D,P: Doctor shares Token with Patient
     
     P->>API: POST /engagements/verify-start {token}
     API->>DB: Verify token & UPDATE status=ACTIVE
@@ -215,6 +215,7 @@ sequenceDiagram
 | **Deployment** | `DEPLOYMENT.md` | Docker, Local, Production setup |
 | **Contributing** | `CONTRIBUTING.md` | Standards & Testing guidelines |
 | **Roadmap** | `MICROSERVICES_ROADMAP.md` | Go Migration & Scaling |
+| **Engagement Logic** | `ENGAGEMENT_LOGIC.md` | Detailed state machine & API flows |
 
 ---
 
