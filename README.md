@@ -215,7 +215,8 @@ sequenceDiagram
 | **Deployment** | `DEPLOYMENT.md` | Docker, Local, Production setup |
 | **Contributing** | `CONTRIBUTING.md` | Standards & Testing guidelines |
 | **Roadmap** | `MICROSERVICES_ROADMAP.md` | Go Migration & Scaling |
-| **Engagement Logic** | `ENGAGEMENT_LOGIC.md` | Detailed state machine & API flows |
+| **Engagement Logic** | [ENGAGEMENT_LOGIC.md](docs/ENGAGEMENT_LOGIC.md) | State machine & API flows |
+| **AI Subscription** | [AI_SUBSCRIPTION.md](docs/AI_SUBSCRIPTION.md) | AI Chatbot STOMP API & Logic |
 
 ---
 
@@ -280,12 +281,14 @@ curl http://localhost:8080/api/actuator/health
 **Subscribe to:**
 - `/topic/engagement/{id}` - Live chat & status updates
 - `/topic/user/{userId}` - Personal notifications
+- `/user/queue/ai` - AI responses
 
 **Send to:**
 - `/app/engagement/{id}/message` - Send chat message
+- `/app/ai/ask` - Ask AI a question
 - `/app/engagement/{id}/typing` - Typing indicator
 
-> **Full API documentation:** See `API_REFERENCE.md`
+> **Full AI API guide:** See `AI_SUBSCRIPTION.md`
 
 ---
 
@@ -319,7 +322,7 @@ curl http://localhost:8080/api/actuator/health
 - Engagement cancellation (pending state)
 - REST fallback for messages
 - Database trigger enforcement
-- **Optimized AI WebSocket (Raw, No constraints, Typing Stop support)**
+- **Integrated AI Chatbot (STOMP-based, Unified session tracking, Heartbeat support)**
 
 ### 🚧 In Progress
 - AI Health Assistant integration (Phase 5)

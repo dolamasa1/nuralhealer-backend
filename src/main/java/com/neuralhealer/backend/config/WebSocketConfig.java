@@ -18,14 +18,22 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Enable simple broker for pub/sub
-        config.enableSimpleBroker("/topic", "/queue");
+        // Enable simple broker with heartbeat support
+        // [10000, 10000] -> Server sends every 10s, expects from client every 10s
+        config.enableSimpleBroker("/topic", "/queue")
+                .setHeartbeatValue(new long[] { 10000, 10000 })
+                .setTaskScheduler(heartbeatScheduler());
 
         // Prefix for messages FROM client TO server
         config.setApplicationDestinationPrefixes("/app");
 
         // Prefix for user-specific messages
         config.setUserDestinationPrefix("/user");
+    }
+
+    @org.springframework.context.annotation.Bean
+    public org.springframework.scheduling.TaskScheduler heartbeatScheduler() {
+        return new org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler();
     }
 
     @Override

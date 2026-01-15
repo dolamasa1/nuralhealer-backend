@@ -1,5 +1,13 @@
 # Engagement System Logic - NeuralHealer
-**Version:** 0.5
+
+---
+**Last Updated:** 2025-01-15
+**Version:** 0.6
+**Changes:** 
+- Documentation cleanup
+- Clarified WebSocket event paths within the STOMP broker
+- Reflected the removal of QR codes definitively
+---
 
 This document defines the core logic, state machine, and API protocols for the NeuralHealer Engagement system.
 
@@ -98,28 +106,110 @@ sequenceDiagram
 
 ---
 
-## 🛠️ 4. API Reference (Lifecycle Only)
+## 🛠️ 4. API Reference & Response Examples
 
-### `POST /api/engagements/initiate`
-- **Role**: Doctor
-- **Payload**: `{ "patientId": "UUID", "accessRuleName": "STRING" }`
-- **Response**: Returns the **START** verification token.
+### 4.1 Initiate Engagement
+**Endpoint**: `POST /api/engagements/initiate`  
+**Role**: Doctor  
+**Request Body**:
+```json
+{
+  "patientId": "550e8400-e29b-41d4-a716-446655440000",
+  "accessRuleName": "FULL_ACCESS"
+}
+```
 
-### `POST /api/engagements/verify-start`
-- **Role**: Patient
-- **Payload**: `{ "token": "STRING" }`
-- **Transition**: `pending` -> `active`.
+**Success Response (200 OK)**:
+```json
+{
+  "engagementId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+  "status": "PENDING",
+  "verification": {
+    "token": "NH-123456",
+    "expiresAt": "2025-01-15T04:00:00"
+  }
+}
+```
 
-### `POST /api/engagements/{id}/end-request`
-- **Role**: Any participant
-- **Transition**: Generates an **END** verification token.
-- **Side Effect**: Broadcasts `end_requested` status via WebSocket.
+---
 
-### `POST /api/engagements/{id}/verify-end`
-- **Role**: Any participant (usually the counter-party)
-- **Payload**: `{ "token": "STRING" }`
-- **Transition**: `active` -> `ended`.
-- **Side Effect**: Triggers data archiving and relationship updates.
+### 4.2 Verify Start (Activation)
+**Endpoint**: `POST /api/engagements/verify-start`  
+**Role**: Patient  
+**Request Body**:
+```json
+{
+  "token": "NH-123456"
+}
+```
+
+**Success Response (200 OK)**:
+```json
+{
+  "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+  "engagementId": "ENG-2025-001",
+  "status": "ACTIVE",
+  "doctor": {
+    "id": "d1e2f3g4...",
+    "firstName": "Ahmed",
+    "lastName": "Raafat",
+    "email": "doctor@neuralhealer.com"
+  },
+  "patient": {
+    "id": "p1q2r3s4...",
+    "firstName": "Sara",
+    "lastName": "Ali",
+    "email": "patient@neuralhealer.com"
+  },
+  "accessRule": "FULL_ACCESS",
+  "startAt": "2025-01-15T03:00:00"
+}
+```
+
+---
+
+### 4.3 Request Termination
+**Endpoint**: `POST /api/engagements/{id}/end-request`  
+**Role**: Any Participant  
+**Request Body**:
+```json
+{
+  "reason": "Treatment completed"
+}
+```
+
+**Success Response (200 OK)**:
+```json
+{
+  "engagementId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+  "status": "END_REQUESTED",
+  "verification": {
+    "token": "END-987654",
+    "expiresAt": "2025-01-15T03:30:00"
+  }
+}
+```
+
+---
+
+### 4.4 Verify End (Termination)
+**Endpoint**: `POST /api/engagements/{id}/verify-end`  
+**Role**: Counter-party  
+**Request Body**:
+```json
+{
+  "token": "END-987654"
+}
+```
+
+**Success Response (200 OK)**:
+```json
+{
+  "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+  "status": "ENDED",
+  "endAt": "2025-01-15T03:15:00"
+}
+```
 
 ---
 
