@@ -1,122 +1,86 @@
-# AI WebSocket API Documentation
-**Version:** 0.4
+# AI Chat (STOMP WebSocket API)
 
-This document describes the interface for the NeuralHealer AI Chatbot WebSocket.
+---
+**Last Updated:** 2025-01-15
+**Version:** 0.6
+**Changes:** 
+- Migrated AI Chat from Raw WebSocket to STOMP
+- Updated endpoints: `/ai-ws` → `/ws` with STOMP protocol
+- Added subscription path: `/user/queue/ai`
+- Implemented STOMP heartbeats (10s) for session robustness
+---
 
 ## Overview
-The AI Chat uses a **Raw WebSocket** connection (Text/JSON).
-*   **Protocol**: Standard WebSocket (`ws://` or `wss://`)
-*   **No STOMP involved**. No subscription headers required.
-*   **Data Format**: JSON stringified text.
+The AI Chat leverages the standard **STOMP Broker** for structured communication, enabling session management and direct destination routing.
 
-## Connection Details
-
-*   **Endpoint**: `ws://<host>:<port>/ai-ws`
-    *   *Localhost Example*: `ws://localhost:8080/ai-ws`
-    *   *Production Example*: `wss://api.neuralhealer.com/ai-ws`
-*   **Authentication**: Public / Anonymous. No headers required.
+*   **Protocol**: STOMP over WebSocket
+*   **Endpoint**: `ws://localhost:8080/ws`
+*   **Authentication**: Bearer Token in `Authorization` header OR `neuralhealer_token` cookie.
 
 ---
 
-## Message Workflow
+## Message Flow
 
-### 1. Client Sends Question
-Send a JSON object with the `question` field.
+### 1. Subscription
+Subscribe to the user-specific queue to receive AI responses.
+**Topic**: `/user/queue/ai`
+
+### 2. Sending Questions
+Send questions to the STOMP destination.
+**Destination**: `/app/ai/ask`
 
 **Payload:**
 ```json
 {
-  "question": "Hello, how are you?"
+  "question": "What are the common symptoms of stress?"
 }
 ```
 
-### 2. Server Sends "Typing" Event
-Indicates the AI is processing the request.
+### 3. Receiving Events
+The server broadcasts events to your subscribed queue.
 
-**Payload:**
+#### AI Typing Start
 ```json
 {
   "type": "AI_TYPING_START",
   "senderName": "AI Assistant",
-  "content": "AI is typing...",
-  "timestamp": "2026-01-08T05:30:00"
+  "content": "AI is typing..."
 }
 ```
 
-### 3. Server Sends "Typing Stop" Event (Optional for UI)
-Indicates the AI has finished processing and is about to send the response.
-
-**Payload:**
-```json
-{
-  "type": "AI_TYPING_STOP",
-  "senderName": "AI Assistant"
-}
-```
-
-### 4. Server Sends Response
-Contains the final answer and source citations.
-*   **Note**: The server automatically cleans prefixes like "Answer:" or "الإجابة:" from the content.
-
-**Payload:**
+#### AI Response
 ```json
 {
   "type": "AI_RESPONSE",
   "senderName": "AI Assistant",
-  "content": "I am fine, thank you! How can I help you with your health today?"
-}
-```
-
-### 4. Error Handling
-If an error occurs (e.g., AI service timeout), the server sends an error event.
-
-**Payload:**
-```json
-{
-  "type": "AI_ERROR",
-  "senderName": "System",
-  "content": "Sorry, the AI service is currently unavailable."
+  "content": "Common symptoms of stress include..."
 }
 ```
 
 ---
 
-## Client Implementation Example (JavaScript)
+## Client Example (JavaScript / StompJS)
 
 ```javascript
-const ws = new WebSocket("ws://localhost:8080/api/ai-ws");
+const client = new StompJs.Client({
+    brokerURL: "ws://localhost:8080/ws",
+    connectHeaders: {
+        Authorization: "Bearer <token>"
+    },
+    onConnect: () => {
+        // Subscribe to AI responses
+        client.subscribe("/user/queue/ai", (message) => {
+            const data = JSON.parse(message.body);
+            console.log("AI Event:", data);
+        });
 
-ws.onopen = () => {
-    console.log("Connected to AI Chat");
-    
-    // Send a message
-    ws.send(JSON.stringify({ 
-        question: "What are the symptoms of anxiety?" 
-    }));
-};
-
-ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    
-    switch(data.type) {
-        case "AI_TYPING_START":
-            showTypingIndicator();
-            break;
-            
-        case "AI_RESPONSE":
-            hideTypingIndicator();
-            displayMessage(data.content);
-            console.log("Sources:", data.sources);
-            break;
-            
-        case "AI_ERROR":
-            hideTypingIndicator();
-            showError(data.content);
-            break;
+        // Send a question
+        client.publish({
+            destination: "/app/ai/ask",
+            body: JSON.stringify({ question: "Hello AI" })
+        });
     }
-};
+});
 
-ws.onclose = () => {
-    console.log("Disconnected");
-};
+client.activate();
 ```

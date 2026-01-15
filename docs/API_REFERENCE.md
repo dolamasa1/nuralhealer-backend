@@ -1,5 +1,12 @@
 # API Reference - NeuralHealer
-**Version:** 0.4
+
+---
+**Last Updated:** 2025-01-15
+**Version:** 0.5
+**Changes:** 
+- Unified Real-Time Plane: Separated STOMP (/ws) and Raw (/notifications)
+- AI Integration: Updated to use STOMP destinations
+---
 
 Base URL: `http://localhost:8080/api`
 
@@ -38,51 +45,36 @@ Base URL: `http://localhost:8080/api`
 
 ---
 
-## 🔌 4. WebSockets (STOMP)
+## 🔌 4. WebSockets
 
-Endpoint: `ws://localhost:8080/ws`
+NeuralHealer supports two WebSocket protocols for different real-time Paradigms.
 
-### Topics (Subscribe)
+### A. Managed Broker (STOMP)
+**Endpoint**: `ws://localhost:8080/ws`  
+**Purpose**: High-reliability, bi-directional communication (Chat, AI).
+
+#### Topics (Subscribe)
 - `/topic/engagement/{id}`: Live chat and status updates.
 - `/topic/user/{userId}`: Personal notifications.
+- `/user/queue/ai`: Direct AI responses (Session-specific).
 
-### Destinations (Send)
+#### Destinations (Send)
 - `/app/engagement/{id}/message`: Send chat message.
-- `/app/engagement/{id}/typing`: Send typing indicator.
+- `/app/ai/ask`: Ask AI a question.
+
+---
+
+### B. Raw Pathway (Standard WS)
+**Endpoint**: `ws://localhost:8080/notifications`  
+**Purpose**: Lightweight broadcasts for future features (Appointment alerts).
 
 ---
 
 ## 🤖 5. AI Chatbot
 
-Absolute configuration values for AI integration.
+AI integration is now unified under the STOMP broker for production readiness.
 
-### A. Health Check (REST)
-**URL**: `http://localhost:8080/api/ai/health`
-**Method**: `GET`
-**Auth**: None (Public)
-**Response**:
-```json
-{
-  "connected": true,
-  "message": "AI Service available",
-  "lastChecked": "2026-01-08T03:00:00"
-}
-```
-
-### B. Ask Question (REST)
-**URL**: `http://localhost:8080/api/ai/ask`
-**Method**: `POST`
-**Auth**: Bearer Token or Cookie
-**Body**:
-```json
-{
-  "question": "Hello AI"
-}
-```
-
-### C. Ask Question (WebSocket)
-The AI Chat uses a **Raw WebSocket** (no STOMP).
-
-*   **Endpoint:** `ws://localhost:8080/ai-ws`
-*   **Documentation:** For full message flow and typing indicator details, see [AI_WEBSOCKET_API.md](AI_WEBSOCKET_API.md).
+- **STOMP Destination**: `/app/ai/ask`
+- **STOMP Queue**: `/user/queue/ai`
+- **Documentation**: See [AI_WEBSOCKET_API.md](AI_WEBSOCKET_API.md) for payload details.
 

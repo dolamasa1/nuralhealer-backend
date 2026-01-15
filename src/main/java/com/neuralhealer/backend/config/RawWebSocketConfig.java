@@ -1,6 +1,6 @@
 package com.neuralhealer.backend.config;
 
-import com.neuralhealer.backend.handler.AiSimpleWebSocketHandler;
+import com.neuralhealer.backend.handler.NotificationWebSocketHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
@@ -13,11 +13,12 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @RequiredArgsConstructor
 public class RawWebSocketConfig implements WebSocketConfigurer {
 
-    private final AiSimpleWebSocketHandler aiHandler;
+    private final NotificationWebSocketHandler notificationHandler;
 
     @Override
     public void registerWebSocketHandlers(@NonNull WebSocketHandlerRegistry registry) {
-        registry.addHandler(aiHandler, "/ai-ws")
-                .setAllowedOriginPatterns("*"); // Allow all origins (Postman, Localhost)
+        // Register future raw Pathways
+        registry.addHandler(notificationHandler, "/notifications")
+                .setAllowedOriginPatterns("*"); // Allow Postman/Cross-origin handshake
     }
 }
