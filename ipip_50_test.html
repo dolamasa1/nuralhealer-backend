@@ -1021,7 +1021,7 @@
         const T = () => translations[currentLang];
 
         // ────────────── API Helpers ──────────────
-        async function apiCall(endpoint, options = {}) {
+        async function apiCall(endpoint, options = {}, isRetry = false) {
             try {
                 const headers = {
                     'Content-Type': 'application/json',
@@ -1038,11 +1038,18 @@
                     headers
                 });
 
+                if (response.status === 401 && !isRetry) {
+                    console.warn("Session unauthorized. Re-starting session...");
+                    const startData = await fetch(`${API_BASE_URL}/start`, { method: 'POST', credentials: 'include' }).then(r => r.json());
+                    sessionId = startData.sessionId;
+                    return apiCall(endpoint, options, true); // Retry once
+                }
+
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 return await response.json();
             } catch (err) {
                 console.error('API Error:', err);
-                showError(T().error);
+                if (endpoint !== '/progress') showError(T().error);
                 throw err;
             }
         }

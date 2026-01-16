@@ -1,20 +1,15 @@
-package com.neuralhealer.backend.activities.quizzes.ipip50.service;
+package com.neuralhealer.backend.activities.quizzes.common;
 
-import com.neuralhealer.backend.activities.quizzes.ipip50.model.Ipip50UserResponse;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.SessionScope;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class QuizSessionService {
+public class QuizService {
 
     private static class SessionData {
-        private String sessionId;
-        private Map<Integer, Integer> userResponses = new HashMap<>();
+        private final String sessionId;
+        private final Map<Integer, Integer> userResponses = new HashMap<>();
         private boolean isCompleted = false;
 
         public SessionData(String sessionId) {
@@ -46,10 +41,10 @@ public class QuizSessionService {
         return sessionId;
     }
 
-    public void saveResponse(String sessionId, int questionId, int score) {
+    public void saveResponse(String sessionId, int questionId, int score, int totalQuestions) {
         SessionData session = getSession(sessionId);
-        if (questionId < 1 || questionId > 50) {
-            throw new IllegalArgumentException("Question ID must be between 1 and 50");
+        if (questionId < 1 || questionId > totalQuestions) {
+            throw new IllegalArgumentException("Question ID must be between 1 and " + totalQuestions);
         }
         if (score < 1 || score > 5) {
             throw new IllegalArgumentException("Score must be between 1 and 5");
@@ -83,8 +78,12 @@ public class QuizSessionService {
         }
     }
 
-    public boolean hasAllResponses(String sessionId) {
-        return getSession(sessionId).getUserResponses().size() == 50;
+    public boolean hasAllResponses(String sessionId, int totalQuestions) {
+        return getSession(sessionId).getUserResponses().size() == totalQuestions;
+    }
+
+    public boolean isValidSession(String sessionId) {
+        return sessionId != null && sessions.containsKey(sessionId);
     }
 
     private SessionData getSession(String sessionId) {
@@ -94,7 +93,15 @@ public class QuizSessionService {
         return sessions.get(sessionId);
     }
 
-    public boolean isValidSession(String sessionId) {
-        return sessionId != null && sessions.containsKey(sessionId);
+    public List<QuizModels.QuizResponse> getResponsesAsList(String sessionId) {
+        Map<Integer, Integer> responses = getAllResponses(sessionId);
+        List<QuizModels.QuizResponse> list = new ArrayList<>();
+        responses.forEach((id, score) -> {
+            QuizModels.QuizResponse qr = new QuizModels.QuizResponse();
+            qr.setQuestionId(id);
+            qr.setScore(score);
+            list.add(qr);
+        });
+        return list;
     }
 }

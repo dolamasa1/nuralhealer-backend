@@ -1,0 +1,376 @@
+{
+  "Conscientiousness": {
+    "Self-Efficacy": {
+      "en": {
+        "High": "You believe you have the intelligence, drive, and self-control necessary for achieving success.",
+        "Average": "Your level of self-efficacy is average.",
+        "Low": "You do not feel effective and may feel that you are not in control of your life."
+      },
+      "ar": {
+        "High": "تؤمن بأن لديك الذكاء والدافع وضبط النفس اللازمين لتحقيق النجاح.",
+        "Average": "مستوى الكفاءة الذاتية لديك متوسط.",
+        "Low": "لا تشعر بالكفاءة وقد تحس بأنك لا تسيطر على مجريات حياتك."
+      }
+    },
+    "Orderliness": {
+      "en": {
+        "High": "You are well-organized, neat, and systematic.",
+        "Average": "You show a moderate level of organization.",
+        "Low": "You prefer flexibility over structure and may be disorganized."
+      },
+      "ar": {
+        "High": "تتميز بالنظام والترتيب والدقة.",
+        "Average": "مستوى التنظيم لديك متوسط.",
+        "Low": "تفضل المرونة على النظام وقد تميل إلى الفوضوية."
+      }
+    },
+    "Dutifulness": {
+      "en": {
+        "High": "You have a strong sense of moral obligation.",
+        "Average": "Your sense of duty is balanced.",
+        "Low": "You are less guided by rules and obligations."
+      },
+      "ar": {
+        "High": "لديك إحساس قوي بالواجب والالتزام.",
+        "Average": "إحساسك بالواجب متوازن.",
+        "Low": "لا تعتمد كثيرًا على القواعد أو الالتزامات."
+      }
+    },
+    "Achievement-Striving": {
+      "en": {
+        "High": "You work hard to achieve excellence.",
+        "Average": "You balance ambition with contentment.",
+        "Low": "You are not strongly driven to achieve high goals."
+      },
+      "ar": {
+        "High": "تسعى بقوة لتحقيق الإنجاز والتميز.",
+        "Average": "توازن بين الطموح والرضا.",
+        "Low": "لا تشعر بدافع قوي لتحقيق أهداف عالية."
+      }
+    },
+    "Self-Discipline": {
+      "en": {
+        "High": "You are able to begin and complete tasks even when they are difficult.",
+        "Average": "Your self-discipline depends on circumstances.",
+        "Low": "You struggle to stay focused and finish tasks."
+      },
+      "ar": {
+        "High": "تستطيع البدء في المهام وإنهاءها حتى لو كانت صعبة.",
+        "Average": "يعتمد انضباطك الذاتي على الظروف.",
+        "Low": "تواجه صعوبة في الاستمرار وإنهاء المهام."
+      }
+    },
+    "Cautiousness": {
+      "en": {
+        "High": "You carefully think through decisions before acting.",
+        "Average": "You balance caution and spontaneity.",
+        "Low": "You act impulsively and take risks easily."
+      },
+      "ar": {
+        "High": "تفكر بعناية قبل اتخاذ القرارات.",
+        "Average": "توازن بين الحذر والعفوية.",
+        "Low": "تتصرف باندفاع وتميل إلى المخاطرة."
+      }
+    }
+  },
+
+  "Neuroticism": {
+    "Anxiety": {
+      "en": {
+        "High": "You frequently feel worried or anxious.",
+        "Average": "Your anxiety levels are moderate.",
+        "Low": "You are generally calm and relaxed."
+      },
+      "ar": {
+        "High": "تشعر بالقلق والتوتر بشكل متكرر.",
+        "Average": "مستوى القلق لديك متوسط.",
+        "Low": "غالبًا ما تكون هادئًا ومطمئنًا."
+      }
+    },
+    "Anger": {
+      "en": {
+        "High": "You get angry easily.",
+        "Average": "Your anger is situational.",
+        "Low": "You rarely feel anger."
+      },
+      "ar": {
+        "High": "تغضب بسهولة.",
+        "Average": "غضبك يعتمد على الموقف.",
+        "Low": "نادرًا ما تشعر بالغضب."
+      }
+    },
+    "Depression": {
+      "en": {
+        "High": "You often feel sad or discouraged.",
+        "Average": "Your mood fluctuates at times.",
+        "Low": "You are generally cheerful and optimistic."
+      },
+      "ar": {
+        "High": "تشعر بالحزن أو الإحباط كثيرًا.",
+        "Average": "يتغير مزاجك أحيانًا.",
+        "Low": "غالبًا ما تكون متفائلًا ومبتهجًا."
+      }
+    },
+    "Self-Consciousness": {
+      "en": {
+        "High": "You are sensitive to what others think of you.",
+        "Average": "You are occasionally self-conscious.",
+        "Low": "You feel comfortable being yourself."
+      },
+      "ar": {
+        "High": "تتأثر كثيرًا برأي الآخرين فيك.",
+        "Average": "تشعر أحيانًا بالحرج.",
+        "Low": "تشعر بالراحة مع نفسك."
+      }
+    },
+    "Immoderation": {
+      "en": {
+        "High": "You have difficulty resisting cravings.",
+        "Average": "You sometimes struggle with self-control.",
+        "Low": "You easily control your impulses."
+      },
+      "ar": {
+        "High": "تواجه صعوبة في مقاومة الرغبات.",
+        "Average": "تعاني أحيانًا من ضعف التحكم الذاتي.",
+        "Low": "تتحكم في اندفاعاتك بسهولة."
+      }
+    },
+    "Vulnerability": {
+      "en": {
+        "High": "You feel overwhelmed by stress easily.",
+        "Average": "You manage stress reasonably well.",
+        "Low": "You remain calm under pressure."
+      },
+      "ar": {
+        "High": "تشعر بالضغط والتوتر بسهولة.",
+        "Average": "تتعامل مع الضغط بشكل مقبول.",
+        "Low": "تبقى هادئًا تحت الضغط."
+      }
+    }
+  },
+
+  "Extraversion": {
+    "Friendliness": {
+      "en": {
+        "High": "You make friends easily.",
+        "Average": "You are friendly in some situations.",
+        "Low": "You prefer to keep to yourself."
+      },
+      "ar": {
+        "High": "تكوّن صداقات بسهولة.",
+        "Average": "تكون اجتماعيًا في بعض المواقف.",
+        "Low": "تفضل العزلة أو الدائرة الضيقة."
+      }
+    },
+    "Gregariousness": {
+      "en": {
+        "High": "You enjoy being around people.",
+        "Average": "You enjoy social interaction in moderation.",
+        "Low": "You prefer solitude."
+      },
+      "ar": {
+        "High": "تستمتع بالتواجد مع الناس.",
+        "Average": "تستمتع بالتفاعل الاجتماعي باعتدال.",
+        "Low": "تفضل الوحدة."
+      }
+    },
+    "Assertiveness": {
+      "en": {
+        "High": "You take charge and lead others.",
+        "Average": "You assert yourself when needed.",
+        "Low": "You avoid taking leadership roles."
+      },
+      "ar": {
+        "High": "تميل إلى القيادة والمبادرة.",
+        "Average": "تدافع عن نفسك عند الحاجة.",
+        "Low": "تتجنب الأدوار القيادية."
+      }
+    },
+    "Activity Level": {
+      "en": {
+        "High": "You lead a fast-paced, energetic life.",
+        "Average": "Your energy level is balanced.",
+        "Low": "You prefer a slow, relaxed pace."
+      },
+      "ar": {
+        "High": "تعيش حياة مليئة بالنشاط والحيوية.",
+        "Average": "مستوى طاقتك متوازن.",
+        "Low": "تفضل الهدوء والوتيرة البطيئة."
+      }
+    },
+    "Excitement-Seeking": {
+      "en": {
+        "High": "You seek thrills and excitement.",
+        "Average": "You enjoy excitement occasionally.",
+        "Low": "You avoid intense stimulation."
+      },
+      "ar": {
+        "High": "تبحث عن الإثارة والمغامرة.",
+        "Average": "تستمتع بالإثارة أحيانًا.",
+        "Low": "تتجنب التحفيز الشديد."
+      }
+    },
+    "Cheerfulness": {
+      "en": {
+        "High": "You are joyful and enthusiastic.",
+        "Average": "Your mood is generally stable.",
+        "Low": "You are more serious or reserved."
+      },
+      "ar": {
+        "High": "تتميز بالمرح والحماس.",
+        "Average": "مزاجك مستقر عمومًا.",
+        "Low": "تميل إلى الجدية أو التحفظ."
+      }
+    }
+  },
+
+  "Agreeableness": {
+    "Trust": {
+      "en": {
+        "High": "You believe others have good intentions.",
+        "Average": "You trust selectively.",
+        "Low": "You are skeptical of others."
+      },
+      "ar": {
+        "High": "تفترض حسن نية الآخرين.",
+        "Average": "تثق بالآخرين بحذر.",
+        "Low": "تميل إلى الشك في الآخرين."
+      }
+    },
+    "Morality": {
+      "en": {
+        "High": "You are honest and sincere.",
+        "Average": "You are generally fair.",
+        "Low": "You may manipulate situations for advantage."
+      },
+      "ar": {
+        "High": "تتميز بالصدق والإخلاص.",
+        "Average": "تتصرف بعدل في الغالب.",
+        "Low": "قد تميل إلى التلاعب لتحقيق مصلحة."
+      }
+    },
+    "Altruism": {
+      "en": {
+        "High": "You enjoy helping others.",
+        "Average": "You help when it is reasonable.",
+        "Low": "You prioritize your own needs."
+      },
+      "ar": {
+        "High": "تحب مساعدة الآخرين.",
+        "Average": "تساعد الآخرين عند الإمكان.",
+        "Low": "تضع احتياجاتك أولًا."
+      }
+    },
+    "Cooperation": {
+      "en": {
+        "High": "You avoid conflict and value harmony.",
+        "Average": "You balance cooperation and assertiveness.",
+        "Low": "You are competitive and confrontational."
+      },
+      "ar": {
+        "High": "تتجنب الصراعات وتسعى للانسجام.",
+        "Average": "توازن بين التعاون والحزم.",
+        "Low": "تميل للمواجهة والتنافس."
+      }
+    },
+    "Modesty": {
+      "en": {
+        "High": "You are humble and modest.",
+        "Average": "You recognize your strengths realistically.",
+        "Low": "You see yourself as superior."
+      },
+      "ar": {
+        "High": "تتصف بالتواضع.",
+        "Average": "تدرك قدراتك بشكل واقعي.",
+        "Low": "قد ترى نفسك أفضل من الآخرين."
+      }
+    },
+    "Sympathy": {
+      "en": {
+        "High": "You are deeply concerned about others.",
+        "Average": "You show empathy when appropriate.",
+        "Low": "You are emotionally detached."
+      },
+      "ar": {
+        "High": "تهتم بمشاعر الآخرين بعمق.",
+        "Average": "تتعاطف عند الحاجة.",
+        "Low": "تميل إلى البرود العاطفي."
+      }
+    }
+  },
+
+  "Openness": {
+    "Imagination": {
+      "en": {
+        "High": "You have a vivid imagination.",
+        "Average": "You enjoy imagination occasionally.",
+        "Low": "You focus on facts rather than fantasy."
+      },
+      "ar": {
+        "High": "لديك خيال واسع وحيوي.",
+        "Average": "تستمتع بالخيال أحيانًا.",
+        "Low": "تركز على الواقع أكثر من الخيال."
+      }
+    },
+    "Artistic Interests": {
+      "en": {
+        "High": "You value art and beauty.",
+        "Average": "You appreciate art to some extent.",
+        "Low": "You are less interested in artistic expression."
+      },
+      "ar": {
+        "High": "تقدّر الفن والجمال.",
+        "Average": "لديك اهتمام فني متوسط.",
+        "Low": "اهتمامك بالفن محدود."
+      }
+    },
+    "Emotionality": {
+      "en": {
+        "High": "You experience emotions deeply.",
+        "Average": "Your emotional experiences are balanced.",
+        "Low": "You are emotionally reserved."
+      },
+      "ar": {
+        "High": "تعيش مشاعرك بعمق.",
+        "Average": "تجاربك العاطفية متوازنة.",
+        "Low": "تميل إلى التحفظ العاطفي."
+      }
+    },
+    "Adventurousness": {
+      "en": {
+        "High": "You enjoy new experiences.",
+        "Average": "You are open to change at times.",
+        "Low": "You prefer routine and familiarity."
+      },
+      "ar": {
+        "High": "تحب التجارب الجديدة.",
+        "Average": "تنفتح على التغيير أحيانًا.",
+        "Low": "تفضل الروتين والمألوف."
+      }
+    },
+    "Intellect": {
+      "en": {
+        "High": "You enjoy complex ideas and intellectual challenges.",
+        "Average": "You engage intellectually when needed.",
+        "Low": "You avoid abstract or theoretical thinking."
+      },
+      "ar": {
+        "High": "تستمتع بالأفكار المعقدة والتحديات الفكرية.",
+        "Average": "تنخرط فكريًا عند الحاجة.",
+        "Low": "تتجنب التفكير النظري أو التجريدي."
+      }
+    },
+    "Liberalism": {
+      "en": {
+        "High": "You question authority and traditional values.",
+        "Average": "You balance tradition with openness.",
+        "Low": "You prefer tradition and stability."
+      },
+      "ar": {
+        "High": "تميل إلى التساؤل حول السلطة والتقاليد.",
+        "Average": "توازن بين التقاليد والانفتاح.",
+        "Low": "تفضل الاستقرار والتمسك بالتقاليد."
+      }
+    }
+  }
+}

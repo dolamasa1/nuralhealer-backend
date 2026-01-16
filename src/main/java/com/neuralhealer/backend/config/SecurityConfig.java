@@ -109,7 +109,8 @@ public class SecurityConfig {
                 "Origin",
                 "X-Requested-With",
                 "Access-Control-Allow-Origin",
-                "X-Quiz-Session"));
+                "X-Quiz-Session",
+                "X-Quiz-Session-120"));
 
         // Expose Authorization header to frontend
         configuration.setExposedHeaders(List.of("Authorization"));

@@ -1,9 +1,9 @@
-package com.neuralhealer.backend.activities.quizzes.ipip50.controller;
+package com.neuralhealer.backend.activities.quizzes.ipip120.controller;
 
 import com.neuralhealer.backend.activities.quizzes.common.JsonLoader;
 import com.neuralhealer.backend.activities.quizzes.common.QuizModels;
 import com.neuralhealer.backend.activities.quizzes.common.QuizService;
-import com.neuralhealer.backend.activities.quizzes.ipip50.service.Ipip50ScoringStrategy;
+import com.neuralhealer.backend.activities.quizzes.ipip120.service.Ipip120ScoringStrategy;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,12 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.util.*;
 
 @RestController
-@RequestMapping("/quizzes/ipip50")
-public class Ipip50Controller {
+@RequestMapping("/quizzes/ipip120")
+public class Ipip120Controller {
 
     @Autowired
     private JsonLoader jsonLoader;
@@ -26,15 +27,15 @@ public class Ipip50Controller {
     private QuizService quizService;
 
     @Autowired
-    private Ipip50ScoringStrategy scoringStrategy;
+    private Ipip120ScoringStrategy scoringStrategy;
 
     private List<QuizModels.QuizQuestion> questions;
-    private static final int TOTAL_QUESTIONS = 50;
+    private static final int TOTAL_QUESTIONS = 120;
 
     @PostConstruct
     public void init() throws IOException {
         QuestionsData questionsData = jsonLoader.loadJson(
-                "quizzes/ipip50/ipip50-questions.json",
+                "quizzes/ipip120/questions.json",
                 QuestionsData.class);
         this.questions = questionsData.getItems();
     }
@@ -46,18 +47,17 @@ public class Ipip50Controller {
 
         String sessionId = quizService.createSession();
 
-        Cookie sessionCookie = new Cookie("quiz_session", sessionId);
+        Cookie sessionCookie = new Cookie("quiz_session_120", sessionId);
         sessionCookie.setHttpOnly(true);
-        sessionCookie.setPath("/api/quizzes/ipip50");
-        sessionCookie.setMaxAge(3600);
+        sessionCookie.setPath("/api/quizzes/ipip120");
+        sessionCookie.setMaxAge(7200); // 2 hours
         response.addCookie(sessionCookie);
 
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("sessionId", sessionId);
         responseData.put("userId", userId);
-        responseData.put("message", "Quiz session started");
+        responseData.put("message", "IPIP-120 Quiz session started");
         responseData.put("totalQuestions", TOTAL_QUESTIONS);
-        responseData.put("remainingQuestions", TOTAL_QUESTIONS);
 
         return ResponseEntity.ok(responseData);
     }
@@ -101,6 +101,26 @@ public class Ipip50Controller {
         return ResponseEntity.ok(questions);
     }
 
+    @GetMapping("/responses")
+    public ResponseEntity<?> getResponses(HttpServletRequest request) {
+        String sessionId = getSessionId(request);
+        if (sessionId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("error", "No active session."));
+        }
+
+        Map<Integer, Integer> responses = quizService.getAllResponses(sessionId);
+        List<Map<String, Object>> responseList = new ArrayList<>();
+        responses.forEach((id, score) -> {
+            Map<String, Object> r = new HashMap<>();
+            r.put("questionId", id);
+            r.put("score", score);
+            responseList.add(r);
+        });
+
+        return ResponseEntity.ok(Collections.singletonMap("responses", responseList));
+    }
+
     @PostMapping("/submit-question")
     public ResponseEntity<Map<String, Object>> submitQuestion(
             @RequestBody QuizModels.QuizResponse submission,
@@ -123,61 +143,11 @@ public class Ipip50Controller {
 
             boolean isDone = quizService.hasAllResponses(sessionId, TOTAL_QUESTIONS);
             responseData.put("allQuestionsCompleted", isDone);
-            responseData.put("message",
-                    isDone ? "All questions completed! You can now submit the quiz." : "Response saved successfully");
 
             return ResponseEntity.ok(responseData);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
         }
-    }
-
-    @GetMapping("/progress")
-    public ResponseEntity<Map<String, Object>> getProgress(HttpServletRequest request) {
-        String sessionId = getSessionId(request);
-        if (sessionId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("error", "No active session. Please start the quiz first."));
-        }
-
-        int completed = quizService.getResponseCount(sessionId);
-        Map<String, Object> progressData = new HashMap<>();
-        progressData.put("sessionId", sessionId);
-        progressData.put("completedQuestions", completed);
-        progressData.put("totalQuestions", TOTAL_QUESTIONS);
-        progressData.put("percentage", (completed * 100) / TOTAL_QUESTIONS);
-        progressData.put("isCompleted", quizService.hasAllResponses(sessionId, TOTAL_QUESTIONS));
-
-        return ResponseEntity.ok(progressData);
-    }
-
-    @GetMapping("/responses")
-    public ResponseEntity<?> getSavedResponses(HttpServletRequest request) {
-        String sessionId = getSessionId(request);
-        if (sessionId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("error", "No active session. Please start the quiz first."));
-        }
-
-        Map<Integer, Integer> responses = quizService.getAllResponses(sessionId);
-        List<Map<String, Object>> detailedResponses = new ArrayList<>();
-
-        responses.forEach((id, score) -> {
-            questions.stream().filter(q -> q.getId() == id).findFirst().ifPresent(q -> {
-                Map<String, Object> detailed = new HashMap<>();
-                detailed.put("questionId", id);
-                detailed.put("questionText", q.getText());
-                detailed.put("score", score);
-                detailed.putAll(q.getMetadata());
-                detailedResponses.add(detailed);
-            });
-        });
-
-        Map<String, Object> responseData = new HashMap<>();
-        responseData.put("totalResponses", responses.size());
-        responseData.put("responses", detailedResponses);
-
-        return ResponseEntity.ok(responseData);
     }
 
     @PostMapping("/submit-quiz")
@@ -188,7 +158,7 @@ public class Ipip50Controller {
         String sessionId = getSessionId(request);
         if (sessionId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("error", "No active session. Please start the quiz first."));
+                    .body(Collections.singletonMap("error", "No active session."));
         }
 
         if (!quizService.hasAllResponses(sessionId, TOTAL_QUESTIONS)) {
@@ -204,8 +174,8 @@ public class Ipip50Controller {
             QuizModels.QuizResult result = new QuizModels.QuizResult();
             result.setUserId(userId != null ? userId : "guest-" + sessionId);
             result.setScores(scores);
-            result.setSummary("IPIP-50 Personality Assessment Completed");
-            result.setArabicSummary("تم اكتمال تقييم الشخصية (IPIP-50)");
+            result.setSummary("IPIP-120 Personality Assessment Completed");
+            result.setArabicSummary("تم اكتمال تقييم الشخصية (IPIP-120)");
 
             quizService.setCompleted(sessionId, true);
 
@@ -213,7 +183,6 @@ public class Ipip50Controller {
             finalResponse.put("result", result);
             finalResponse.put("sessionId", sessionId);
             finalResponse.put("completionDate", new Date());
-            finalResponse.put("totalScore", scores.stream().mapToInt(QuizModels.ScoreDetail::getScore).sum());
 
             return ResponseEntity.ok(finalResponse);
         } catch (Exception e) {
@@ -222,36 +191,18 @@ public class Ipip50Controller {
         }
     }
 
-    @DeleteMapping("/reset")
-    public ResponseEntity<Map<String, Object>> resetQuiz(HttpServletRequest request, HttpServletResponse response) {
-        String sessionId = getSessionId(request);
-        if (sessionId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("error", "No active session"));
-        }
-
-        quizService.clearSession(sessionId);
-        Cookie cookie = new Cookie("quiz_session", "");
-        cookie.setPath("/api/quizzes/ipip50");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-
-        Map<String, Object> responseData = new HashMap<>();
-        responseData.put("success", true);
-        responseData.put("message", "Quiz session reset successfully");
-
-        return ResponseEntity.ok(responseData);
-    }
-
     private String getSessionId(HttpServletRequest request) {
-        String headerId = request.getHeader("X-Quiz-Session");
+        String headerId = request.getHeader("X-Quiz-Session-120");
+        if (headerId == null)
+            headerId = request.getHeader("X-Quiz-Session"); // Fallback
+
         if (headerId != null && quizService.isValidSession(headerId))
             return headerId;
 
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("quiz_session".equals(cookie.getName()) && quizService.isValidSession(cookie.getValue())) {
+                if ("quiz_session_120".equals(cookie.getName()) && quizService.isValidSession(cookie.getValue())) {
                     return cookie.getValue();
                 }
             }
