@@ -2,8 +2,10 @@ package com.neuralhealer.backend.activities.quizzes.ipip50.model;
 
 public class Ipip50ScoreResult {
     private String trait;
+    private String arabicTrait;
     private int score; // 10-50
     private String level; // LOW, AVERAGE, HIGH
+    private String arabicLevel;
     private String description;
     private String arabicDescription;
 
@@ -14,6 +16,14 @@ public class Ipip50ScoreResult {
 
     public void setTrait(String trait) {
         this.trait = trait;
+    }
+
+    public String getArabicTrait() {
+        return arabicTrait;
+    }
+
+    public void setArabicTrait(String arabicTrait) {
+        this.arabicTrait = arabicTrait;
     }
 
     public int getScore() {
@@ -30,6 +40,14 @@ public class Ipip50ScoreResult {
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public String getArabicLevel() {
+        return arabicLevel;
+    }
+
+    public void setArabicLevel(String arabicLevel) {
+        this.arabicLevel = arabicLevel;
     }
 
     public String getDescription() {

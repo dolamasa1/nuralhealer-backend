@@ -6,6 +6,7 @@ public class Ipip50AssessmentResult {
     private String userId;
     private List<Ipip50ScoreResult> scores;
     private String summary;
+    private String arabicSummary;
 
     // Getters and Setters
     public String getUserId() {
@@ -30,5 +31,13 @@ public class Ipip50AssessmentResult {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getArabicSummary() {
+        return arabicSummary;
+    }
+
+    public void setArabicSummary(String arabicSummary) {
+        this.arabicSummary = arabicSummary;
     }
 }

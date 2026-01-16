@@ -277,6 +277,7 @@ public class Ipip50Controller {
             result.setUserId(userId != null ? userId : "guest-" + sessionId);
             result.setScores(scores);
             result.setSummary("IPIP-50 Personality Assessment Completed");
+            result.setArabicSummary("تم اكتمال تقييم الشخصية (IPIP-50)");
 
             // Mark session as completed
             quizSessionService.setCompleted(sessionId, true);

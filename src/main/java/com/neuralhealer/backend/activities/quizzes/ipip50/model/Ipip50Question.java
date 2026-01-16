@@ -8,6 +8,9 @@ public class Ipip50Question {
     @JsonProperty("text")
     private String text;
 
+    @JsonProperty("arabic_text")
+    private String arabicText;
+
     @JsonProperty("factor")
     private int factor; // 1-5
 
@@ -29,6 +32,14 @@ public class Ipip50Question {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getArabicText() {
+        return arabicText;
+    }
+
+    public void setArabicText(String arabicText) {
+        this.arabicText = arabicText;
     }
 
     public int getFactor() {

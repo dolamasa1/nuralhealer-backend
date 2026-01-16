@@ -84,10 +84,26 @@ public class Ipip50InterpretationService {
         }
     }
 
+    private static final Map<String, String> TRAIT_ARABIC_MAP = Map.of(
+            "Extraversion", "الانبساطية",
+            "Agreeableness", "الوداعة (المقبولية)",
+            "Conscientiousness", "الضمير الحي (اليقظة)",
+            "Neuroticism", "العصابية (القلق)",
+            "Openness to Experience", "الانفتاح على التجارب");
+
+    private static final Map<String, String> LEVEL_ARABIC_MAP = Map.of(
+            "LOW", "منخفض",
+            "AVERAGE", "متوسط",
+            "HIGH", "مرتفع");
+
     public void addInterpretations(List<Ipip50ScoreResult> scoreResults, String language) {
         for (Ipip50ScoreResult result : scoreResults) {
             String trait = result.getTrait();
             String level = result.getLevel().toUpperCase();
+
+            // Set Arabic names for Trait and Level
+            result.setArabicTrait(TRAIT_ARABIC_MAP.getOrDefault(trait, trait));
+            result.setArabicLevel(LEVEL_ARABIC_MAP.getOrDefault(level, level));
 
             Map<String, Map<String, String>> traitInterpretations = interpretations.get(trait);
             if (traitInterpretations != null) {
@@ -108,7 +124,8 @@ public class Ipip50InterpretationService {
             if (result.getDescription() == null && result.getArabicDescription() == null) {
                 String defaultMsg = "No interpretation available for " + trait + " level: " + level;
                 if ("ar".equalsIgnoreCase(language)) {
-                    result.setArabicDescription("لا يوجد تفسير متاح لـ " + trait + " مستوى: " + level);
+                    result.setArabicDescription(
+                            "لا يوجد تفسير متاح لـ " + result.getArabicTrait() + " مستوى: " + result.getArabicLevel());
                 } else {
                     result.setDescription(defaultMsg);
                 }
