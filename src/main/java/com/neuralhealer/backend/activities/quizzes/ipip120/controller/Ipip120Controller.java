@@ -67,10 +67,6 @@ public class Ipip120Controller {
             @RequestParam(required = false) Integer questionId,
             HttpServletRequest request) {
         String sessionId = getSessionId(request);
-        if (sessionId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("error", "No active session. Please start the quiz first."));
-        }
 
         if (questionId != null) {
             if (questionId < 1 || questionId > TOTAL_QUESTIONS) {
@@ -87,13 +83,13 @@ public class Ipip120Controller {
             if (question == null)
                 return ResponseEntity.notFound().build();
 
-            Integer savedResponse = quizService.getResponse(sessionId, questionId);
+            Integer savedResponse = (sessionId != null) ? quizService.getResponse(sessionId, questionId) : null;
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("question", question);
             responseData.put("savedResponse", savedResponse);
             responseData.put("totalQuestions", TOTAL_QUESTIONS);
-            responseData.put("completedQuestions", quizService.getResponseCount(sessionId));
+            responseData.put("completedQuestions", (sessionId != null) ? quizService.getResponseCount(sessionId) : 0);
 
             return ResponseEntity.ok(responseData);
         }
@@ -105,8 +101,7 @@ public class Ipip120Controller {
     public ResponseEntity<?> getResponses(HttpServletRequest request) {
         String sessionId = getSessionId(request);
         if (sessionId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("error", "No active session."));
+            return ResponseEntity.ok(Collections.singletonMap("responses", Collections.emptyList()));
         }
 
         Map<Integer, Integer> responses = quizService.getAllResponses(sessionId);
@@ -132,7 +127,8 @@ public class Ipip120Controller {
         }
 
         try {
-            quizService.saveResponse(sessionId, submission.getQuestionId(), submission.getScore(), TOTAL_QUESTIONS);
+            quizService.saveResponse(sessionId, submission.getQuestionId(), submission.getScore(), TOTAL_QUESTIONS, 1,
+                    5);
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);

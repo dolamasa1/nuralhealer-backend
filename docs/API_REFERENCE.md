@@ -35,7 +35,7 @@ Base URL: `http://localhost:8080/api`
 | `POST` | `/engagements/{id}/verify-end` | Conclude Engagement | Yes | Status Object |
 
 > [!TIP]
-> **Detailed Documentation**: See [ENGAGEMENT_LOGIC.md](ENGAGEMENT_LOGIC.md) for full JSON request/response examples for each transition.
+> **Detailed Documentation**: See [ENGAGEMENT_LOGIC.md](api/ENGAGEMENT_LOGIC.md) for full JSON request/response examples for each transition.
 
 ---
 
@@ -66,7 +66,7 @@ NeuralHealer supports two WebSocket protocols for different real-time Paradigms.
 - `/app/ai/ask`: Ask AI a question.
 
 > [!TIP]
-> **AI Documentation**: See [AI_SUBSCRIPTION.md](AI_SUBSCRIPTION.md) for detailed JSON payloads for questions, typing, and answers.
+> **AI Documentation**: See [AI_SUBSCRIPTION.md](api/AI_SUBSCRIPTION.md) for detailed JSON payloads for questions, typing, and answers.
 
 ---
 
@@ -76,11 +76,36 @@ NeuralHealer supports two WebSocket protocols for different real-time Paradigms.
 
 ---
 
-## 🤖 5. AI Chatbot
+## 🧠 5. Personality Quizzes (IPIP)
+
+NeuralHealer provides personality assessments based on IPIP standards.
+
+| Type | Base Endpoint | Questions | Session Support |
+| :--- | :--- | :--- | :--- |
+| **IPIP-120** | `/quizzes/ipip120` | 120 | 2 Hours |
+| **IPIP-50** | `/quizzes/ipip50` | 50 | 1 Hour |
+
+> [!TIP]
+> **Quiz Documentation**: See [QUIZ_APIS.md](api/QUIZ_APIS.md) for full endpoint lists and models.
+
+---
+
+## 🤖 6. AI Chatbot
 
 AI integration is now unified under the STOMP broker for production readiness.
 
 - **STOMP Destination**: `/app/ai/ask`
 - **STOMP Queue**: `/user/queue/ai`
-- **Documentation**: See [AI_SUBSCRIPTION.md](AI_SUBSCRIPTION.md) for payload and subscription details.
+- **Documentation**: See [AI_SUBSCRIPTION.md](api/AI_SUBSCRIPTION.md) for payload and subscription details.
 
+---
+
+## 📚 Project Documentation Index
+
+Explore more details about NeuralHealer:
+
+- **Architecture**: [ARCHITECTURE.md](design/ARCHITECTURE.md)
+- **Roadmap**: [MICROSERVICES_ROADMAP.md](design/MICROSERVICES_ROADMAP.md)
+- **Security**: [SECURITY.md](security/SECURITY.md)
+- **Deployment**: [DEPLOYMENT.md](dev/DEPLOYMENT.md)
+- **Contributing**: [CONTRIBUTING.md](dev/CONTRIBUTING.md)

@@ -1,0 +1,22 @@
+{
+  "test_name": "PHQ-9",
+  "instruction_en": "Over the last 2 weeks, how often have you been bothered by any of the following problems?",
+  "instruction_ar": "خلال الأسبوعين الماضيين، ما مدى تكرار شعورك بالانزعاج بسبب المشكلات التالية؟",
+  "scale": [
+    {"value": 0, "text_en": "Not at all", "text_ar": "على الإطلاق"},
+    {"value": 1, "text_en": "Several days", "text_ar": "لعدة أيام"},
+    {"value": 2, "text_en": "More than half the days", "text_ar": "أكثر من نصف الأيام"},
+    {"value": 3, "text_en": "Nearly every day", "text_ar": "تقريباً كل يوم"}
+  ],
+  "items": [
+    {"id": 1, "text": "Little interest or pleasure in doing things.", "arabic_text": "قليل من الاهتمام أو الاستمتاع بعمل الأشياء."},
+    {"id": 2, "text": "Feeling down, depressed, or hopeless.", "arabic_text": "الشعور بضيق أو اكتئاب أو يأس."},
+    {"id": 3, "text": "Trouble falling or staying asleep, or sleeping too much.", "arabic_text": "صعوبة في النوم أو في البقاء نائماً، أو النوم أكثر من اللازم."},
+    {"id": 4, "text": "Feeling tired or having little energy.", "arabic_text": "الشعور بالتعب أو الإرهاق أو نقص الطاقة."},
+    {"id": 5, "text": "Poor appetite or overeating.", "arabic_text": "ضعف الشهية أو الإفراط في الأكل."},
+    {"id": 6, "text": "Feeling bad about yourself — or that you are a failure or have let yourself or your family down.", "arabic_text": "الشعور بالضيق تجاه نفسك - أو أنك فاشل أو أنك خذلت نفسك أو عائلتك."},
+    {"id": 7, "text": "Trouble concentrating on things, such as reading the newspaper or watching television.", "arabic_text": "صعوبة التركيز على أمور معينة، مثل قراءة الصحف أو مشاهدة التلفزيون."},
+    {"id": 8, "text": "Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual.", "arabic_text": "التحرك أو التحدث ببطء شديد لدرجة ملاحظة الآخرين لذلك؟ أو العكس - التململ أو عدم الاستقرار والتحرك أكثر من المعتاد."},
+    {"id": 9, "text": "Thoughts that you would be better off dead or of hurting yourself in some way.", "arabic_text": "أفكار بأنك ستكون أفضل حالاً لو كنت ميتاً، أو برغبة في إيذاء نفسك بطريقة ما."}
+  ]
+}

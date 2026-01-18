@@ -1,6 +1,9 @@
 {
   "test_name": "IPIP-NEO-120",
-  "language": ["en", "ar"],
+  "language": [
+    "en",
+    "ar"
+  ],
   "total_items": 120,
   "domains": {
     "N": "Neuroticism",
@@ -10,145 +13,845 @@
     "C": "Conscientiousness"
   },
   "items": [
-    {"id":1,"text":"Worry about things.","text_ar":"أقلق من الأمور بسهولة.","domain":"N","keying":"+"},
-    {"id":2,"text":"Make friends easily.","text_ar":"أكوّن صداقات بسهولة.","domain":"E","keying":"+"},
-    {"id":3,"text":"Have a vivid imagination.","text_ar":"لدي خيال واسع وحيوي.","domain":"O","keying":"+"},
-    {"id":4,"text":"Trust others.","text_ar":"أثق في الآخرين.","domain":"A","keying":"+"},
-    {"id":5,"text":"Complete tasks successfully.","text_ar":"أنجز المهام بنجاح.","domain":"C","keying":"+"},
-    {"id":6,"text":"Get angry easily.","text_ar":"أغضب بسهولة.","domain":"N","keying":"+"},
-    {"id":7,"text":"Love large parties.","text_ar":"أحب الحفلات والتجمعات الكبيرة.","domain":"E","keying":"+"},
-    {"id":8,"text":"Believe in the importance of art.","text_ar":"أؤمن بأهمية الفن.","domain":"O","keying":"+"},
-    {"id":9,"text":"Use others for my own ends.","text_ar":"أستغل الآخرين لتحقيق مصلحتي.","domain":"A","keying":"-"},
-    {"id":10,"text":"Like to tidy up.","text_ar":"أحب الترتيب والتنظيم.","domain":"C","keying":"+"},
-
-    {"id":11,"text":"Often feel blue.","text_ar":"غالبًا أشعر بالحزن.","domain":"N","keying":"+"},
-    {"id":12,"text":"Take charge.","text_ar":"أتولى القيادة.","domain":"E","keying":"+"},
-    {"id":13,"text":"Experience my emotions intensely.","text_ar":"أشعر بمشاعري بقوة.","domain":"O","keying":"+"},
-    {"id":14,"text":"Love to help others.","text_ar":"أحب مساعدة الآخرين.","domain":"A","keying":"+"},
-    {"id":15,"text":"Keep my promises.","text_ar":"ألتزم بوعودي.","domain":"C","keying":"+"},
-    {"id":16,"text":"Find it difficult to approach others.","text_ar":"أجد صعوبة في التقرب من الآخرين.","domain":"N","keying":"+"},
-    {"id":17,"text":"Am always busy.","text_ar":"دائمًا مشغول.","domain":"E","keying":"+"},
-    {"id":18,"text":"Prefer variety to routine.","text_ar":"أفضل التنوع على الروتين.","domain":"O","keying":"+"},
-    {"id":19,"text":"Love a good fight.","text_ar":"أحب الجدال أو الصراع.","domain":"A","keying":"-"},
-    {"id":20,"text":"Work hard.","text_ar":"أعمل بجد.","domain":"C","keying":"+"},
-
-    {"id":21,"text":"Go on binges.","text_ar":"أنغمس في الأمور بإفراط.","domain":"N","keying":"+"},
-    {"id":22,"text":"Love excitement.","text_ar":"أحب الإثارة.","domain":"E","keying":"+"},
-    {"id":23,"text":"Love to read challenging material.","text_ar":"أحب قراءة المواد الصعبة فكريًا.","domain":"O","keying":"+"},
-    {"id":24,"text":"Believe that I am better than others.","text_ar":"أعتقد أنني أفضل من الآخرين.","domain":"A","keying":"-"},
-    {"id":25,"text":"Am always prepared.","text_ar":"أكون دائمًا مستعدًا.","domain":"C","keying":"+"},
-    {"id":26,"text":"Panic easily.","text_ar":"أفزع بسهولة.","domain":"N","keying":"+"},
-    {"id":27,"text":"Radiate joy.","text_ar":"أنشر الفرح من حولي.","domain":"E","keying":"+"},
-    {"id":28,"text":"Tend to vote for liberal (progressive) political candidates.","text_ar":"أميل لدعم الأفكار التقدمية.","domain":"O","keying":"+"},
-    {"id":29,"text":"Sympathise with the homeless.","text_ar":"أتعاطف مع المشردين.","domain":"A","keying":"+"},
-    {"id":30,"text":"Jump into things without thinking.","text_ar":"أتصرف دون تفكير.","domain":"C","keying":"-"},
-
-    {"id":31,"text":"Fear for the worst.","text_ar":"أتوقع الأسوأ.","domain":"N","keying":"+"},
-    {"id":32,"text":"Feel comfortable around people.","text_ar":"أشعر بالراحة وسط الناس.","domain":"E","keying":"+"},
-    {"id":33,"text":"Enjoy wild flights of fantasy.","text_ar":"أستمتع بالخيال الواسع.","domain":"O","keying":"+"},
-    {"id":34,"text":"Believe that others have good intentions.","text_ar":"أعتقد أن نوايا الناس طيبة.","domain":"A","keying":"+"},
-    {"id":35,"text":"Excel in what I do.","text_ar":"أتميز فيما أفعله.","domain":"C","keying":"+"},
-
-    {"id":36,"text":"Get irritated easily.","text_ar":"أنزعج بسهولة.","domain":"N","keying":"+"},
-    {"id":37,"text":"Talk to a lot of different people at parties.","text_ar":"أتحدث مع أشخاص كُثُر في المناسبات.","domain":"E","keying":"+"},
-    {"id":38,"text":"See beauty in things that others might not notice.","text_ar":"أرى الجمال في أشياء قد لا يلاحظها الآخرون.","domain":"O","keying":"+"},
-    {"id":39,"text":"Cheat to get ahead.","text_ar":"أغش للتقدم.","domain":"A","keying":"-"},
-    {"id":40,"text":"Often forget to put things back in their proper place.","text_ar":"أنسى كثيرًا إعادة الأشياء لمكانها.","domain":"C","keying":"-"},
-
-    {"id":41,"text":"Dislike myself.","text_ar":"لا أحب نفسي.","domain":"N","keying":"+"},
-    {"id":42,"text":"Try to lead others.","text_ar":"أحاول قيادة الآخرين.","domain":"E","keying":"+"},
-    {"id":43,"text":"Feel others' emotions.","text_ar":"أشعر بمشاعر الآخرين.","domain":"O","keying":"+"},
-    {"id":44,"text":"Am concerned about others.","text_ar":"أهتم بالآخرين.","domain":"A","keying":"+"},
-    {"id":45,"text":"Tell the truth.","text_ar":"أقول الحقيقة.","domain":"C","keying":"+"},
-
-    {"id":46,"text":"Am afraid to draw attention to myself.","text_ar":"أخاف من لفت الانتباه.","domain":"N","keying":"+"},
-    {"id":47,"text":"Am always on the go.","text_ar":"دائم الحركة.","domain":"E","keying":"+"},
-    {"id":48,"text":"Prefer to stick with things that I know.","text_ar":"أفضل الالتزام بما أعرفه.","domain":"O","keying":"-"},
-    {"id":49,"text":"Yell at people.","text_ar":"أصرخ في وجه الناس.","domain":"A","keying":"-"},
-    {"id":50,"text":"Do more than what's expected of me.","text_ar":"أفعل أكثر مما هو متوقع مني.","domain":"C","keying":"+"},
-
-    {"id":51,"text":"Rarely overindulge.","text_ar":"نادرًا ما أفرط.","domain":"N","keying":"-"},
-    {"id":52,"text":"Seek adventure.","text_ar":"أبحث عن المغامرة.","domain":"E","keying":"+"},
-    {"id":53,"text":"Avoid philosophical discussions.","text_ar":"أتجنب النقاشات الفلسفية.","domain":"O","keying":"-"},
-    {"id":54,"text":"Think highly of myself.","text_ar":"أفكر في نفسي بتقدير عالٍ.","domain":"A","keying":"-"},
-    {"id":55,"text":"Carry out my plans.","text_ar":"أنفذ خططي.","domain":"C","keying":"+"},
-
-    {"id":56,"text":"Become overwhelmed by events.","text_ar":"تغمرني الأحداث بسهولة.","domain":"N","keying":"+"},
-    {"id":57,"text":"Have a lot of fun.","text_ar":"أستمتع بالحياة كثيرًا.","domain":"E","keying":"+"},
-    {"id":58,"text":"Believe that there is no absolute right or wrong.","text_ar":"أؤمن بعدم وجود صواب أو خطأ مطلق.","domain":"O","keying":"+"},
-    {"id":59,"text":"Feel sympathy for those who are worse off than myself.","text_ar":"أتعاطف مع من هم أقل حظًا.","domain":"A","keying":"+"},
-    {"id":60,"text":"Make rash decisions.","text_ar":"أتخذ قرارات متهورة.","domain":"C","keying":"-"},
-
-    {"id":61,"text":"Am afraid of many things.","text_ar":"أخاف من أشياء كثيرة.","domain":"N","keying":"+"},
-    {"id":62,"text":"Avoid contact with others.","text_ar":"أتجنب التعامل مع الآخرين.","domain":"E","keying":"-"},
-    {"id":63,"text":"Love to daydream.","text_ar":"أحب أحلام اليقظة.","domain":"O","keying":"+"},
-    {"id":64,"text":"Trust what people say.","text_ar":"أثق فيما يقوله الناس.","domain":"A","keying":"+"},
-    {"id":65,"text":"Handle tasks smoothly.","text_ar":"أتعامل مع المهام بسلاسة.","domain":"C","keying":"+"},
-
-    {"id":66,"text":"Lose my temper.","text_ar":"أفقد أعصابي.","domain":"N","keying":"+"},
-    {"id":67,"text":"Prefer to be alone.","text_ar":"أفضل أن أكون وحدي.","domain":"E","keying":"-"},
-    {"id":68,"text":"Do not like poetry.","text_ar":"لا أحب الشعر.","domain":"O","keying":"-"},
-    {"id":69,"text":"Take advantage of others.","text_ar":"أستغل الآخرين.","domain":"A","keying":"-"},
-    {"id":70,"text":"Leave a mess in my room.","text_ar":"أترك غرفتي غير مرتبة.","domain":"C","keying":"-"},
-
-    {"id":71,"text":"Am often down in the dumps.","text_ar":"غالبًا ما أشعر بالإحباط.","domain":"N","keying":"+"},
-    {"id":72,"text":"Take control of things.","text_ar":"أسيطر على الأمور.","domain":"E","keying":"+"},
-    {"id":73,"text":"Rarely notice my emotional reactions.","text_ar":"نادراً ما ألاحظ ردود أفعالي العاطفية.","domain":"O","keying":"-"},
-    {"id":74,"text":"Am indifferent to the feelings of others.","text_ar":"لا أبالي بمشاعر الآخرين.","domain":"A","keying":"-"},
-    {"id":75,"text":"Break rules.","text_ar":"أكسر القواعد.","domain":"C","keying":"-"},
-
-    {"id":76,"text":"Only feel comfortable with friends.","text_ar":"أشعر بالراحة فقط مع أصدقائي.","domain":"N","keying":"+"},
-    {"id":77,"text":"Do a lot in my spare time.","text_ar":"أفعل الكثير في وقت فراغي.","domain":"E","keying":"+"},
-    {"id":78,"text":"Dislike changes.","text_ar":"لا أحب التغييرات.","domain":"O","keying":"-"},
-    {"id":79,"text":"Insult people.","text_ar":"أهين الناس.","domain":"A","keying":"-"},
-    {"id":80,"text":"Do just enough work to get by.","text_ar":"أعمل بالحد الأدنى فقط.","domain":"C","keying":"-"},
-
-    {"id":81,"text":"Easily resist temptations.","text_ar":"أقاوم الإغراءات بسهولة.","domain":"N","keying":"-"},
-    {"id":82,"text":"Enjoy being reckless.","text_ar":"أستمتع بالتصرف بتهور.","domain":"E","keying":"+"},
-    {"id":83,"text":"Have difficulty understanding abstract ideas.","text_ar":"أجد صعوبة في فهم الأفكار المجردة.","domain":"O","keying":"-"},
-    {"id":84,"text":"Have a high opinion of myself.","text_ar":"لدي رأي عالٍ في نفسي.","domain":"A","keying":"-"},
-    {"id":85,"text":"Waste my time.","text_ar":"أضيع وقتي.","domain":"C","keying":"-"},
-
-    {"id":86,"text":"Feel that I'm unable to deal with things.","text_ar":"أشعر أنني غير قادر على التعامل مع الأمور.","domain":"N","keying":"+"},
-    {"id":87,"text":"Love life.","text_ar":"أحب الحياة.","domain":"E","keying":"+"},
-    {"id":88,"text":"Tend to vote for conservative political candidates.","text_ar":"أميل لدعم الأفكار المحافظة.","domain":"O","keying":"-"},
-    {"id":89,"text":"Am not interested in other people's problems.","text_ar":"لا أهتم بمشاكل الآخرين.","domain":"A","keying":"-"},
-    {"id":90,"text":"Rush into things.","text_ar":"أندفع في الأمور.","domain":"C","keying":"-"},
-
-    {"id":91,"text":"Get stressed out easily.","text_ar":"أتوتر بسهولة.","domain":"N","keying":"+"},
-    {"id":92,"text":"Keep others at a distance.","text_ar":"أبقي الآخرين على مسافة.","domain":"E","keying":"-"},
-    {"id":93,"text":"Like to get lost in thought.","text_ar":"أحب الشرود في التفكير.","domain":"O","keying":"+"},
-    {"id":94,"text":"Distrust people.","text_ar":"لا أثق بالناس.","domain":"A","keying":"-"},
-    {"id":95,"text":"Know how to get things done.","text_ar":"أعرف كيف أنجز الأمور.","domain":"C","keying":"+"},
-
-    {"id":96,"text":"Am not easily annoyed.","text_ar":"لا أنزعج بسهولة.","domain":"N","keying":"-"},
-    {"id":97,"text":"Avoid crowds.","text_ar":"أتجنب الزحام.","domain":"E","keying":"-"},
-    {"id":98,"text":"Do not enjoy going to art museums.","text_ar":"لا أستمتع بزيارة المتاحف الفنية.","domain":"O","keying":"-"},
-    {"id":99,"text":"Obstruct others' plans.","text_ar":"أعرقل خطط الآخرين.","domain":"A","keying":"-"},
-    {"id":100,"text":"Leave my belongings around.","text_ar":"أترك أغراضي مبعثرة.","domain":"C","keying":"-"},
-
-    {"id":101,"text":"Feel comfortable with myself.","text_ar":"أشعر بالراحة مع نفسي.","domain":"N","keying":"-"},
-    {"id":102,"text":"Wait for others to lead the way.","text_ar":"أنتظر الآخرين ليتولوا القيادة.","domain":"E","keying":"-"},
-    {"id":103,"text":"Don't understand people who get emotional.","text_ar":"لا أفهم الأشخاص العاطفيين.","domain":"O","keying":"-"},
-    {"id":104,"text":"Take no time for others.","text_ar":"لا أخصص وقتًا للآخرين.","domain":"A","keying":"-"},
-    {"id":105,"text":"Break my promises.","text_ar":"أنقض وعودي.","domain":"C","keying":"-"},
-
-    {"id":106,"text":"Am not bothered by difficult social situations.","text_ar":"لا أنزعج من المواقف الاجتماعية الصعبة.","domain":"N","keying":"-"},
-    {"id":107,"text":"Like to take it easy.","text_ar":"أحب الراحة وعدم الضغط.","domain":"E","keying":"-"},
-    {"id":108,"text":"Am attached to conventional ways.","text_ar":"متمسك بالطرق التقليدية.","domain":"O","keying":"-"},
-    {"id":109,"text":"Get back at others.","text_ar":"أنتقم من الآخرين.","domain":"A","keying":"-"},
-    {"id":110,"text":"Put little time and effort into my work.","text_ar":"أبذل مجهودًا ووقتًا قليلين في عملي.","domain":"C","keying":"-"},
-
-    {"id":111,"text":"Am able to control my cravings.","text_ar":"أتحكم في رغباتي.","domain":"N","keying":"-"},
-    {"id":112,"text":"Act wild and crazy.","text_ar":"أتصرف بجنون.","domain":"E","keying":"+"},
-    {"id":113,"text":"Am not interested in theoretical discussions.","text_ar":"لا أهتم بالنقاشات النظرية.","domain":"O","keying":"-"},
-    {"id":114,"text":"Boast about my virtues.","text_ar":"أتفاخر بمميزاتي.","domain":"A","keying":"-"},
-    {"id":115,"text":"Have difficulty starting tasks.","text_ar":"أجد صعوبة في بدء المهام.","domain":"C","keying":"-"},
-
-    {"id":116,"text":"Remain calm under pressure.","text_ar":"أبقى هادئًا تحت الضغط.","domain":"N","keying":"-"},
-    {"id":117,"text":"Look at the bright side of life.","text_ar":"أنظر إلى الجانب المشرق من الحياة.","domain":"E","keying":"+"},
-    {"id":118,"text":"Believe that we should be tough on crime.","text_ar":"أؤمن بالحزم في مواجهة الجريمة.","domain":"O","keying":"-"},
-    {"id":119,"text":"Try not to think about the needy.","text_ar":"أحاول عدم التفكير في المحتاجين.","domain":"A","keying":"-"},
-    {"id":120,"text":"Act without thinking.","text_ar":"أتصرف دون تفكير.","domain":"C","keying":"-"}
+    {
+      "id": 1,
+      "text": "Worry about things.",
+      "arabic_text": "أقلق من الأمور بسهولة.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 2,
+      "text": "Make friends easily.",
+      "arabic_text": "أكوّن صداقات بسهولة.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 3,
+      "text": "Have a vivid imagination.",
+      "arabic_text": "لدي خيال واسع وحيوي.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 4,
+      "text": "Trust others.",
+      "arabic_text": "أثق في الآخرين.",
+      "domain": "A",
+      "keying": "+"
+    },
+    {
+      "id": 5,
+      "text": "Complete tasks successfully.",
+      "arabic_text": "أنجز المهام بنجاح.",
+      "domain": "C",
+      "keying": "+"
+    },
+    {
+      "id": 6,
+      "text": "Get angry easily.",
+      "arabic_text": "أغضب بسهولة.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 7,
+      "text": "Love large parties.",
+      "arabic_text": "أحب الحفلات والتجمعات الكبيرة.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 8,
+      "text": "Believe in the importance of art.",
+      "arabic_text": "أؤمن بأهمية الفن.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 9,
+      "text": "Use others for my own ends.",
+      "arabic_text": "أستغل الآخرين لتحقيق مصلحتي.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 10,
+      "text": "Like to tidy up.",
+      "arabic_text": "أحب الترتيب والتنظيم.",
+      "domain": "C",
+      "keying": "+"
+    },
+    {
+      "id": 11,
+      "text": "Often feel blue.",
+      "arabic_text": "غالبًا أشعر بالحزن.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 12,
+      "text": "Take charge.",
+      "arabic_text": "أتولى القيادة.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 13,
+      "text": "Experience my emotions intensely.",
+      "arabic_text": "أشعر بمشاعري بقوة.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 14,
+      "text": "Love to help others.",
+      "arabic_text": "أحب مساعدة الآخرين.",
+      "domain": "A",
+      "keying": "+"
+    },
+    {
+      "id": 15,
+      "text": "Keep my promises.",
+      "arabic_text": "ألتزم بوعودي.",
+      "domain": "C",
+      "keying": "+"
+    },
+    {
+      "id": 16,
+      "text": "Find it difficult to approach others.",
+      "arabic_text": "أجد صعوبة في التقرب من الآخرين.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 17,
+      "text": "Am always busy.",
+      "arabic_text": "دائمًا مشغول.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 18,
+      "text": "Prefer variety to routine.",
+      "arabic_text": "أفضل التنوع على الروتين.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 19,
+      "text": "Love a good fight.",
+      "arabic_text": "أحب الجدال أو الصراع.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 20,
+      "text": "Work hard.",
+      "arabic_text": "أعمل بجد.",
+      "domain": "C",
+      "keying": "+"
+    },
+    {
+      "id": 21,
+      "text": "Go on binges.",
+      "arabic_text": "أنغمس في الأمور بإفراط.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 22,
+      "text": "Love excitement.",
+      "arabic_text": "أحب الإثارة.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 23,
+      "text": "Love to read challenging material.",
+      "arabic_text": "أحب قراءة المواد الصعبة فكريًا.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 24,
+      "text": "Believe that I am better than others.",
+      "arabic_text": "أعتقد أنني أفضل من الآخرين.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 25,
+      "text": "Am always prepared.",
+      "arabic_text": "أكون دائمًا مستعدًا.",
+      "domain": "C",
+      "keying": "+"
+    },
+    {
+      "id": 26,
+      "text": "Panic easily.",
+      "arabic_text": "أفزع بسهولة.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 27,
+      "text": "Radiate joy.",
+      "arabic_text": "أنشر الفرح من حولي.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 28,
+      "text": "Tend to vote for liberal (progressive) political candidates.",
+      "arabic_text": "أميل لدعم الأفكار التقدمية.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 29,
+      "text": "Sympathise with the homeless.",
+      "arabic_text": "أتعاطف مع المشردين.",
+      "domain": "A",
+      "keying": "+"
+    },
+    {
+      "id": 30,
+      "text": "Jump into things without thinking.",
+      "arabic_text": "أتصرف دون تفكير.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 31,
+      "text": "Fear for the worst.",
+      "arabic_text": "أتوقع الأسوأ.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 32,
+      "text": "Feel comfortable around people.",
+      "arabic_text": "أشعر بالراحة وسط الناس.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 33,
+      "text": "Enjoy wild flights of fantasy.",
+      "arabic_text": "أستمتع بالخيال الواسع.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 34,
+      "text": "Believe that others have good intentions.",
+      "arabic_text": "أعتقد أن نوايا الناس طيبة.",
+      "domain": "A",
+      "keying": "+"
+    },
+    {
+      "id": 35,
+      "text": "Excel in what I do.",
+      "arabic_text": "أتميز فيما أفعله.",
+      "domain": "C",
+      "keying": "+"
+    },
+    {
+      "id": 36,
+      "text": "Get irritated easily.",
+      "arabic_text": "أنزعج بسهولة.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 37,
+      "text": "Talk to a lot of different people at parties.",
+      "arabic_text": "أتحدث مع أشخاص كُثُر في المناسبات.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 38,
+      "text": "See beauty in things that others might not notice.",
+      "arabic_text": "أرى الجمال في أشياء قد لا يلاحظها الآخرون.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 39,
+      "text": "Cheat to get ahead.",
+      "arabic_text": "أغش للتقدم.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 40,
+      "text": "Often forget to put things back in their proper place.",
+      "arabic_text": "أنسى كثيرًا إعادة الأشياء لمكانها.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 41,
+      "text": "Dislike myself.",
+      "arabic_text": "لا أحب نفسي.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 42,
+      "text": "Try to lead others.",
+      "arabic_text": "أحاول قيادة الآخرين.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 43,
+      "text": "Feel others' emotions.",
+      "arabic_text": "أشعر بمشاعر الآخرين.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 44,
+      "text": "Am concerned about others.",
+      "arabic_text": "أهتم بالآخرين.",
+      "domain": "A",
+      "keying": "+"
+    },
+    {
+      "id": 45,
+      "text": "Tell the truth.",
+      "arabic_text": "أقول الحقيقة.",
+      "domain": "C",
+      "keying": "+"
+    },
+    {
+      "id": 46,
+      "text": "Am afraid to draw attention to myself.",
+      "arabic_text": "أخاف من لفت الانتباه.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 47,
+      "text": "Am always on the go.",
+      "arabic_text": "دائم الحركة.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 48,
+      "text": "Prefer to stick with things that I know.",
+      "arabic_text": "أفضل الالتزام بما أعرفه.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 49,
+      "text": "Yell at people.",
+      "arabic_text": "أصرخ في وجه الناس.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 50,
+      "text": "Do more than what's expected of me.",
+      "arabic_text": "أفعل أكثر مما هو متوقع مني.",
+      "domain": "C",
+      "keying": "+"
+    },
+    {
+      "id": 51,
+      "text": "Rarely overindulge.",
+      "arabic_text": "نادرًا ما أفرط.",
+      "domain": "N",
+      "keying": "-"
+    },
+    {
+      "id": 52,
+      "text": "Seek adventure.",
+      "arabic_text": "أبحث عن المغامرة.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 53,
+      "text": "Avoid philosophical discussions.",
+      "arabic_text": "أتجنب النقاشات الفلسفية.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 54,
+      "text": "Think highly of myself.",
+      "arabic_text": "أفكر في نفسي بتقدير عالٍ.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 55,
+      "text": "Carry out my plans.",
+      "arabic_text": "أنفذ خططي.",
+      "domain": "C",
+      "keying": "+"
+    },
+    {
+      "id": 56,
+      "text": "Become overwhelmed by events.",
+      "arabic_text": "تغمرني الأحداث بسهولة.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 57,
+      "text": "Have a lot of fun.",
+      "arabic_text": "أستمتع بالحياة كثيرًا.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 58,
+      "text": "Believe that there is no absolute right or wrong.",
+      "arabic_text": "أؤمن بعدم وجود صواب أو خطأ مطلق.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 59,
+      "text": "Feel sympathy for those who are worse off than myself.",
+      "arabic_text": "أتعاطف مع من هم أقل حظًا.",
+      "domain": "A",
+      "keying": "+"
+    },
+    {
+      "id": 60,
+      "text": "Make rash decisions.",
+      "arabic_text": "أتخذ قرارات متهورة.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 61,
+      "text": "Am afraid of many things.",
+      "arabic_text": "أخاف من أشياء كثيرة.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 62,
+      "text": "Avoid contact with others.",
+      "arabic_text": "أتجنب التعامل مع الآخرين.",
+      "domain": "E",
+      "keying": "-"
+    },
+    {
+      "id": 63,
+      "text": "Love to daydream.",
+      "arabic_text": "أحب أحلام اليقظة.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 64,
+      "text": "Trust what people say.",
+      "arabic_text": "أثق فيما يقوله الناس.",
+      "domain": "A",
+      "keying": "+"
+    },
+    {
+      "id": 65,
+      "text": "Handle tasks smoothly.",
+      "arabic_text": "أتعامل مع المهام بسلاسة.",
+      "domain": "C",
+      "keying": "+"
+    },
+    {
+      "id": 66,
+      "text": "Lose my temper.",
+      "arabic_text": "أفقد أعصابي.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 67,
+      "text": "Prefer to be alone.",
+      "arabic_text": "أفضل أن أكون وحدي.",
+      "domain": "E",
+      "keying": "-"
+    },
+    {
+      "id": 68,
+      "text": "Do not like poetry.",
+      "arabic_text": "لا أحب الشعر.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 69,
+      "text": "Take advantage of others.",
+      "arabic_text": "أستغل الآخرين.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 70,
+      "text": "Leave a mess in my room.",
+      "arabic_text": "أترك غرفتي غير مرتبة.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 71,
+      "text": "Am often down in the dumps.",
+      "arabic_text": "غالبًا ما أشعر بالإحباط.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 72,
+      "text": "Take control of things.",
+      "arabic_text": "أسيطر على الأمور.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 73,
+      "text": "Rarely notice my emotional reactions.",
+      "arabic_text": "نادراً ما ألاحظ ردود أفعالي العاطفية.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 74,
+      "text": "Am indifferent to the feelings of others.",
+      "arabic_text": "لا أبالي بمشاعر الآخرين.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 75,
+      "text": "Break rules.",
+      "arabic_text": "أكسر القواعد.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 76,
+      "text": "Only feel comfortable with friends.",
+      "arabic_text": "أشعر بالراحة فقط مع أصدقائي.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 77,
+      "text": "Do a lot in my spare time.",
+      "arabic_text": "أفعل الكثير في وقت فراغي.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 78,
+      "text": "Dislike changes.",
+      "arabic_text": "لا أحب التغييرات.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 79,
+      "text": "Insult people.",
+      "arabic_text": "أهين الناس.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 80,
+      "text": "Do just enough work to get by.",
+      "arabic_text": "أعمل بالحد الأدنى فقط.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 81,
+      "text": "Easily resist temptations.",
+      "arabic_text": "أقاوم الإغراءات بسهولة.",
+      "domain": "N",
+      "keying": "-"
+    },
+    {
+      "id": 82,
+      "text": "Enjoy being reckless.",
+      "arabic_text": "أستمتع بالتصرف بتهور.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 83,
+      "text": "Have difficulty understanding abstract ideas.",
+      "arabic_text": "أجد صعوبة في فهم الأفكار المجردة.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 84,
+      "text": "Have a high opinion of myself.",
+      "arabic_text": "لدي رأي عالٍ في نفسي.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 85,
+      "text": "Waste my time.",
+      "arabic_text": "أضيع وقتي.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 86,
+      "text": "Feel that I'm unable to deal with things.",
+      "arabic_text": "أشعر أنني غير قادر على التعامل مع الأمور.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 87,
+      "text": "Love life.",
+      "arabic_text": "أحب الحياة.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 88,
+      "text": "Tend to vote for conservative political candidates.",
+      "arabic_text": "أميل لدعم الأفكار المحافظة.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 89,
+      "text": "Am not interested in other people's problems.",
+      "arabic_text": "لا أهتم بمشاكل الآخرين.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 90,
+      "text": "Rush into things.",
+      "arabic_text": "أندفع في الأمور.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 91,
+      "text": "Get stressed out easily.",
+      "arabic_text": "أتوتر بسهولة.",
+      "domain": "N",
+      "keying": "+"
+    },
+    {
+      "id": 92,
+      "text": "Keep others at a distance.",
+      "arabic_text": "أبقي الآخرين على مسافة.",
+      "domain": "E",
+      "keying": "-"
+    },
+    {
+      "id": 93,
+      "text": "Like to get lost in thought.",
+      "arabic_text": "أحب الشرود في التفكير.",
+      "domain": "O",
+      "keying": "+"
+    },
+    {
+      "id": 94,
+      "text": "Distrust people.",
+      "arabic_text": "لا أثق بالناس.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 95,
+      "text": "Know how to get things done.",
+      "arabic_text": "أعرف كيف أنجز الأمور.",
+      "domain": "C",
+      "keying": "+"
+    },
+    {
+      "id": 96,
+      "text": "Am not easily annoyed.",
+      "arabic_text": "لا أنزعج بسهولة.",
+      "domain": "N",
+      "keying": "-"
+    },
+    {
+      "id": 97,
+      "text": "Avoid crowds.",
+      "arabic_text": "أتجنب الزحام.",
+      "domain": "E",
+      "keying": "-"
+    },
+    {
+      "id": 98,
+      "text": "Do not enjoy going to art museums.",
+      "arabic_text": "لا أستمتع بزيارة المتاحف الفنية.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 99,
+      "text": "Obstruct others' plans.",
+      "arabic_text": "أعرقل خطط الآخرين.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 100,
+      "text": "Leave my belongings around.",
+      "arabic_text": "أترك أغراضي مبعثرة.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 101,
+      "text": "Feel comfortable with myself.",
+      "arabic_text": "أشعر بالراحة مع نفسي.",
+      "domain": "N",
+      "keying": "-"
+    },
+    {
+      "id": 102,
+      "text": "Wait for others to lead the way.",
+      "arabic_text": "أنتظر الآخرين ليتولوا القيادة.",
+      "domain": "E",
+      "keying": "-"
+    },
+    {
+      "id": 103,
+      "text": "Don't understand people who get emotional.",
+      "arabic_text": "لا أفهم الأشخاص العاطفيين.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 104,
+      "text": "Take no time for others.",
+      "arabic_text": "لا أخصص وقتًا للآخرين.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 105,
+      "text": "Break my promises.",
+      "arabic_text": "أنقض وعودي.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 106,
+      "text": "Am not bothered by difficult social situations.",
+      "arabic_text": "لا أنزعج من المواقف الاجتماعية الصعبة.",
+      "domain": "N",
+      "keying": "-"
+    },
+    {
+      "id": 107,
+      "text": "Like to take it easy.",
+      "arabic_text": "أحب الراحة وعدم الضغط.",
+      "domain": "E",
+      "keying": "-"
+    },
+    {
+      "id": 108,
+      "text": "Am attached to conventional ways.",
+      "arabic_text": "متمسك بالطرق التقليدية.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 109,
+      "text": "Get back at others.",
+      "arabic_text": "أنتقم من الآخرين.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 110,
+      "text": "Put little time and effort into my work.",
+      "arabic_text": "أبذل مجهودًا ووقتًا قليلين في عملي.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 111,
+      "text": "Am able to control my cravings.",
+      "arabic_text": "أتحكم في رغباتي.",
+      "domain": "N",
+      "keying": "-"
+    },
+    {
+      "id": 112,
+      "text": "Act wild and crazy.",
+      "arabic_text": "أتصرف بجنون.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 113,
+      "text": "Am not interested in theoretical discussions.",
+      "arabic_text": "لا أهتم بالنقاشات النظرية.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 114,
+      "text": "Boast about my virtues.",
+      "arabic_text": "أتفاخر بمميزاتي.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 115,
+      "text": "Have difficulty starting tasks.",
+      "arabic_text": "أجد صعوبة في بدء المهام.",
+      "domain": "C",
+      "keying": "-"
+    },
+    {
+      "id": 116,
+      "text": "Remain calm under pressure.",
+      "arabic_text": "أبقى هادئًا تحت الضغط.",
+      "domain": "N",
+      "keying": "-"
+    },
+    {
+      "id": 117,
+      "text": "Look at the bright side of life.",
+      "arabic_text": "أنظر إلى الجانب المشرق من الحياة.",
+      "domain": "E",
+      "keying": "+"
+    },
+    {
+      "id": 118,
+      "text": "Believe that we should be tough on crime.",
+      "arabic_text": "أؤمن بالحزم في مواجهة الجريمة.",
+      "domain": "O",
+      "keying": "-"
+    },
+    {
+      "id": 119,
+      "text": "Try not to think about the needy.",
+      "arabic_text": "أحاول عدم التفكير في المحتاجين.",
+      "domain": "A",
+      "keying": "-"
+    },
+    {
+      "id": 120,
+      "text": "Act without thinking.",
+      "arabic_text": "أتصرف دون تفكير.",
+      "domain": "C",
+      "keying": "-"
+    }
   ]
 }

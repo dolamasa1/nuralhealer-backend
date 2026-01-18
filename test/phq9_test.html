@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PHQ-9 Depression Screening</title>
+    <link rel="stylesheet" href="quiz.css">
+    <style>
+        .crisis-resources {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .resource-item {
+            margin-bottom: 15px;
+            padding-left: 15px;
+            border-left: 3px solid var(--primary);
+        }
+
+        [dir="rtl"] .resource-item {
+            padding-left: 0;
+            padding-right: 15px;
+            border-left: none;
+            border-right: 3px solid var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="lang-toggle" id="langToggle"><span id="langText">العربية</span></div>
+    <div class="theme-toggle" id="themeToggle">🌓</div>
+
+    <div class="container">
+        <div class="test">
+            <h1 style="text-align: center; margin-bottom: 20px;">PHQ-9 Depression Screening</h1>
+
+            <div class="timeframe-banner" id="timeframeBanner">
+                <span>Over the last 2 weeks, how often have you been bothered by any of the following problems?</span>
+                <span class="timeframe-emphasis">⏱️ Think about the past 14 days</span>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Loading...</div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-text" id="questionText">...</div>
+                <div class="options" id="options"></div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn-secondary" id="prevBtn">Previous</button>
+                <button class="btn-primary" id="nextBtn">Next</button>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h1 style="text-align: center; margin-bottom: 30px;">Your Results</h1>
+            <div id="resultsList"></div>
+
+            <div class="crisis-resources">
+                <h3 style="margin-bottom: 15px;">Crisis Resources</h3>
+                <div class="resource-item">
+                    <strong>National Suicide Prevention Lifeline (USA)</strong><br>
+                    Call or text 988 • Available 24/7
+                </div>
+                <div class="resource-item">
+                    <strong>International Crisis Centers</strong><br>
+                    Visit <a href="https://www.iasp.info/resources/Crisis_Centres" target="_blank">iasp.info</a>
+                </div>
+            </div>
+
+            <div class="nav-buttons" style="margin-top: 30px;">
+                <button class="btn-secondary" onclick="quiz.retake()">Retake Assessment</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="quiz.js"></script>
+    <script>
+        const quiz = new QuizEngine({
+            type: 'phq9',
+            baseUrl: 'http://localhost:8080/api/quizzes/phq9'
+        });
+        window.onload = () => quiz.init();
+    </script>
+</body>
+
+</html>

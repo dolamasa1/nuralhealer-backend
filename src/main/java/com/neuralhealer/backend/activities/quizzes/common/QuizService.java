@@ -41,13 +41,14 @@ public class QuizService {
         return sessionId;
     }
 
-    public void saveResponse(String sessionId, int questionId, int score, int totalQuestions) {
+    public void saveResponse(String sessionId, int questionId, int score, int totalQuestions, int minScore,
+            int maxScore) {
         SessionData session = getSession(sessionId);
         if (questionId < 1 || questionId > totalQuestions) {
             throw new IllegalArgumentException("Question ID must be between 1 and " + totalQuestions);
         }
-        if (score < 1 || score > 5) {
-            throw new IllegalArgumentException("Score must be between 1 and 5");
+        if (score < minScore || score > maxScore) {
+            throw new IllegalArgumentException("Score must be between " + minScore + " and " + maxScore);
         }
         session.getUserResponses().put(questionId, score);
     }

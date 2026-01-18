@@ -1,0 +1,47 @@
+{
+  "calculation_logic": "Simple sum of all items (Range 0-27)",
+  "citation": "Kroenke K, Spitzer RL, Psychiatric Annals 2002;32:509-521",
+  "interpretations": [
+    {
+      "range": [0, 4],
+      "severity_en": "None-minimal",
+      "severity_ar": "لا يوجد أو طفيف جداً",
+      "action_en": "None",
+      "action_ar": "لا يوجد"
+    },
+    {
+      "range": [5, 9],
+      "severity_en": "Mild",
+      "severity_ar": "بسيط",
+      "action_en": "Watchful waiting; repeat PHQ-9 at follow-up",
+      "action_ar": "الانتظار والترقب؛ إعادة إجراء الاختبار في وقت لاحق"
+    },
+    {
+      "range": [10, 14],
+      "severity_en": "Moderate",
+      "severity_ar": "متوسط",
+      "action_en": "Treatment plan, considering counseling, follow-up and/or pharmacotherapy",
+      "action_ar": "وضع خطة علاجية، مع الأخذ في الاعتبار الاستشارة والمتابعة و/أو العلاج الدوائي"
+    },
+    {
+      "range": [15, 19],
+      "severity_en": "Moderately Severe",
+      "severity_ar": "شديد نسبياً",
+      "action_en": "Active treatment with pharmacotherapy and/or psychotherapy",
+      "action_ar": "البدء بالعلاج الفعال باستخدام الأدوية و/أو العلاج النفسي"
+    },
+    {
+      "range": [20, 27],
+      "severity_en": "Severe",
+      "severity_ar": "شديد",
+      "action_en": "Immediate initiation of pharmacotherapy and, if severe impairment or poor response to therapy, expedited referral to a mental health specialist for psychotherapy and/or collaborative management",
+      "action_ar": "البدء الفوري في العلاج الدوائي، وفي حالة الضعف الشديد أو عدم الاستجابة، الإحالة السريعة إلى أخصائي الصحة النفسية"
+    }
+  ],
+  "critical_alert": {
+    "item_id": 9,
+    "threshold": 1,
+    "message_en": "Safety Notice: You indicated thoughts of self-harm. Please reach out to a professional or a crisis hotline immediately.",
+    "message_ar": "تنبيه سلامة: لقد أشرت إلى وجود أفكار حول إيذاء النفس. يرجى التواصل مع مختص أو خط ساخن للمساعدة فوراً."
+  }
+}

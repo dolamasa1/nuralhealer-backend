@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>IPIP-50 Personality Test</title>
+    <link rel="stylesheet" href="quiz.css">
+</head>
+
+<body>
+    <div class="lang-toggle" id="langToggle"><span id="langText">العربية</span></div>
+    <div class="theme-toggle" id="themeToggle">🌓</div>
+
+    <div class="container">
+        <div class="test">
+            <h1>Personality Assessment (IPIP-50)</h1>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Loading...</div>
+            </div>
+            <div class="question-card">
+                <div class="question-text" id="questionText">...</div>
+                <div class="options" id="options"></div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn-secondary" id="prevBtn">Previous</button>
+                <button class="btn-primary" id="nextBtn">Next</button>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h1>Your Results</h1>
+            <div id="resultsList"></div>
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="quiz.retake()">Retake Test</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="quiz.js"></script>
+    <script>
+        const quiz = new QuizEngine({
+            type: 'ipip50',
+            baseUrl: 'http://localhost:8080/api/quizzes/ipip50'
+        });
+        window.onload = () => quiz.init();
+    </script>
+</body>
+
+</html>

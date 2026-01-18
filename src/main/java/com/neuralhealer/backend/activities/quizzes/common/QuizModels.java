@@ -89,6 +89,7 @@ public class QuizModels {
         private String description;
         private String arabicDescription;
         private List<ScoreDetail> facets;
+        private Map<String, Object> metadata = new HashMap<>();
 
         // Getters and Setters
         public String getTrait() {
@@ -153,6 +154,20 @@ public class QuizModels {
 
         public void setFacets(List<ScoreDetail> facets) {
             this.facets = facets;
+        }
+
+        @com.fasterxml.jackson.annotation.JsonAnySetter
+        public void addMetadata(String key, Object value) {
+            metadata.put(key, value);
+        }
+
+        @com.fasterxml.jackson.annotation.JsonAnyGetter
+        public Map<String, Object> getMetadata() {
+            return metadata;
+        }
+
+        public Object getMeta(String key) {
+            return metadata.get(key);
         }
     }
 
