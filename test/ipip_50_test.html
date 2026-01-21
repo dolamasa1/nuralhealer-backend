@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <title>IPIP-50 Personality Test</title>
     <link rel="stylesheet" href="quiz.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
@@ -30,13 +33,14 @@
             </div>
         </div>
 
+        <!-- Update the results div in both HTML files -->
+        <!-- For ipip_50_test.html and ipip120_test.html, replace the results section with: -->
         <div class="results" id="results">
-            <h1>Your Results</h1>
+            <h1 id="resultsTitle">Your Personality Results</h1>
             <div id="resultsList"></div>
-            <div class="nav-buttons">
-                <button class="btn-secondary" onclick="quiz.retake()">Retake Test</button>
-            </div>
+            <!-- Action buttons will be added by JavaScript -->
         </div>
+
     </div>
 
     <script src="quiz.js"></script>

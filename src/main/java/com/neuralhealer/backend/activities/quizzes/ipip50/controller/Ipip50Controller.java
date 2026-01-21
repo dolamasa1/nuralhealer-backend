@@ -192,8 +192,10 @@ public class Ipip50Controller {
         }
 
         if (!quizService.hasAllResponses(sessionId, TOTAL_QUESTIONS)) {
-            return ResponseEntity.badRequest()
-                    .body(Collections.singletonMap("error", "All " + TOTAL_QUESTIONS + " questions must be answered."));
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("error", "Please answer all " + TOTAL_QUESTIONS + " questions before submitting.");
+            errorBody.put("missingQuestions", quizService.getMissingQuestionIds(sessionId, TOTAL_QUESTIONS));
+            return ResponseEntity.badRequest().body(errorBody);
         }
 
         try {

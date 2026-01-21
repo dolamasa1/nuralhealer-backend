@@ -3,6 +3,11 @@
  * Unified, non-overengineered logic for IPIP-120, IPIP-50, and PHQ-9
  */
 
+/**
+ * NeuralHealer Quiz Engine
+ * Unified, non-overengineered logic for IPIP-120, IPIP-50, and PHQ-9
+ */
+
 const TR = {
     en: {
         title: "Assessment",
@@ -14,7 +19,7 @@ const TR = {
         viewResults: "View Results",
         retake: "Retake Test",
         yourResults: "Your Results",
-        yourProfile: "Your Profile",
+        yourProfile: "Your Personality Profile",
         loading: "Loading questions...",
         starting: "Starting session...",
         saving: "Saving response...",
@@ -33,7 +38,7 @@ const TR = {
         viewResults: "عرض النتائج",
         retake: "إعادة الاختبار",
         yourResults: "نتائجك",
-        yourProfile: "ملفك",
+        yourProfile: "ملفك الشخصي",
         loading: "جاري تحميل الأسئلة...",
         starting: "جاري بدء الجلسة...",
         saving: "جاري حفظ الإجابة...",
@@ -46,7 +51,7 @@ const TR = {
 
 class QuizEngine {
     constructor(config) {
-        this.config = config; // { type: 'ipip120' | 'ipip50' | 'phq9', baseUrl: string, sessionHeader: string }
+        this.config = config;
         this.lang = 'en';
         this.currentIdx = 0;
         this.questions = [];
@@ -73,7 +78,7 @@ class QuizEngine {
             await this.loadProgress();
 
             // Find first unanswered or stay at 0
-            this.currentIdx = this.questions.findIndex((_, idx) => !this.answers[this.questions[idx].id]) || 0;
+            this.currentIdx = this.questions.findIndex((_, idx) => !this.answers[this.questions[idx].id]);
             if (this.currentIdx === -1) this.currentIdx = 0;
 
             this.hideLoading();
@@ -98,23 +103,21 @@ class QuizEngine {
             'Content-Type': 'application/json',
             'X-Quiz-Session': this.sessionId
         };
-        // Compatibility for IPIP-120 header if needed
         if (this.config.type === 'ipip120') headers['X-Quiz-Session-120'] = this.sessionId;
 
         try {
             const res = await fetch(`${this.config.baseUrl}${path}`, { ...options, headers });
 
             if (res.status === 401 && !isRetry) {
-                console.warn("Unauthorized. This endpoint requires an active session. Retrying...");
+                console.warn("Unauthorized. Retrying...");
                 await this.startNewSession();
                 return this.api(path, options, true);
             }
 
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
-                const errMsg = errData.error || errData.message || "API Fail";
-                console.error(`API Error [${res.status}] ${path}:`, errMsg);
-                throw new Error(errMsg);
+                console.error(`API Error [${res.status}] ${path}:`, errData);
+                throw errData; // Throw the whole object
             }
             return await res.json();
         } catch (e) {
@@ -161,7 +164,7 @@ class QuizEngine {
         const options = this.config.type === 'phq9' ? this.t().phq9Options : this.t().ipipOptions;
 
         options.forEach((label, i) => {
-            const val = this.config.type === 'phq9' ? i : i + 1; // PHQ-9 is 0-3, IPIP is 1-5
+            const val = this.config.type === 'phq9' ? i : i + 1;
             const div = document.createElement('div');
             div.className = `option ${this.answers[q.id] === val ? 'selected' : ''}`;
             div.innerHTML = `<span class="option-value">${val}</span><span>${label}</span>`;
@@ -213,8 +216,20 @@ class QuizEngine {
         const answered = Object.keys(this.answers).length;
 
         if (answered < total) {
-            console.warn(`Attempted submit with missing answers: ${answered}/${total}`);
-            this.showError(`Please answer all ${total} questions before submitting.`);
+            const missingIds = [];
+            for (let i = 0; i < total; i++) {
+                const qId = this.questions[i].id;
+                if (!this.answers[qId]) {
+                    missingIds.push(i + 1); // Use humans-readable index (1-based)
+                }
+            }
+            const list = missingIds.join(', ');
+            console.warn(`Attempted submit with missing answers: ${answered}/${total}. Missing: ${list}`);
+
+            const msg = this.lang === 'ar'
+                ? `يرجى الإجابة على جميع الأسئلة الـ ${total} قبل الإرسال. الأسئلة المفقودة: ${list}`
+                : `Please answer all ${total} questions before submitting. Missing: ${list}`;
+            this.showError(msg);
             return;
         }
 
@@ -225,13 +240,24 @@ class QuizEngine {
             this.showResults(data.result);
         } catch (e) {
             this.hideLoading();
-            this.showError(`Calculation failed: ${e.message}`);
+            if (e.missingQuestions && e.missingQuestions.length > 0) {
+                const list = e.missingQuestions.join(', ');
+                this.showError(`${this.lang === 'ar' ? 'يرجى الإجابة على الأسئلة التالية:' : 'Please check these questions:'} ${list}`);
+            } else {
+                this.showError(`Calculation failed: ${e.error || e.message || 'Unknown error'}`);
+            }
         }
     }
 
     showResults(result) {
         document.querySelector('.test').classList.add('hidden');
         document.getElementById('results').classList.add('active');
+
+        // Set results title
+        const titleEl = document.getElementById('resultsTitle');
+        if (titleEl) {
+            titleEl.innerText = this.lang === 'ar' ? 'نتائج ملفك الشخصي' : 'Your Personality Results';
+        }
 
         if (this.config.type === 'ipip120') {
             this.render120Results(result);
@@ -242,64 +268,143 @@ class QuizEngine {
         }
     }
 
-    render120Results(result) {
-        const cont = document.getElementById('resultsList');
-        cont.innerHTML = `<div class="radar-container"><canvas id="radarChart"></canvas></div>`;
-
-        const labels = [], scores = [];
-        result.scores.forEach(s => {
-            labels.push(this.lang === 'ar' ? s.arabicTrait : s.trait);
-            scores.push(s.score);
-
-            const card = document.createElement('div');
-            card.className = 'domain-card';
-            const pct = (s.score / 120) * 100;
-            card.innerHTML = `
-                <div class="domain-header">
-                    <span class="domain-name">${this.lang === 'ar' ? s.arabicTrait : s.trait}</span>
-                    <span class="domain-score">${s.score}</span>
-                </div>
-                <div class="domain-bar"><div class="domain-bar-fill" style="width:${pct}%"></div></div>
-                <div class="facets-container">
-                    ${s.facets.map(f => `
-                        <div class="facet-item">
-                            <div class="facet-header">
-                                <span>${this.lang === 'ar' ? (f.arabicTrait || f.trait) : f.trait}</span>
-                                <span>${f.score} / 20</span>
-                            </div>
-                            <div class="facet-bar"><div class="facet-bar-fill" style="width:${(f.score / 20) * 100}%"></div></div>
-                            <p class="facet-description">${this.lang === 'ar' ? f.arabicDescription : f.description}</p>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            card.onclick = () => card.classList.toggle('expanded');
-            cont.appendChild(card);
-        });
-
-        this.drawRadar(labels, scores);
-    }
+    // REMOVE THE OLD render50Results and render120Results METHODS AND KEEP THESE ONES:
 
     render50Results(result) {
         const cont = document.getElementById('resultsList');
-        cont.innerHTML = `
-            <div class="narrative">
-                <div class="narrative-title">${this.t().yourProfile}</div>
-                <div class="narrative-content">
-                    ${result.scores.map(s => `
-                        <div class="trait-insight">
-                            <span class="trait-icon">${this.getIcon(s.trait)}</span>
-                            <span class="trait-text"><strong>${this.lang === 'ar' ? s.arabicTrait : s.trait}:</strong> ${this.lang === 'ar' ? s.arabicDescription : s.description}</span>
-                        </div>
-                    `).join('')}
+        cont.innerHTML = '';
+
+        // Standard Scientific Results Section
+        const resultsSection = document.createElement('div');
+        resultsSection.className = 'results-section';
+        resultsSection.innerHTML = `
+            <div class="section-header">
+                <div class="section-title">${this.t().yourProfile}</div>
+                <div class="scientific-badge">
+                    <span>🔬</span>
+                    <span>${this.lang === 'ar' ? 'الدكتور جون جونسون' : 'Dr. John Johnson'}</span>
                 </div>
             </div>
         `;
+
+        const narrative = document.createElement('div');
+        narrative.className = 'narrative';
+
+        result.scores.forEach(s => {
+            // Calculate percentage (assuming max score is 50 for each trait)
+            const maxScore = 50;
+            const percentage = Math.round((s.score / maxScore) * 100);
+
+            const insight = document.createElement('div');
+            insight.className = 'trait-insight';
+            insight.innerHTML = `
+                <div class="trait-icon">${this.getIcon(s.trait)}</div>
+                <div class="trait-content">
+                    <div class="trait-header-row">
+                        <div class="trait-name">${this.lang === 'ar' ? s.arabicTrait : s.trait}</div>
+                        <div class="trait-percentage">${percentage}%</div>
+                    </div>
+                    <div class="trait-bar-container">
+                        <div class="trait-bar" style="width: 0%" data-width="${percentage}"></div>
+                    </div>
+                    <div class="trait-description">${this.lang === 'ar' ? s.arabicDescription : s.description}</div>
+                </div>
+            `;
+            narrative.appendChild(insight);
+        });
+
+        resultsSection.appendChild(narrative);
+        cont.appendChild(resultsSection);
+
+        // AI Chat Redirect Section
+        this.addAIChatRedirect(cont);
+
+        // Action Buttons
+        this.addActionButtons(cont);
+    }
+
+    render120Results(result) {
+        const cont = document.getElementById('resultsList');
+        cont.innerHTML = '';
+
+        // Standard Scientific Results Section
+        const resultsSection = document.createElement('div');
+        resultsSection.className = 'results-section';
+        resultsSection.innerHTML = `
+            <div class="section-header">
+                <div class="section-title">${this.t().yourProfile}</div>
+                <div class="scientific-badge">
+                    <span>🔬</span>
+                    <span>${this.lang === 'ar' ? 'الدكتور جون جونسون' : 'Dr. John Johnson'}</span>
+                </div>
+            </div>
+        `;
+
+        const narrative = document.createElement('div');
+        narrative.className = 'narrative';
+
+        result.scores.forEach(s => {
+            // Calculate percentage (max score is 120 for each domain)
+            const maxScore = 120;
+            const percentage = Math.round((s.score / maxScore) * 100);
+
+            const insight = document.createElement('div');
+            insight.className = 'trait-insight';
+
+            // Create facets HTML if they exist
+            let facetsHTML = '';
+            if (s.facets && s.facets.length > 0) {
+                facetsHTML = `
+                    <div class="facets-container" style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border);">
+                        ${s.facets.map(f => {
+                    const facetPercentage = Math.round((f.score / 20) * 100);
+                    return `
+                                <div class="facet-item">
+                                    <div class="facet-header">
+                                        <span>${this.lang === 'ar' ? (f.arabicTrait || f.trait) : f.trait}</span>
+                                        <span>${f.score} / 20</span>
+                                    </div>
+                                    <div class="facet-bar-container">
+                                        <div class="facet-bar" style="width: 0%" data-width="${facetPercentage}"></div>
+                                    </div>
+                                    <div class="facet-description">${this.lang === 'ar' ? f.arabicDescription : f.description}</div>
+                                </div>
+                            `;
+                }).join('')}
+                    </div>
+                `;
+            }
+
+            insight.innerHTML = `
+                <div class="trait-icon">${this.getIcon(s.trait)}</div>
+                <div class="trait-content">
+                    <div class="trait-header-row">
+                        <div class="trait-name">${this.lang === 'ar' ? s.arabicTrait : s.trait}</div>
+                        <div class="trait-percentage">${percentage}%</div>
+                    </div>
+                    <div class="trait-bar-container">
+                        <div class="trait-bar" style="width: 0%" data-width="${percentage}"></div>
+                    </div>
+                    <div class="trait-description">${this.lang === 'ar' ? s.arabicDescription : s.description}</div>
+                    ${facetsHTML}
+                </div>
+            `;
+            narrative.appendChild(insight);
+        });
+
+        resultsSection.appendChild(narrative);
+        cont.appendChild(resultsSection);
+
+        // AI Chat Redirect Section
+        this.addAIChatRedirect(cont);
+
+        // Action Buttons
+        this.addActionButtons(cont);
     }
 
     renderPhq9Results(result) {
         const cont = document.getElementById('resultsList');
-        const s = result.scores[0]; // PHQ-9 has one main score
+        const s = result.scores[0];
 
         const sevClass = s.score <= 4 ? 'sev-none' : s.score <= 9 ? 'sev-mild' : s.score <= 14 ? 'sev-moderate' : 'sev-high';
 
@@ -321,13 +426,135 @@ class QuizEngine {
         `;
     }
 
+    // Helper methods
+    addAIChatRedirect(container) {
+        const aiSection = document.createElement('div');
+        aiSection.className = 'ai-chat-redirect';
+        aiSection.innerHTML = `
+            <div class="redirect-content">
+                <div class="redirect-icon">✨</div>
+                <div class="redirect-text">
+                    <div class="redirect-title">${this.lang === 'ar' ? 'افتح رؤى أعمق' : 'Unlock Deeper Insights'}</div>
+                    <div class="redirect-subtitle">${this.lang === 'ar' ? 'ناقش ملفك الشخصي مع مساعدنا الذكي' : 'Discuss your personality profile with our AI consultant'}</div>
+                </div>
+                <button class="redirect-btn" onclick="quiz.openAIChat()">
+                    <span>${this.lang === 'ar' ? 'ابدأ الاستشارة' : 'Begin Consultation'}</span>
+                    <span class="arrow">${this.lang === 'ar' ? '←' : '→'}</span>
+                </button>
+            </div>
+        `;
+        container.appendChild(aiSection);
+    }
+
+    addActionButtons(container) {
+        const actionButtons = document.createElement('div');
+        actionButtons.className = 'action-buttons';
+        actionButtons.innerHTML = `
+            <button class="action-btn btn-download" onclick="quiz.downloadReport()">
+                <span>📥</span>
+                <span>${this.lang === 'ar' ? 'تحميل التقرير' : 'Download Report'}</span>
+            </button>
+            <button class="action-btn btn-retake" onclick="quiz.retake()">
+                <span>🔄</span>
+                <span>${this.t().retake}</span>
+            </button>
+        `;
+        container.appendChild(actionButtons);
+    }
+
     getIcon(trait) {
-        const icons = { 'Extraversion': '👥', 'Agreeableness': '🤝', 'Conscientiousness': '📋', 'Neuroticism': '🧘', 'Openness': '🎨' };
+        const icons = {
+            'Extraversion': '👥',
+            'Agreeableness': '🤝',
+            'Conscientiousness': '📋',
+            'Neuroticism': '🧘',
+            'Openness': '🎨',
+            'Openness to Experience': '🎨',
+            'Emotional Stability': '🧘'
+        };
         return icons[trait] || '✨';
     }
 
+    openAIChat() {
+        const url = this.lang === 'ar'
+            ? `/ar/chat?context=personality_${this.config.type}`
+            : `/en/chat?context=personality_${this.config.type}`;
+
+        if (this.config.type === 'ipip120' || this.config.type === 'ipip50') {
+            const personalityData = {
+                type: this.config.type,
+                scores: this.questions.map(q => ({
+                    question: q.text,
+                    answer: this.answers[q.id]
+                }))
+            };
+
+            sessionStorage.setItem('personalityData', JSON.stringify(personalityData));
+            window.open(url, '_blank');
+        }
+    }
+
+    downloadReport() {
+        // Create a simple text report
+        const report = `
+PERSONALITY ASSESSMENT REPORT
+${this.config.type.toUpperCase()} Results
+Generated: ${new Date().toLocaleDateString()}
+Language: ${this.lang === 'ar' ? 'Arabic' : 'English'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YOUR PERSONALITY PROFILE
+
+${this.questions.map((q, i) => {
+            const answer = this.answers[q.id];
+            const answerText = this.config.type === 'phq9'
+                ? this.t().phq9Options[answer]
+                : this.t().ipipOptions[answer - 1];
+            return `Q${i + 1}: ${q.text}\nA: ${answerText}\n`;
+        }).join('\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Assessment based on ${this.config.type.toUpperCase()}
+NeuralHealer Personality Insights
+        `.trim();
+
+        // Create blob and download
+        const blob = new Blob([report], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `personality-report-${this.config.type}-${Date.now()}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        // Visual feedback
+        const btn = document.querySelector('.btn-download');
+        if (btn) {
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<span>✓</span><span>${this.lang === 'ar' ? 'تم التنزيل!' : 'Downloaded!'}</span>`;
+            btn.style.background = 'linear-gradient(135deg, #27AE60, #229954)';
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.style.background = '';
+            }, 2000);
+        }
+    }
+
+    retake() {
+        if (confirm(this.lang === 'ar' ? "هل تريد إعادة الاختبار؟" : "Are you sure you want to retake the test?")) {
+            localStorage.removeItem(this.sessionKey);
+            window.location.reload();
+        }
+    }
+
     drawRadar(labels, data) {
-        const ctx = document.getElementById('radarChart').getContext('2d');
+        const ctx = document.getElementById('radarChart')?.getContext('2d');
+        if (!ctx) return;
+
         if (window.myRadar) window.myRadar.destroy();
         window.myRadar = new Chart(ctx, {
             type: 'radar',
@@ -336,9 +563,9 @@ class QuizEngine {
                 datasets: [{
                     label: this.t().yourResults,
                     data,
-                    backgroundColor: 'rgba(155, 89, 182, 0.2)',
-                    borderColor: '#9B59B6',
-                    pointBackgroundColor: '#8E44AD',
+                    backgroundColor: 'rgba(107, 70, 193, 0.2)',
+                    borderColor: '#6B46C1',
+                    pointBackgroundColor: '#553C9A',
                     fill: true
                 }]
             },
@@ -357,12 +584,23 @@ class QuizEngine {
             document.documentElement.setAttribute('dir', this.lang === 'ar' ? 'rtl' : 'ltr');
             document.getElementById('langText').innerText = this.lang === 'en' ? 'العربية' : 'English';
             this.render();
-            if (document.getElementById('results').classList.contains('active')) this.submit(); // Refresh results for lang
+            if (document.getElementById('results').classList.contains('active')) {
+                this.submit(); // Refresh results for lang
+            }
         };
-        document.getElementById('prevBtn').onclick = () => { if (this.currentIdx > 0) { this.currentIdx--; this.render(); } };
+        document.getElementById('prevBtn').onclick = () => {
+            if (this.currentIdx > 0) {
+                this.currentIdx--;
+                this.render();
+            }
+        };
         document.getElementById('nextBtn').onclick = () => {
-            if (this.currentIdx < this.questions.length - 1) { this.currentIdx++; this.render(); }
-            else this.submit();
+            if (this.currentIdx < this.questions.length - 1) {
+                this.currentIdx++;
+                this.render();
+            } else {
+                this.submit();
+            }
         };
     }
 
@@ -391,7 +629,10 @@ class QuizEngine {
         `;
         document.body.appendChild(cont);
         setTimeout(() => cont.classList.add('show'), 100);
-        setTimeout(() => { cont.classList.remove('show'); setTimeout(() => cont.remove(), 600); }, 3000);
+        setTimeout(() => {
+            cont.classList.remove('show');
+            setTimeout(() => cont.remove(), 600);
+        }, 3000);
     }
 
     showLoading(msg) {
@@ -405,13 +646,13 @@ class QuizEngine {
         }
         l.innerText = msg;
     }
-    hideLoading() { this.isLoading = false; document.getElementById('loader')?.remove(); }
-    showError(msg) { alert(msg); }
 
-    retake() {
-        if (confirm(this.lang === 'ar' ? "هل تريد إعادة الاختبار؟" : "Retake the test?")) {
-            localStorage.removeItem(this.sessionKey);
-            window.location.reload();
-        }
+    hideLoading() {
+        this.isLoading = false;
+        document.getElementById('loader')?.remove();
+    }
+
+    showError(msg) {
+        alert(msg);
     }
 }

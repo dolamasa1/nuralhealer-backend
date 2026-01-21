@@ -83,6 +83,17 @@ public class QuizService {
         return getSession(sessionId).getUserResponses().size() == totalQuestions;
     }
 
+    public List<Integer> getMissingQuestionIds(String sessionId, int totalQuestions) {
+        Map<Integer, Integer> responses = getSession(sessionId).getUserResponses();
+        List<Integer> missing = new ArrayList<>();
+        for (int i = 1; i <= totalQuestions; i++) {
+            if (!responses.containsKey(i)) {
+                missing.add(i);
+            }
+        }
+        return missing;
+    }
+
     public boolean isValidSession(String sessionId) {
         return sessionId != null && sessions.containsKey(sessionId);
     }
