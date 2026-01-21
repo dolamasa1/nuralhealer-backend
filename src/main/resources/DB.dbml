@@ -1,0 +1,355 @@
+// NEURALHEALER - Database Schema
+// Healthcare Platform with AI-Powered Patient Care
+
+enum engagement_status {
+  pending
+  active
+  ended
+  archived
+  cancelled
+}
+
+enum verification_type {
+  start
+  end
+}
+
+enum token_status {
+  pending
+  verified
+  expired
+  cancelled
+}
+
+enum subscription_status {
+  active
+  expired
+  cancelled
+  pending
+}
+
+enum chat_sender_type {
+  patient
+  ai
+}
+
+enum job_status {
+  pending
+  processing
+  completed
+  failed
+  retry
+}
+
+Table engagement_access_rules {
+  id uuid [pk]
+  rule_name varchar(255) [unique, not null]
+  can_view_all_history boolean [default: false]
+  can_view_current_only boolean [default: true]
+  can_view_patient_profile boolean [default: true]
+  can_modify_notes boolean [default: true]
+  can_message_patient boolean [default: true]
+  retains_period_access boolean [default: false]
+  retains_history_access boolean [default: false]
+  retains_no_access boolean [default: true]
+  description text
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table users {
+  id uuid [pk]
+  email varchar(255) [unique, not null]
+  password_hash varchar(255) [not null]
+  first_name varchar(100) [not null]
+  last_name varchar(100) [not null]
+  phone varchar(20)
+  timezone varchar(50) [default: 'UTC']
+  email_verified_at timestamp
+  phone_verified_at timestamp
+  is_active boolean [default: true]
+  last_login_at timestamp
+  mfa_enabled boolean [default: false]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp
+}
+
+Table doctor_profiles {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  title varchar(100)
+  bio text
+  specialities jsonb
+  experience_years integer
+  certificates jsonb
+  location_city varchar(100)
+  location_country varchar(100)
+  is_verified boolean [default: false]
+  verification_data jsonb
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table patient_profiles {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  date_of_birth date
+  gender varchar(20)
+  emergency_contact varchar(255)
+  primary_health_concerns jsonb
+  medical_history jsonb
+  notes text
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table engagements {
+  id uuid [pk]
+  engagement_id varchar(100) [unique]
+  doctor_id uuid [not null, ref: > doctor_profiles.id]
+  patient_id uuid [not null, ref: > patient_profiles.id]
+  access_rule_name varchar(255) [not null, ref: > engagement_access_rules.rule_name]
+  status engagement_status [default: 'pending']
+  engagement_type varchar(50)
+  start_at timestamp
+  end_at timestamp
+  ended_by uuid [ref: > users.id]
+  termination_reason text
+  start_verified_at timestamp
+  end_verified_at timestamp
+  notes text
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table doctor_patients {
+  id uuid [pk]
+  doctor_id uuid [not null, ref: > doctor_profiles.id]
+  patient_id uuid [not null, ref: > patient_profiles.id]
+  relationship_status varchar(255) [ref: > engagement_access_rules.rule_name]
+  current_engagement_id uuid [ref: > engagements.id]
+  added_at timestamp [default: `now()`]
+  relationship_started_at timestamp
+  relationship_ended_at timestamp
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  
+  indexes {
+    (doctor_id, patient_id) [unique]
+  }
+}
+
+Table engagement_verification_tokens {
+  id uuid [pk]
+  engagement_id uuid [not null, ref: > engagements.id]
+  token varchar(255) [unique, not null]
+  verification_type verification_type
+  qr_code_data text
+  doctor_id uuid [ref: > users.id]
+  patient_id uuid [ref: > users.id]
+  verified_by uuid [ref: > users.id]
+  verified_at timestamp
+  expires_at timestamp [not null]
+  status token_status [default: 'pending']
+  created_at timestamp [default: `now()`]
+}
+
+Table engagement_messages {
+  id uuid [pk]
+  engagement_id uuid [not null, ref: > engagements.id]
+  message_uuid uuid
+  sender_id uuid [ref: > users.id]
+  recipient_id uuid [ref: > users.id]
+  content text
+  content_type varchar(50) [default: 'text']
+  sent_at timestamp [default: `now()`]
+  delivered_at timestamp
+  read_at timestamp
+  is_encrypted boolean [default: true]
+  encryption_key_id varchar(255)
+  is_system_message boolean [default: false]
+  system_message_type varchar(50)
+  created_at timestamp [default: `now()`]
+}
+
+Table engagement_analytics {
+  id uuid [pk]
+  engagement_id uuid [not null, ref: > engagements.id]
+  metric_name varchar(100) [not null]
+  metric_value decimal
+  recorded_at timestamp [default: `now()`]
+  created_at timestamp [default: `now()`]
+}
+
+Table engagement_events {
+  id uuid [pk]
+  engagement_id uuid [not null, ref: > engagements.id]
+  event_type varchar(100) [not null]
+  triggered_at timestamp [default: `now()`]
+  triggered_by uuid [ref: > users.id]
+  payload jsonb
+  created_at timestamp [default: `now()`]
+}
+
+Table active_service_subscriptions {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  plan_id varchar(100) [not null]
+  plan_name varchar(255)
+  start_date timestamp [not null]
+  end_date timestamp
+  status subscription_status [default: 'active']
+  auto_renew boolean [default: true]
+  payment_data jsonb
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table engagement_sessions {
+  id uuid [pk]
+  engagement_id uuid [not null, ref: > engagements.id]
+  user_id uuid [ref: > users.id]
+  session_token varchar(255) [unique, not null]
+  session_start timestamp [default: `now()`]
+  session_end timestamp
+  ip_address inet
+  user_agent text
+  device_info jsonb
+  created_at timestamp [default: `now()`]
+}
+
+Table platform_analytics {
+  id uuid [pk]
+  analytics_date date [not null, unique]
+  total_users integer [default: 0]
+  new_users integer [default: 0]
+  active_users integer [default: 0]
+  total_sessions integer [default: 0]
+  new_sessions integer [default: 0]
+  total_doctors integer [default: 0]
+  verified_doctors integer [default: 0]
+  active_doctors integer [default: 0]
+  active_engagements integer [default: 0]
+  ended_engagements integer [default: 0]
+  crm_resources_count integer [default: 0]
+  messages_processed integer [default: 0]
+  avg_engagement_duration interval
+  created_at timestamp [default: `now()`]
+}
+
+Table audit_log {
+  id uuid [pk]
+  user_id uuid [ref: > users.id]
+  action varchar(100) [not null]
+  resource_type varchar(100)
+  resource_id varchar(255)
+  change_data jsonb
+  ip_address inet
+  user_agent text
+  created_at timestamp [default: `now()`]
+}
+
+Table security_authentication_tokens {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  token_type varchar(50) [default: 'session']
+  token varchar(255) [unique, not null]
+  expires_at timestamp [not null]
+  is_revoked boolean [default: false]
+  revoked_at timestamp
+  created_at timestamp [default: `now()`]
+}
+
+Table url_shortcuts {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  url text [not null]
+  label varchar(255)
+  short_code varchar(50) [unique, not null]
+  visit_count integer [default: 0]
+  expires_at timestamp
+  created_at timestamp [default: `now()`]
+}
+
+Table user_management_metrics {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  metric_name varchar(100) [not null]
+  metric_value decimal
+  recorded_at timestamp [default: `now()`]
+  period varchar(20) [default: 'daily']
+  created_at timestamp [default: `now()`]
+}
+
+Table system_settings {
+  id uuid [pk]
+  setting_key varchar(255) [unique, not null]
+  setting_value jsonb
+  description text
+  is_public boolean [default: false]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table ai_chat_sessions {
+  id uuid [pk]
+  patient_id uuid [not null, ref: > patient_profiles.id]
+  session_title varchar(255)
+  session_type varchar(50) [default: 'general']
+  started_at timestamp [default: `now()`]
+  ended_at timestamp
+  is_active boolean [default: true]
+  message_count integer [default: 0]
+  total_duration interval
+  meta jsonb
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table ai_chat_messages {
+  id uuid [pk]
+  session_id uuid [not null, ref: > ai_chat_sessions.id]
+  sender_type chat_sender_type [not null]
+  sender_id uuid [ref: > users.id]
+  content text [not null]
+  content_type varchar(50) [default: 'text']
+  ai_model varchar(50)
+  ai_response_time integer
+  tokens_used integer
+  sentiment_score decimal
+  flagged_for_review boolean [default: false]
+  flag_reason varchar(255)
+  sent_at timestamp [default: `now()`]
+  read_at timestamp
+  created_at timestamp [default: `now()`]
+}
+
+Table message_queues {
+  id uuid [pk]
+  job_type varchar(100) [not null]
+  payload jsonb
+  status job_status [default: 'pending']
+  scheduled_at timestamp [default: `now()`]
+  processed_at timestamp
+  retry_count integer [default: 0]
+  error_message text
+  created_at timestamp [default: `now()`]
+}
+
+Table notifications {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  type varchar(100) [not null]
+  title varchar(255)
+  message text
+  engagement_id uuid [ref: > engagements.id]
+  payload jsonb
+  is_read boolean [default: false]
+  sent_at timestamp [default: `now()`]
+  read_at timestamp
+  expires_at timestamp
+  created_at timestamp [default: `now()`]
+}

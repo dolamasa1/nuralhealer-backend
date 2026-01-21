@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/neuralhealer
+    username: postgres
+    password: aaa
+  jpa:
+    hibernate:
+      ddl-auto: update # Automatic updates for dev convenience
+    show-sql: true
+
+logging:
+  level:
+    "[com.neuralhealer.backend]": DEBUG
+    "[org.hibernate.SQL]": DEBUG

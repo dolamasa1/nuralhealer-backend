@@ -1,6 +1,6 @@
 # NeuralHealer Backend
 
-**Version:** 0.4 | **Tier:** 1 (Pre-production) | **Read Time:** ~15 min
+**Version:** 0.5.0 | **Tier:** 1 (Pre-production) | **Read Time:** ~15 min
 
 ## 📋 Overview
 
@@ -220,6 +220,21 @@ sequenceDiagram
 
 ---
 
+## ⚙️ Environment Configuration
+
+NeuralHealer uses environment variables for secure configuration. Copy `.env.example` to `.env` (or set them in your environment) before running.
+
+| Variable | Description | Default (Dev) |
+|----------|-------------|---------------|
+| `DB_URL` | PostgreSQL JDBC URL | `jdbc:postgresql://localhost:5432/neuralhealer` |
+| `DB_USERNAME` | Database username | `postgres` |
+| `DB_PASSWORD` | Database password | `aaa` |
+| `JWT_SECRET` | Base64 encoded secret for JWT | (Dev default provided) |
+| `AI_SERVICE_URL` | External AI Chatbot URL | (Ngrok dev URL) |
+| `AI_SERVICE_TIMEOUT_SECONDS` | Timeout for AI calls | `90` |
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -250,6 +265,10 @@ curl http://localhost:8080/api/actuator/health
 ## 🔌 API Overview
 
 **Base URL:** `http://localhost:8080/api`
+
+> [!TIP]
+> **Interactive Documentation**: Access the [Swagger UI](http://localhost:8080/api/swagger) for live testing.
+> **Raw API Specs**: [OpenAPI JSON](http://localhost:8080/api/docs)
 
 ### Authentication
 | Method | Endpoint | Description | Auth Required |

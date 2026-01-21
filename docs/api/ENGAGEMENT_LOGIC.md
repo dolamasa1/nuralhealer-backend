@@ -1,8 +1,8 @@
 # Engagement System Logic - NeuralHealer
 
 ---
-**Last Updated:** 2025-01-15
-**Version:** 0.6
+**Last Updated:** 2026-01-21
+**Version:** 0.5.0
 **Changes:** 
 - Documentation cleanup
 - Clarified WebSocket event paths within the STOMP broker

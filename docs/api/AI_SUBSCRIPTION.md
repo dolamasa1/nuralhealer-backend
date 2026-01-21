@@ -1,8 +1,8 @@
 # AI Chat & Subscription (STOMP API)
 
 ---
-**Last Updated:** 2025-01-15
-**Version:** 1.0
+**Last Updated:** 2026-01-21
+**Version:** 0.5.0
 **Status:** Production-Ready
 **Changes:** 
 - Consolidated AI API details and Subscription logic into a single document

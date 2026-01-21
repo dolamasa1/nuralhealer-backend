@@ -3,8 +3,8 @@
 Documentation for the Personality Assessment Quiz APIs in NeuralHealer.
 
 ---
-**Last Updated:** 2025-01-18
-**Version:** 0.1
+**Last Updated:** 2026-01-21
+**Version:** 0.5.0
 ---
 
 ## 🧩 1. IPIP-120 Quiz

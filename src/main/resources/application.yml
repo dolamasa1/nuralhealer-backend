@@ -6,9 +6,9 @@ spring:
     name: neuralhealer-backend
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/neuralhealer
-    username: postgres
-    password: aaa
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/neuralhealer}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:aaa}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -58,6 +58,23 @@ springdoc:
     path: /swagger
     operations-sorter: method
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ${spring.application.name}
+    version: 0.5.0
+    description: NeuralHealer Healthcare Platform Backend
+    java:
+      version: 21
+
 logging:
   level:
     com.neuralhealer.backend: DEBUG
@@ -67,8 +84,8 @@ logging:
 # AI Chatbot Configuration
 ai:
   chatbot:
-    base-url: https://unenticed-huong-creedless.ngrok-free.dev
+    base-url: ${AI_SERVICE_URL:https://unenticed-huong-creedless.ngrok-free.dev}
     health-endpoint: /health
     ask-endpoint: /ask
-    timeout-seconds: 90
+    timeout-seconds: ${AI_SERVICE_TIMEOUT_SECONDS:90}
 
