@@ -594,6 +594,8 @@ FOR EACH ROW EXECUTE FUNCTION generate_engagement_id();
 -- ================================================================
 
 INSERT INTO engagement_access_rules (rule_name, can_view_all_history, can_view_current_only, can_view_patient_profile, can_modify_notes, can_message_patient, retains_period_access, retains_history_access, retains_no_access, description) VALUES
+('INITIAL_PENDING', false, false, false, false, false, false, false, true, 'First engagement request sent, not yet verified'),
+('INITIAL_CANCELLED_PENDING', false, false, false, false, false, false, false, true, 'First engagement cancelled before activation'),
 ('FULL_ACCESS', true, true, true, true, true, true, false, false, 'Full access to all patient data and history'),
 ('CURRENT_ENGAGEMENT_ACCESS', false, true, true, true, true, false, false, true, 'Access only to current engagement period'),
 ('READ_ONLY_ACCESS', true, true, true, false, false, true, false, false, 'Read-only access to patient data'),
