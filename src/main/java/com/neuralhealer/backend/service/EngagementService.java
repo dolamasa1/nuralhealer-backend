@@ -25,6 +25,7 @@ public class EngagementService {
     private final EngagementVerificationTokenRepository tokenRepository;
     private final EngagementAccessRuleRepository accessRuleRepository;
     private final DoctorPatientRepository doctorPatientRepository;
+    private final EngagementEventRepository eventRepository;
     private final UserRepository userRepository;
     private final DoctorProfileRepository doctorProfileRepository;
     private final PatientProfileRepository patientProfileRepository;
@@ -208,23 +209,23 @@ public class EngagementService {
                         patUser.getLastName(), patUser.getEmail()),
                 e.getAccessRule() != null ? e.getAccessRule().getRuleName() : null,
                 e.getStartAt(),
-                e.getEndAt());
+                e.getEndAt(),
+                e.getTerminationReason());
     }
 
     @Transactional
     public void hardDeleteEngagement(User user, UUID engagementId) {
         Engagement engagement = getEngagementIfAuthorized(engagementId, user);
 
-        // VALIDATION 1: Must be creator doctor
-        if (!engagement.getDoctor().getUser().getId().equals(user.getId())) {
-            throw new ForbiddenException("Only the doctor who created this engagement can delete it");
+        // VALIDATION 1: Must be doctor OR patient in the engagement
+        boolean isDoctor = engagement.getDoctor().getUser().getId().equals(user.getId());
+        boolean isPatient = engagement.getPatient().getUser().getId().equals(user.getId());
+
+        if (!isDoctor && !isPatient) {
+            throw new ForbiddenException("Only participants can delete this engagement");
         }
 
-        // VALIDATION 2: Must be PENDING status
-        if (engagement.getStatus() != EngagementStatus.pending) {
-            throw new ConflictException(
-                    "Can only delete PENDING engagements. Current status: " + engagement.getStatus());
-        }
+        // Delete works on ANY status - complete removal from database
 
         // Handle doctor_patients record
         DoctorPatient relationship = doctorPatientRepository
@@ -275,6 +276,16 @@ public class EngagementService {
         engagement.setTerminationReason(request.reason());
         engagementRepository.save(engagement);
 
+        // Store event in engagement_events table
+        EngagementEvent event = EngagementEvent.builder()
+                .engagementId(engagementId)
+                .eventType("CANCELLED")
+                .triggeredBy(user.getId())
+                .payload("{\"reason\":\"" + (request.reason() != null ? request.reason().replace("\"", "\\\"") : "")
+                        + "\",\"cancelledBy\":\"" + cancelledBy.name() + "\"}")
+                .build();
+        eventRepository.save(event);
+
         // Update Relationship
         DoctorPatient relationship = doctorPatientRepository
                 .findByDoctorIdAndPatientId(engagement.getDoctor().getId(), engagement.getPatient().getId())
@@ -297,22 +308,31 @@ public class EngagementService {
         broadcastEngagementStatus(engagement.getId(), "cancelled",
                 "Engagement has been cancelled by " + cancelledBy.name());
 
-        // Notify other party
-        UUID recipientId = isDoctor ? engagement.getPatient().getUser().getId()
-                : engagement.getDoctor().getUser().getId();
+        // Notify BOTH parties
+        String cancellerName = isDoctor
+                ? "Dr. " + engagement.getDoctor().getUser().getLastName()
+                : "Patient " + engagement.getPatient().getUser().getFirstName();
+
+        // Notify doctor
         notificationService.notifyUser(
-                recipientId,
+                engagement.getDoctor().getUser().getId(),
                 NotificationType.ENGAGEMENT_CANCELLED,
                 "Engagement Cancelled",
-                (isDoctor ? "Dr. " + engagement.getDoctor().getUser().getLastName()
-                        : "Patient " + engagement.getPatient().getUser().getFirstName())
-                        + " has cancelled the engagement.");
+                cancellerName + " has cancelled the engagement.");
+
+        // Notify patient
+        notificationService.notifyUser(
+                engagement.getPatient().getUser().getId(),
+                NotificationType.ENGAGEMENT_CANCELLED,
+                "Engagement Cancelled",
+                cancellerName + " has cancelled the engagement.");
 
         return mapToResponse(engagement);
     }
 
     private String determineRelationshipStatusAfterCancellation(Engagement e, DoctorPatient rp, CancellationRole role,
             String chosenRule) {
+        // Pending cancellation
         if (e.getStatus() == EngagementStatus.pending) {
             if ("INITIAL_PENDING".equals(rp.getRelationshipStatus())) {
                 return "INITIAL_CANCELLED_PENDING";
@@ -320,15 +340,14 @@ public class EngagementService {
             return rp.getRelationshipStatus();
         }
 
-        // Active cancellation
-        if (role == CancellationRole.PATIENT && chosenRule != null) {
-            return chosenRule;
+        // Active cancellation by DOCTOR = always NO_ACCESS
+        if (role == CancellationRole.DOCTOR) {
+            return "NO_ACCESS";
         }
 
-        // Doctor cancels or patient didn't specify: use retention rules
-        EngagementAccessRule rule = e.getAccessRule();
-        if (rule != null && rule.getRetainsHistoryAccess()) {
-            return rule.getRuleName();
+        // Active cancellation by PATIENT = use their choice, otherwise NO_ACCESS
+        if (role == CancellationRole.PATIENT && chosenRule != null && !chosenRule.trim().isEmpty()) {
+            return chosenRule;
         }
         return "NO_ACCESS";
     }

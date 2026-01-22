@@ -264,30 +264,29 @@ UPDATES:
 ## 5. DELETE vs CANCEL Operations
 
 
-markdown
-### 5.1 Hard DELETE - System Admin Nuclear Option
 
-**Purpose:** Complete removal for system administration/emergency cleanup. **SYSTEM ADMIN ONLY**. DANGEROUS operation that bypasses normal business logic.
+### 5.1 Hard DELETE - Participant Cleanup Option
+
+**Purpose:** Complete removal for testing or production cleanup. **Participants (Doctor or Patient) ONLY**. DANGEROUS operation that removes all records related to this engagement.
 
 **API:** `DELETE /api/engagements/{id}`
 
 **Authorization:**
-- ✅ **System Admin role ONLY** (requires special permission)
+- ✅ **Doctor who is part of this engagement**
+- ✅ **Patient who is part of this engagement**
 - ✅ Works for **ANY** status (pending, active, cancelled, ended)
-- ❌ Regular doctors/patients CANNOT use this
+- ❌ Non-participants CANNOT use this
 
 **Special Handling for ACTIVE Engagements:**
 IF engagement.status == 'active':
   1. Update engagement.status = 'cancelled'
   2. Update engagement.end_at = NOW()
-  3. Update engagement.ended_by = SYSTEM_ADMIN_USER_ID
-  4. Update engagement.termination_reason = "System admin emergency cleanup"
+  3. Update engagement.ended_by = Current User ID
+  4. Update engagement.termination_reason = "Hard delete by participant"
   5. Update doctor_patients.relationship_status = 'NO_ACCESS'
   6. Update doctor_patients.is_active = false
   7. Update doctor_patients.relationship_ended_at = NOW()
   8. Update doctor_patients.current_engagement_id = NULL
-  9. **Send notifications** to doctor and patient
-  10. **Create audit log** entry
 
 **What Gets Deleted:**
 CASCADE DELETE:
@@ -297,17 +296,7 @@ CASCADE DELETE:
 ├─ engagement_events
 └─ engagement_analytics
 
-KEEP (do not delete):
-└─ doctor_patients record (update only, never delete)
-└─ notifications (set engagement_id = NULL)
-└─ audit_log entries (for accountability)
-
-text
-
-**Important:** This is **NOT for normal operations**. Only for:
-- Emergency data cleanup
-- Compliance requirements  
-- System migration scenarios
+**Important:** This is for cleaning up unwanted engagements (mistakes, tests, or total removal). Use CANCEL for professional terminations where history is needed.
 ---
 
 ### 5.2 Soft CANCEL
@@ -362,12 +351,11 @@ CREATES system message in engagement_messages:
   system_message_type: 'engagement_cancelled'
 }
 
-CREATES notification for patient:
+CREATES notification for BOTH parties:
 {
   type: "ENGAGEMENT_CANCELLED"
   title: "Engagement Request Cancelled"
-  message: "Dr. [FirstName LastName] cancelled the engagement request before activation."
-  engagement_id: <engagement uuid>
+  message: "Dr. [LastName] cancelled the engagement request."
 }
 
 WEBSOCKET BROADCAST:
@@ -404,12 +392,11 @@ CREATES system message:
   system_message_type: 'engagement_cancelled'
 }
 
-CREATES notification for doctor:
+CREATES notification for BOTH parties:
 {
   type: "ENGAGEMENT_CANCELLED"
   title: "Engagement Request Declined"
-  message: "Patient [FirstName LastName] declined your engagement request."
-  engagement_id: <engagement uuid>
+  message: "Patient [FirstName] declined the engagement request."
 }
 
 WEBSOCKET BROADCAST:
@@ -425,24 +412,11 @@ Payload: {
 #### 5.2.3 ACTIVE + Doctor Cancels
 
 ```
-STEP 1: Get retention rule from access_rule
-SELECT retains_history_access, retains_no_access 
-FROM engagement_access_rules 
-WHERE rule_name = engagement.access_rule_name;
-
-STEP 2: Determine new relationship_status
-IF retains_no_access = true:
-  new_status = 'NO_ACCESS'
-  new_is_active = false
-  new_ended_at = NOW()
-ELSE IF retains_history_access = true:
-  new_status = engagement.access_rule_name (keep same)
-  new_is_active = true
-  new_ended_at = NULL
-ELSE:
-  new_status = 'CURRENT_ENGAGEMENT_ACCESS'
-  new_is_active = true
-  new_ended_at = NULL
+STEP 1: Determine new relationship_status
+// Doctor cancellation always results in NO_ACCESS to protect patient privacy
+new_status = 'NO_ACCESS'
+new_is_active = false
+new_ended_at = NOW()
 
 UPDATES engagement:
 ├─ status: 'active' → 'cancelled'
@@ -463,12 +437,11 @@ CREATES system message:
   system_message_type: 'engagement_cancelled'
 }
 
-CREATES notification for patient:
+CREATES notification for BOTH parties:
 {
   type: "ENGAGEMENT_CANCELLED"
   title: "Engagement Cancelled by Doctor"
-  message: "Dr. [FirstName LastName] has cancelled your engagement. Access updated based on retention policy."
-  engagement_id: <engagement uuid>
+  message: "Dr. [LastName] has cancelled the engagement. Access revoked."
 }
 
 WEBSOCKET BROADCAST:
@@ -519,12 +492,11 @@ CREATES system message:
   system_message_type: 'engagement_cancelled'
 }
 
-CREATES notification for doctor:
+CREATES notification for BOTH parties:
 {
   type: "ENGAGEMENT_CANCELLED"
   title: "Engagement Cancelled by Patient"
-  message: "Patient [FirstName LastName] cancelled the engagement. Your access is now: [newAccessRule]"
-  engagement_id: <engagement uuid>
+  message: "Patient [FirstName] cancelled the engagement. Access set to: [newAccessRule]"
 }
 
 WEBSOCKET BROADCAST:
@@ -683,7 +655,7 @@ ELSE:
 | POST | `/api/engagements/verify-start` | Patient activates engagement | Patient | pending |
 | POST | `/api/engagements/{id}/end-request` | Request termination | Doctor or Patient | active |
 | POST | `/api/engagements/{id}/verify-end` | Confirm termination | Other party | active |
-| DELETE | `/api/engagements/{id}` | Hard delete (testing) | Creator doctor | pending only |
+| DELETE | `/api/engagements/{id}` | Hard delete (cleanup) | Participant | any status |
 | POST | `/api/engagements/{id}/cancel` | Soft cancel with reason | Doctor or Patient | pending or active |
 | POST | `/api/engagements/{id}/refresh-token` | Regenerate START token | Creator doctor | pending |
 | GET | `/api/engagements/{id}/token` | Get current valid token | Creator doctor | pending |
@@ -897,10 +869,10 @@ STEP 7: If any fail, return 403 Forbidden
 | Current Status | CREATE | VERIFY_START | CANCEL | DELETE | REFRESH_TOKEN | END_REQUEST | VERIFY_END |
 |----------------|--------|--------------|--------|--------|---------------|-------------|------------|
 | N/A (new) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| pending | ❌ | ✅ | ✅ | ✅ (doctor) | ✅ (doctor) | ❌ | ❌ |
-| active | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ |
-| ended | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| cancelled | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| pending | ❌ | ✅ | ✅ | ✅ | ✅ (doctor) | ❌ | ❌ |
+| active | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| ended | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| cancelled | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
 
 ---
 

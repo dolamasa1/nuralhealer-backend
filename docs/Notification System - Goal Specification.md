@@ -70,7 +70,7 @@ The Notification System is responsible for:
 |------|---------|-----------|----------|----------|
 | `ENGAGEMENT_CREATED` | Doctor initiates engagement | Patient | HIGH | In-app, Email |
 | `ENGAGEMENT_STARTED` | Patient verifies START token | Doctor | HIGH | In-app, Push |
-| `ENGAGEMENT_CANCELLED` | Either party cancels | Other party | HIGH | In-app, Email, Push |
+| `ENGAGEMENT_CANCELLED` | Either party cancels | Both parties | HIGH | In-app, Email, Push |
 | `ENGAGEMENT_END_REQUESTED` | Either party requests end | Other party | HIGH | In-app, Push |
 | `ENGAGEMENT_ENDED` | End verified | Both parties | MEDIUM | In-app, Email |
 | `TOKEN_EXPIRED` | START token reaches expiry | Patient | MEDIUM | In-app, Email |
@@ -322,13 +322,15 @@ Example: Token Expiration Warning
 **Pattern:** User performs action → Backend validates → Sends notification to other party
 
 ```
-Example: Message Sent
-├─ User sends message in engagement chat
-├─ Backend saves message
-├─ Check if recipient is online
-│  ├─ If online: WebSocket notification (in-app)
-│  └─ If offline: Push + Email notification
-```
+Example: Cancellation
+├─ User cancels engagement
+├─ Backend validates status
+├─ Backend saves cancellation reason
+├─ Notification to BOTH parties:
+│  ├─ To initiator: "You have cancelled the engagement"
+│  └─ To other party: "[Actor Name] has cancelled the engagement"
+└─ Real-time broadcast to all viewers
+
 
 ---
 

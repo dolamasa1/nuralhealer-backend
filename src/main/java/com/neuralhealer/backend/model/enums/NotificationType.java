@@ -5,5 +5,6 @@ public enum NotificationType {
     ENGAGEMENT_ENDED,
     ENGAGEMENT_CANCELLED,
     NEW_MESSAGE,
-    SYSTEM_ALERT
+    SYSTEM_ALERT,
+    SYSTEM_BROADCAST
 }

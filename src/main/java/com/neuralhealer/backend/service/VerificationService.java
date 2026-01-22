@@ -74,6 +74,12 @@ public class VerificationService {
             throw new InvalidVerificationException("User not authorized to verify this engagement");
         }
 
+        // START tokens can ONLY be verified by the PATIENT (doctor creates, patient
+        // verifies)
+        if (token.getVerificationType() == VerificationType.start && !userId.equals(patientId)) {
+            throw new InvalidVerificationException("Only the patient can verify the START token");
+        }
+
         token.setStatus(TokenStatus.verified);
         token.setVerifiedAt(LocalDateTime.now());
         return tokenRepository.save(token);
