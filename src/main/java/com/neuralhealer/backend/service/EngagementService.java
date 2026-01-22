@@ -33,6 +33,7 @@ public class EngagementService {
     private final VerificationService verificationService;
     private final SimpMessagingTemplate messagingTemplate;
     private final NotificationService notificationService;
+    private final EngagementMessageService messageService;
 
     @Transactional
     public StartEngagementResponse initiateEngagement(User doctor, StartEngagementRequest request) {
@@ -153,6 +154,9 @@ public class EngagementService {
 
         broadcastEngagementStatus(engagement.getId(), "ended", "Engagement has been ended");
 
+        // Record system message
+        messageService.sendSystemMessage(engagement, "Engagement has been ended by " + user.getFirstName());
+
         // Notify other party
         UUID otherPartyId = engagement.getDoctor().getUser().getId().equals(user.getId())
                 ? engagement.getPatient().getUser().getId()
@@ -268,6 +272,20 @@ public class EngagementService {
             throw new ForbiddenException("Not authorized to cancel this engagement");
         }
 
+        // VALIDATION: Patient MUST provide newAccessRule if engagement is active
+        if (engagement.getStatus() == EngagementStatus.active && isPatient) {
+            if (request.newAccessRule() == null || request.newAccessRule().trim().isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Patients must provide a newAccessRule when cancelling an active engagement");
+            }
+        }
+
+        // VALIDATION: Doctor CANNOT provide newAccessRule (access is always revoked)
+        if (isDoctor && request.newAccessRule() != null && !request.newAccessRule().trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Doctors cannot specify a record access rule; access is always revoked upon doctor cancellation");
+        }
+
         CancellationRole cancelledBy = isDoctor ? CancellationRole.DOCTOR : CancellationRole.PATIENT;
 
         engagement.setStatus(EngagementStatus.cancelled);
@@ -326,6 +344,13 @@ public class EngagementService {
                 NotificationType.ENGAGEMENT_CANCELLED,
                 "Engagement Cancelled",
                 cancellerName + " has cancelled the engagement.");
+
+        // Record system message
+        String systemMessageContent = "Engagement has been cancelled by " + cancellerName;
+        if (request.reason() != null && !request.reason().trim().isEmpty()) {
+            systemMessageContent += ". Reason: " + request.reason();
+        }
+        messageService.sendSystemMessage(engagement, systemMessageContent);
 
         return mapToResponse(engagement);
     }

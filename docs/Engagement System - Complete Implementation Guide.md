@@ -413,7 +413,8 @@ Payload: {
 
 ```
 STEP 1: Determine new relationship_status
-// Doctor cancellation always results in NO_ACCESS to protect patient privacy
+// Doctor cancellation ALWAYS results in NO_ACCESS for security/privacy.
+// The request MUST NOT contain newAccessRule.
 new_status = 'NO_ACCESS'
 new_is_active = false
 new_ended_at = NOW()
@@ -458,7 +459,7 @@ Payload: {
 #### 5.2.4 ACTIVE + Patient Cancels
 
 ```
-VALIDATION: request.newAccessRule must be provided and must be one of:
+VALIDATION: request.newAccessRule MUST be provided and must be one of:
 - FULL_ACCESS
 - READ_ONLY_ACCESS
 - CURRENT_ENGAGEMENT_ACCESS

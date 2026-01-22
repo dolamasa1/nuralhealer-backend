@@ -81,6 +81,20 @@ public class EngagementMessageService {
                                 .collect(Collectors.toList());
         }
 
+        @Transactional
+        public void sendSystemMessage(Engagement engagement, String content) {
+                EngagementMessage message = EngagementMessage.builder()
+                                .engagement(engagement)
+                                .sender(null) // null sender indicates system message
+                                .recipient(null)
+                                .content(content)
+                                .isSystemMessage(true)
+                                .sentAt(LocalDateTime.now())
+                                .build();
+
+                messageRepository.save(message);
+        }
+
         private MessageResponse mapToResponse(EngagementMessage msg) {
                 return new MessageResponse(
                                 msg.getId(),

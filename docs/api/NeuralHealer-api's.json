@@ -1,0 +1,548 @@
+{
+  "name": "NeuralHealer-api's",
+  "version": "1",
+  "items": [
+    {
+      "type": "folder",
+      "name": "1. Authentication",
+      "filename": "auth",
+      "seq": 1,
+      "items": [
+        {
+          "type": "http",
+          "name": "Login Doctor",
+          "filename": "login-doctor.bru",
+          "seq": 1,
+          "request": {
+            "url": "http://localhost:8080/api/auth/login",
+            "method": "POST",
+            "body": {
+              "mode": "json",
+              "json": "{\"email\":\"doctor@test.com\",\"password\":\"Test1234\"}"
+            }
+          }
+        },
+        {
+          "type": "http",
+          "name": "Login Patient",
+          "filename": "login-patient.bru",
+          "seq": 2,
+          "request": {
+            "url": "http://localhost:8080/api/auth/login",
+            "method": "POST",
+            "body": {
+              "mode": "json",
+              "json": "{\"email\":\"patient@test.com\",\"password\":\"Test1234\"}"
+            }
+          }
+        },
+        {
+          "type": "http",
+          "name": "Register Doctor",
+          "filename": "register-doctor.bru",
+          "seq": 3,
+          "request": {
+            "url": "http://localhost:8080/api/auth/register",
+            "method": "POST",
+            "body": {
+              "mode": "json",
+              "json": "{\"email\":\"doctor2@test.com\",\"password\":\"Test1234\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"role\":\"DOCTOR\"}"
+            }
+          }
+        },
+        {
+          "type": "http",
+          "name": "Register Patient",
+          "filename": "register-patient.bru",
+          "seq": 4,
+          "request": {
+            "url": "http://localhost:8080/api/auth/register",
+            "method": "POST",
+            "body": {
+              "mode": "json",
+              "json": "{\"email\":\"patient2@test.com\",\"password\":\"Test1234\",\"firstName\":\"Jane\",\"lastName\":\"Doe\",\"role\":\"PATIENT\"}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "2. User Management",
+      "filename": "User Management",
+      "seq": 2,
+      "items": [
+        {
+          "type": "http",
+          "name": "Get Current User (Me)",
+          "filename": "GetCurrentUser.bru",
+          "seq": 1,
+          "request": {
+            "url": "http://localhost:8080/api/users/me",
+            "method": "GET"
+          }
+        },
+        {
+          "type": "http",
+          "name": "Find User by Email",
+          "filename": "FindUserByEmail.bru",
+          "seq": 2,
+          "request": {
+            "url": "http://localhost:8080/api/users/by-email?email=patient@test.com",
+            "method": "GET",
+            "docs": "Lookup a user's basic info and role by their email address."
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "3. Doctors",
+      "filename": "doctors",
+      "seq": 3,
+      "items": [
+        {
+          "type": "http",
+          "name": "Get All Doctors",
+          "filename": "GetAllDoctors.bru",
+          "seq": 1,
+          "request": {
+            "url": "http://localhost:8080/api/doctors",
+            "method": "GET",
+            "docs": "List all available doctor profiles in the system."
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "4. Engagement System",
+      "filename": "Engagement System",
+      "seq": 4,
+      "items": [
+        {
+          "type": "http",
+          "name": "1. Initiate Engagement (Doctor)",
+          "filename": "Initiate Engagement (Doctor).bru",
+          "seq": 1,
+          "request": {
+            "url": "http://localhost:8080/api/engagements/initiate",
+            "method": "POST",
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"accessRuleName\": \"FULL_ACCESS\"\n}"
+            },
+            "docs": "Doctor creates a pending engagement."
+          }
+        },
+        {
+          "type": "http",
+          "name": "2. Get Current Token (Doctor)",
+          "filename": "GetToken.bru",
+          "seq": 2,
+          "request": {
+            "url": "http://localhost:8080/api/engagements/{{engagement_id}}/token",
+            "method": "GET",
+            "docs": "Retrieve valid START token."
+          }
+        },
+        {
+          "type": "http",
+          "name": "3. Refresh Token (Doctor)",
+          "filename": "RefreshToken.bru",
+          "seq": 3,
+          "request": {
+            "url": "http://localhost:8080/api/engagements/{{engagement_id}}/refresh-token",
+            "method": "POST"
+          }
+        },
+        {
+          "type": "http",
+          "name": "4. Verify & Start (Patient)",
+          "filename": "VerifyStart.bru",
+          "seq": 4,
+          "request": {
+            "url": "http://localhost:8080/api/engagements/verify-start",
+            "method": "POST",
+            "body": {
+              "mode": "json",
+              "json": "{\"token\": \"NH-XXXXXX\"}"
+            }
+          }
+        },
+        {
+          "type": "http",
+          "name": "5. List My Engagements",
+          "filename": "List Engagements.bru",
+          "seq": 5,
+          "request": {
+            "url": "http://localhost:8080/api/engagements/my-engagements",
+            "method": "GET"
+          }
+        },
+        {
+          "type": "folder",
+          "name": "Messaging",
+          "filename": "Messaging",
+          "seq": 6,
+          "items": [
+            {
+              "type": "http",
+              "name": "Get Messages",
+              "filename": "GetMessages.bru",
+              "seq": 1,
+              "request": {
+                "url": "http://localhost:8080/api/engagements/{{engagement_id}}/messages",
+                "method": "GET"
+              }
+            },
+            {
+              "type": "http",
+              "name": "Send Message",
+              "filename": "SendMessage.bru",
+              "seq": 2,
+              "request": {
+                "url": "http://localhost:8080/api/engagements/{{engagement_id}}/messages",
+                "method": "POST",
+                "body": {
+                  "mode": "json",
+                  "json": "{\"content\": \"Hello!\"}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "Termination",
+          "filename": "Termination",
+          "seq": 7,
+          "items": [
+            {
+              "type": "http",
+              "name": "Cancel (Doctor)",
+              "filename": "CancelDoctor.bru",
+              "seq": 1,
+              "request": {
+                "url": "http://localhost:8080/api/engagements/{{engagement_id}}/cancel",
+                "method": "POST",
+                "body": {
+                  "mode": "json",
+                  "json": "{\"reason\": \"Schedule conflict\"}"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Cancel (Patient)",
+              "filename": "CancelPatient.bru",
+              "seq": 2,
+              "request": {
+                "url": "http://localhost:8080/api/engagements/{{engagement_id}}/cancel",
+                "method": "POST",
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"reason\": \"Switching doctors\",\n  \"newAccessRule\": \"READ_ONLY_ACCESS\"\n}"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Hard Delete (Cleanup)",
+              "filename": "HardDelete.bru",
+              "seq": 3,
+              "request": {
+                "url": "http://localhost:8080/api/engagements/{{engagement_id}}",
+                "method": "DELETE"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "5. Activities (Quizzes)",
+      "filename": "activities",
+      "seq": 5,
+      "items": [
+        {
+          "type": "folder",
+          "name": "IPIP-50",
+          "filename": "ipip50",
+          "seq": 1,
+          "items": [
+            {
+              "type": "http",
+              "name": "Start Session",
+              "filename": "StartSession.bru",
+              "seq": 1,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/ipip50/start",
+                "method": "POST"
+              }
+            },
+            {
+              "type": "http",
+              "name": "Get Questions",
+              "filename": "GetQuestions.bru",
+              "seq": 2,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/ipip50/questions",
+                "method": "GET"
+              }
+            },
+            {
+              "type": "http",
+              "name": "Submit Response",
+              "filename": "SubmitResponse.bru",
+              "seq": 3,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/ipip50/submit-question",
+                "method": "POST",
+                "body": {
+                  "mode": "json",
+                  "json": "{\"questionId\": 1, \"score\": 5}"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Get Progress",
+              "filename": "GetProgress.bru",
+              "seq": 4,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/ipip50/progress",
+                "method": "GET"
+              }
+            },
+            {
+              "type": "http",
+              "name": "Finish & Score",
+              "filename": "Finish.bru",
+              "seq": 5,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/ipip50/submit-quiz",
+                "method": "POST"
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "IPIP-120",
+          "filename": "ipip120",
+          "seq": 2,
+          "items": [
+            {
+              "type": "http",
+              "name": "Start Session",
+              "filename": "StartSession.bru",
+              "seq": 1,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/ipip120/start",
+                "method": "POST"
+              }
+            },
+            {
+              "type": "http",
+              "name": "Get Questions",
+              "filename": "GetQuestions.bru",
+              "seq": 2,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/ipip120/questions",
+                "method": "GET"
+              }
+            },
+            {
+              "type": "http",
+              "name": "Submit Response",
+              "filename": "SubmitResponse.bru",
+              "seq": 3,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/ipip120/submit-question",
+                "method": "POST",
+                "body": {
+                  "mode": "json",
+                  "json": "{\"questionId\": 1, \"score\": 4}"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Finish & Score",
+              "filename": "Finish.bru",
+              "seq": 4,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/ipip120/submit-quiz",
+                "method": "POST"
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "PHQ-9",
+          "filename": "phq9",
+          "seq": 3,
+          "items": [
+            {
+              "type": "http",
+              "name": "Start Session",
+              "filename": "StartSession.bru",
+              "seq": 1,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/phq9/start",
+                "method": "POST"
+              }
+            },
+            {
+              "type": "http",
+              "name": "Get Questions",
+              "filename": "GetQuestions.bru",
+              "seq": 2,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/phq9/questions",
+                "method": "GET"
+              }
+            },
+            {
+              "type": "http",
+              "name": "Submit Response",
+              "filename": "SubmitResponse.bru",
+              "seq": 3,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/phq9/submit-question",
+                "method": "POST",
+                "body": {
+                  "mode": "json",
+                  "json": "{\"questionId\": 1, \"score\": 2}"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Finish & Score",
+              "filename": "Finish.bru",
+              "seq": 4,
+              "request": {
+                "url": "http://localhost:8080/api/quizzes/phq9/submit-quiz",
+                "method": "POST"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "6. Notifications",
+      "filename": "notifications",
+      "seq": 6,
+      "items": [
+        {
+          "type": "http",
+          "name": "Get My Notifications",
+          "filename": "GetNotifications.bru",
+          "seq": 1,
+          "request": {
+            "url": "http://localhost:8080/api/notifications",
+            "method": "GET"
+          }
+        },
+        {
+          "type": "http",
+          "name": "Unread Count",
+          "filename": "UnreadCount.bru",
+          "seq": 2,
+          "request": {
+            "url": "http://localhost:8080/api/notifications/unread",
+            "method": "GET"
+          }
+        },
+        {
+          "type": "http",
+          "name": "Mark as Read",
+          "filename": "MarkRead.bru",
+          "seq": 3,
+          "request": {
+            "url": "http://localhost:8080/api/notifications/{{notif_id}}/read",
+            "method": "PUT"
+          }
+        },
+        {
+          "type": "http",
+          "name": "Mark All as Read",
+          "filename": "MarkAllRead.bru",
+          "seq": 4,
+          "request": {
+            "url": "http://localhost:8080/api/notifications/read-all",
+            "method": "POST"
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "7. AI Chatbot",
+      "filename": "AI-chat",
+      "seq": 7,
+      "items": [
+        {
+          "type": "http",
+          "name": "Ask AI (REST)",
+          "filename": "ask.bru",
+          "seq": 1,
+          "request": {
+            "url": "http://localhost:8080/api/app/ai/ask",
+            "method": "POST",
+            "body": {
+              "mode": "json",
+              "json": "{\"question\": \"كيف حالك؟\"}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "8. WebSocket Protocols",
+      "filename": "WS Protcols",
+      "seq": 8,
+      "items": [
+        {
+          "type": "http",
+          "name": "AI Chat STOMP",
+          "filename": "AI-STOMP.bru",
+          "seq": 1,
+          "request": {
+            "url": "ws://localhost:8080/api/ws-endpoint",
+            "method": "GET",
+            "docs": "STOMP Connection:\n- Send to: /app/ai/ask\n- Subscribe: /user/queue/ai\n- Features: Typing indicators, Error handling"
+          }
+        },
+        {
+          "type": "http",
+          "name": "Engagement Events",
+          "filename": "EngagementWS.bru",
+          "seq": 2,
+          "request": {
+            "url": "ws://localhost:8080/api/ws-endpoint",
+            "method": "GET",
+            "docs": "STOMP Connection:\n- Subscribe: /topic/engagement/{{id}}\n- Payload: CHAT_MESSAGE, TYPING_INDICATOR, ENGAGEMENT_STATUS"
+          }
+        }
+      ]
+    }
+  ],
+  "environments": [],
+  "brunoConfig": {
+    "version": "1",
+    "name": "NeuralHealer-api's",
+    "type": "collection",
+    "ignore": [
+      "node_modules",
+      ".git"
+    ]
+  }
+}
