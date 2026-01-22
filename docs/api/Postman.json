@@ -1,0 +1,1650 @@
+{
+  "info": {
+    "name": "NeuralHealer-api's",
+    "description": "",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "5. Activities (Quizzes)",
+      "item": [
+        {
+          "name": "IPIP-120",
+          "item": [
+            {
+              "name": "Finish & Score",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip120/submit-quiz",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip120",
+                    "submit-quiz"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Get Questions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip120/questions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip120",
+                    "questions"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Start Session",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip120/start",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip120",
+                    "start"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Submit Response",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip120/submit-question",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip120",
+                    "submit-question"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"questionId\": 1, \"score\": 4}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "IPIP-50",
+          "item": [
+            {
+              "name": "Finish & Score",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/submit-quiz",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "submit-quiz"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Get Progress",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/progress",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "progress"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Get Questions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/questions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "questions"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Start Session",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/start",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "start"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Submit Response",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/submit-question",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "submit-question"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"questionId\": 1, \"score\": 5}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "PHQ-9",
+          "item": [
+            {
+              "name": "Finish & Score",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/phq9/submit-quiz",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "phq9",
+                    "submit-quiz"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Get Questions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/phq9/questions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "phq9",
+                    "questions"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Start Session",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/phq9/start",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "phq9",
+                    "start"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Submit Response",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/phq9/submit-question",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "phq9",
+                    "submit-question"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"questionId\": 1, \"score\": 2}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Login Doctor",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"doctor@test.com\",\"password\":\"Test1234\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login Patient",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"patient@test.com\",\"password\":\"Test1234\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Register Doctor",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"doctor2@test.com\",\"password\":\"Test1234\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"role\":\"DOCTOR\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Register Patient",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"patient2@test.com\",\"password\":\"Test1234\",\"firstName\":\"Jane\",\"lastName\":\"Doe\",\"role\":\"PATIENT\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. AI Chatbot",
+      "item": [
+        {
+          "name": "Ask AI (REST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patient_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/app/ai/ask",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "app",
+                "ai",
+                "ask"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"question\": \"كيف حالك؟\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Doctors",
+      "item": [
+        {
+          "name": "Get All Doctors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctor_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/doctors",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "doctors"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "// Tests",
+                  "// List all available doctor profiles in the system."
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Engagement System",
+      "item": [
+        {
+          "name": "2. Get Current Token (Doctor)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctor_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/token",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "engagements",
+                "{{engagement_id}}",
+                "token"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "// Tests",
+                  "// Retrieve valid START token."
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1. Initiate Engagement (Doctor)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctor_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/engagements/initiate",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "engagements",
+                "initiate"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"accessRuleName\": \"FULL_ACCESS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "// Tests",
+                  "// Doctor creates a pending engagement."
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. List My Engagements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctor_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/engagements/my-engagements",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "engagements",
+                "my-engagements"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "3. Refresh Token (Doctor)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctor_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/refresh-token",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "engagements",
+                "{{engagement_id}}",
+                "refresh-token"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "4. Verify & Start (Patient)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patient_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/engagements/verify-start",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "engagements",
+                "verify-start"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"token\": \"NH-XXXXXX\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Messaging",
+          "item": [
+            {
+              "name": "Get Messages",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctor_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/messages",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "engagements",
+                    "{{engagement_id}}",
+                    "messages"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Send Message",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctor_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/messages",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "engagements",
+                    "{{engagement_id}}",
+                    "messages"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"content\": \"Hello!\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Termination",
+          "item": [
+            {
+              "name": "Cancel (Doctor)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctor_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/cancel",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "engagements",
+                    "{{engagement_id}}",
+                    "cancel"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"reason\": \"Schedule conflict\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Cancel (Patient)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{patient_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/cancel",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "engagements",
+                    "{{engagement_id}}",
+                    "cancel"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Switching doctors\",\n  \"newAccessRule\": \"READ_ONLY_ACCESS\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Hard Delete (Cleanup)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{doctor_token}}",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/engagements/{{engagement_id}}",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "engagements",
+                    "{{engagement_id}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Notifications",
+      "item": [
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patient_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/notifications",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patient_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/notifications/read-all",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "read-all"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Mark as Read",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patient_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/notifications/{{notif_id}}/read",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{notif_id}}",
+                "read"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Unread Count",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patient_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/notifications/unread",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "unread"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. User Management",
+      "item": [
+        {
+          "name": "Find User by Email",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctor_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/users/by-email?email=patient@test.com",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "users",
+                "by-email"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "// Tests",
+                  "// Lookup a user's basic info and role by their email address."
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{doctor_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/users/me",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. WebSocket Protocols",
+      "item": [
+        {
+          "name": "AI Chat STOMP",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patient_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "ws://localhost:8080/api/ws-endpoint",
+              "protocol": "ws",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "ws-endpoint"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "// Tests",
+                  "// STOMP Connection:",
+                  "// - Send to: /app/ai/ask",
+                  "// - Subscribe: /user/queue/ai",
+                  "// - Features: Typing indicators, Error handling"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Engagement Events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patient_token}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "ws://localhost:8080/api/ws-endpoint",
+              "protocol": "ws",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "ws-endpoint"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "// Tests",
+                  "// STOMP Connection:",
+                  "// - Subscribe: /topic/engagement/{{id}}",
+                  "// - Payload: CHAT_MESSAGE, TYPING_INDICATOR, ENGAGEMENT_STATUS"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "patient_token",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "doctor_token",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "engagement_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "patient_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "notif_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "id",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
