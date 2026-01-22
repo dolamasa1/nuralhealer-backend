@@ -263,65 +263,51 @@ UPDATES:
 
 ## 5. DELETE vs CANCEL Operations
 
-### 5.1 Hard DELETE
 
-**Purpose:** Complete removal for testing/cleanup. DANGEROUS operation.
+markdown
+### 5.1 Hard DELETE - System Admin Nuclear Option
+
+**Purpose:** Complete removal for system administration/emergency cleanup. **SYSTEM ADMIN ONLY**. DANGEROUS operation that bypasses normal business logic.
 
 **API:** `DELETE /api/engagements/{id}`
 
 **Authorization:**
-- ✅ Only the doctor who created the engagement
-- ✅ Only if engagement status is `pending`
-- ❌ Cannot delete active, ended, or cancelled engagements
+- ✅ **System Admin role ONLY** (requires special permission)
+- ✅ Works for **ANY** status (pending, active, cancelled, ended)
+- ❌ Regular doctors/patients CANNOT use this
 
-**Validation Steps:**
-1. Check: User is authenticated
-2. Check: Engagement exists
-3. Check: Engagement status is `pending`
-4. Check: Requester is the doctor who created it (compare `engagement.doctor_id.user_id` with `requester.user_id`)
+**Special Handling for ACTIVE Engagements:**
+IF engagement.status == 'active':
+  1. Update engagement.status = 'cancelled'
+  2. Update engagement.end_at = NOW()
+  3. Update engagement.ended_by = SYSTEM_ADMIN_USER_ID
+  4. Update engagement.termination_reason = "System admin emergency cleanup"
+  5. Update doctor_patients.relationship_status = 'NO_ACCESS'
+  6. Update doctor_patients.is_active = false
+  7. Update doctor_patients.relationship_ended_at = NOW()
+  8. Update doctor_patients.current_engagement_id = NULL
+  9. **Send notifications** to doctor and patient
+  10. **Create audit log** entry
 
 **What Gets Deleted:**
-```
 CASCADE DELETE:
 ├─ engagement (the record itself)
-├─ engagement_verification_tokens (all tokens for this engagement)
-├─ engagement_messages (all messages in this engagement)
-├─ engagement_events (all event logs)
-└─ engagement_analytics (all analytics data)
+├─ engagement_verification_tokens
+├─ engagement_messages
+├─ engagement_events
+└─ engagement_analytics
 
-NULLIFY (don't delete):
-└─ notifications.engagement_id → NULL (keep notifications for audit)
+KEEP (do not delete):
+└─ doctor_patients record (update only, never delete)
+└─ notifications (set engagement_id = NULL)
+└─ audit_log entries (for accountability)
 
-CONDITIONAL DELETE:
-└─ doctor_patients record:
-    IF relationship_status is 'INITIAL_PENDING':
-      → DELETE the entire doctor_patients record
-    ELSE:
-      → Keep record, set current_engagement_id → NULL
-```
+text
 
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Engagement permanently deleted",
-  "deletedEngagementId": "uuid-here",
-  "deletedRelationship": true  // or false
-}
-```
-
-**Error Cases:**
-```json
-// Not authorized
-{ "status": 403, "message": "Only the creator doctor can delete this engagement" }
-
-// Wrong status
-{ "status": 400, "message": "Can only delete pending engagements. Current status: active" }
-
-// Engagement not found
-{ "status": 404, "message": "Engagement not found" }
-```
-
+**Important:** This is **NOT for normal operations**. Only for:
+- Emergency data cleanup
+- Compliance requirements  
+- System migration scenarios
 ---
 
 ### 5.2 Soft CANCEL

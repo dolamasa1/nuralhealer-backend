@@ -61,8 +61,7 @@ public class EngagementMessageService {
                                 recipient.getId(),
                                 NotificationType.NEW_MESSAGE,
                                 "New Message",
-                                sender.getFirstName() + " sent you a message",
-                                engagement.getId());
+                                sender.getFirstName() + " sent you a message");
 
                 return mapToResponse(message);
         }

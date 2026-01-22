@@ -30,7 +30,7 @@ public class NotificationService {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
-    public void notifyUser(UUID userId, NotificationType type, String title, String message, UUID engagementId) {
+    public void notifyUser(UUID userId, NotificationType type, String title, String message) {
         try {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -41,7 +41,6 @@ public class NotificationService {
                     .type(type)
                     .title(title)
                     .message(message)
-                    .engagementId(engagementId)
                     .createdAt(LocalDateTime.now())
                     .isRead(false)
                     .build();
@@ -126,7 +125,6 @@ public class NotificationService {
                 n.getType(),
                 n.getTitle(),
                 n.getMessage(),
-                n.getEngagementId(),
                 n.isRead(),
                 n.getCreatedAt());
     }

@@ -13,7 +13,7 @@ CREATE DATABASE neuralhealer
     TEMPLATE = template0;
 
 -- Connect to the database
-\c neuralhealer
+--\c neuralhealer
 
 -- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -471,7 +471,6 @@ CREATE TABLE notifications (
   type VARCHAR(100) NOT NULL,
   title VARCHAR(255),
   message TEXT,
-  engagement_id UUID REFERENCES engagements(id) ON DELETE SET NULL,
   payload JSONB,
   is_read BOOLEAN DEFAULT false,
   sent_at TIMESTAMP DEFAULT now(),
@@ -594,13 +593,16 @@ FOR EACH ROW EXECUTE FUNCTION generate_engagement_id();
 -- ================================================================
 
 INSERT INTO engagement_access_rules (rule_name, can_view_all_history, can_view_current_only, can_view_patient_profile, can_modify_notes, can_message_patient, retains_period_access, retains_history_access, retains_no_access, description) VALUES
-('INITIAL_PENDING', false, false, false, false, false, false, false, true, 'First engagement request sent, not yet verified'),
-('INITIAL_CANCELLED_PENDING', false, false, false, false, false, false, false, true, 'First engagement cancelled before activation'),
 ('FULL_ACCESS', true, true, true, true, true, true, false, false, 'Full access to all patient data and history'),
 ('CURRENT_ENGAGEMENT_ACCESS', false, true, true, true, true, false, false, true, 'Access only to current engagement period'),
 ('READ_ONLY_ACCESS', true, true, true, false, false, true, false, false, 'Read-only access to patient data'),
 ('LIMITED_ENGAGEMENT_ACCESS', false, true, false, false, true, false, false, true, 'Limited access during active engagement only'),
-('NO_ACCESS', false, false, false, false, false, false, false, true, 'No access to patient data');
+('NO_ACCESS', false, false, false, false, false, false, false, true, 'No access to patient data'),
+-- new added 22/1/2026 --
+('INITIAL_PENDING', false, false, false, false, false, false, false, true, 'First engagement request sent, not yet verified'),
+('INITIAL_CANCELLED_PENDING', false, false, false, false, false, false, false, true, 'First engagement cancelled before activation');
+-- done adding ---
+
 
 -- ================================================================
 -- CRITICAL TRIGGERS - AUTO-UPDATE RELATIONSHIP STATUS
@@ -608,7 +610,7 @@ INSERT INTO engagement_access_rules (rule_name, can_view_all_history, can_view_c
 
 -- Trigger to update doctor_patients relationship when engagement status changes
 CREATE OR REPLACE FUNCTION update_relationship_status_on_engagement()
-RETURNS TRIGGER AS $
+RETURNS TRIGGER AS $$
 DECLARE
     current_rule RECORD;
     new_status VARCHAR;
@@ -681,7 +683,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER engagement_status_change
 AFTER INSERT OR UPDATE OF status ON engagements
@@ -690,7 +692,7 @@ EXECUTE FUNCTION update_relationship_status_on_engagement();
 
 -- Notify when relationship_status changes
 CREATE OR REPLACE FUNCTION notify_access_rule_change()
-RETURNS TRIGGER AS $
+RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.relationship_status IS DISTINCT FROM OLD.relationship_status THEN
         -- Insert system message into active engagement
@@ -715,7 +717,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER relationship_access_change
 AFTER UPDATE OF relationship_status ON doctor_patients
@@ -739,7 +741,7 @@ RETURNS TABLE (
   sender_id UUID,
   sent_at TIMESTAMP,
   is_system_message BOOLEAN
-) AS $
+) AS $$
 DECLARE
   v_relationship_status VARCHAR(255);
   v_current_engagement_id UUID;
@@ -795,7 +797,7 @@ BEGIN
     ORDER BY em.sent_at DESC;
   END IF;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Function to get accessible AI chat sessions for a doctor viewing a patient
 CREATE OR REPLACE FUNCTION get_accessible_ai_chat_sessions(
@@ -808,7 +810,7 @@ RETURNS TABLE (
   started_at TIMESTAMP,
   message_count INTEGER,
   is_active BOOLEAN
-) AS $
+) AS $$
 DECLARE
   v_relationship_status VARCHAR(255);
   v_can_view_all_history BOOLEAN;
@@ -869,14 +871,14 @@ BEGIN
     ORDER BY s.started_at DESC;
   END IF;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Function to check if doctor can view specific AI session
 CREATE OR REPLACE FUNCTION can_doctor_view_ai_session(
     p_doctor_id UUID,   -- doctor_profiles.id
     p_patient_id UUID,  -- patient_profiles.id
     p_session_id UUID
-) RETURNS BOOLEAN AS $
+) RETURNS BOOLEAN AS $$
 DECLARE
     v_result BOOLEAN;
 BEGIN
@@ -900,7 +902,7 @@ BEGIN
     
     RETURN COALESCE(v_result, false);
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- ================================================================
 -- COMMENTS FOR DOCUMENTATION

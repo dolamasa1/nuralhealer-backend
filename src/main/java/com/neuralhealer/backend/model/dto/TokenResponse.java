@@ -10,10 +10,13 @@ import java.util.UUID;
  * @param token        The token string (e.g., "NH-12345678")
  * @param expiresAt    When the token expires
  * @param qrCodeData   Optional QR code data for token
+ * @param isNew        Whether this token was freshly generated (true) or
+ *                     existing (false)
  */
 public record TokenResponse(
-        UUID engagementId,
-        String token,
-        LocalDateTime expiresAt,
-        String qrCodeData) {
+                UUID engagementId,
+                String token,
+                LocalDateTime expiresAt,
+                String qrCodeData,
+                boolean isNew) {
 }

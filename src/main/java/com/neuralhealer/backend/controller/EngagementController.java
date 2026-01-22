@@ -57,12 +57,37 @@ public class EngagementController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Cancel a pending engagement (Doctor only)")
-    public ResponseEntity<Void> cancel(
+    @Operation(summary = "Hard delete a PENDING engagement (Doctor only)")
+    public ResponseEntity<Void> deleteEngagement(
             @AuthenticationPrincipal User user,
             @PathVariable UUID id) {
-        engagementService.cancelEngagement(user, id);
+        engagementService.hardDeleteEngagement(user, id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/cancel")
+    @Operation(summary = "Soft cancel an engagement (Doctor or Patient)")
+    public ResponseEntity<EngagementResponse> cancelEngagement(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id,
+            @Valid @RequestBody CancelEngagementRequest request) {
+        return ResponseEntity.ok(engagementService.cancelEngagement(user, id, request));
+    }
+
+    @PostMapping("/{id}/refresh-token")
+    @Operation(summary = "Refresh START token for a pending engagement (Doctor only)")
+    public ResponseEntity<TokenResponse> refreshToken(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id) {
+        return ResponseEntity.ok(engagementService.refreshToken(user, id));
+    }
+
+    @GetMapping("/{id}/token")
+    @Operation(summary = "Get current valid START token (Doctor only)")
+    public ResponseEntity<TokenResponse> getCurrentToken(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id) {
+        return ResponseEntity.ok(engagementService.getCurrentToken(user, id));
     }
 
     @PostMapping("/{id}/end-request")

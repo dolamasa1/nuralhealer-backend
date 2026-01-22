@@ -37,9 +37,6 @@ public class Notification {
     @Column(name = "message")
     private String message;
 
-    @Column(name = "engagement_id")
-    private UUID engagementId;
-
     @Column(name = "is_read")
     @Builder.Default
     private boolean isRead = false;

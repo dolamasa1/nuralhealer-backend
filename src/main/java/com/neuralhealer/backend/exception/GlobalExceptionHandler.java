@@ -160,6 +160,82 @@ public class GlobalExceptionHandler {
         }
 
         /**
+         * Handle conflict exceptions (business rule violations).
+         * Returns HTTP 409 Conflict.
+         */
+        @ExceptionHandler(ConflictException.class)
+        public ResponseEntity<ErrorResponse> handleConflict(
+                        ConflictException ex,
+                        HttpServletRequest request) {
+
+                log.debug("Conflict: {}", ex.getMessage());
+
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.CONFLICT.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
+
+        /**
+         * Handle forbidden exceptions (permission denied).
+         * Returns HTTP 403 Forbidden.
+         */
+        @ExceptionHandler(ForbiddenException.class)
+        public ResponseEntity<ErrorResponse> handleForbidden(
+                        ForbiddenException ex,
+                        HttpServletRequest request) {
+
+                log.debug("Forbidden: {}", ex.getMessage());
+
+                return ResponseEntity
+                                .status(HttpStatus.FORBIDDEN)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.FORBIDDEN.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
+
+        /**
+         * Handle illegal state exceptions (invalid state transitions).
+         * Returns HTTP 409 Conflict.
+         */
+        @ExceptionHandler(IllegalStateException.class)
+        public ResponseEntity<ErrorResponse> handleIllegalState(
+                        IllegalStateException ex,
+                        HttpServletRequest request) {
+
+                log.warn("Illegal state: {}", ex.getMessage());
+
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.CONFLICT.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
+
+        /**
+         * Handle security exceptions (authorization failures).
+         * Returns HTTP 403 Forbidden.
+         */
+        @ExceptionHandler(SecurityException.class)
+        public ResponseEntity<ErrorResponse> handleSecurityException(
+                        SecurityException ex,
+                        HttpServletRequest request) {
+
+                log.warn("Security violation: {}", ex.getMessage());
+
+                return ResponseEntity
+                                .status(HttpStatus.FORBIDDEN)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.FORBIDDEN.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
+
+        /**
          * Handle all other unexpected exceptions.
          */
         @ExceptionHandler(Exception.class)

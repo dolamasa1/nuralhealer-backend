@@ -44,13 +44,21 @@ public class DoctorPatient {
     @Column(name = "relationship_status", length = 50)
     private String relationshipStatus;
 
-    // Tracks the currently active engagement ID (if any)
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "current_engagement_id")
-    private Engagement currentEngagement;
+    @Column(name = "is_active")
+    private Boolean isActive;
 
-    @Column(name = "last_interaction_at")
-    private LocalDateTime lastInteractionAt;
+    // Tracks the currently active engagement ID (if any)
+    @Column(name = "current_engagement_id")
+    private UUID currentEngagementId;
+
+    @Column(name = "added_at", updatable = false)
+    private LocalDateTime addedAt;
+
+    @Column(name = "relationship_started_at")
+    private LocalDateTime relationshipStartedAt;
+
+    @Column(name = "relationship_ended_at")
+    private LocalDateTime relationshipEndedAt;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
