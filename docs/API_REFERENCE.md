@@ -2,7 +2,7 @@
 
 ---
 **Last Updated:** 2026-01-21
-**Version:** 0.5.0
+**Version:** 0.6.0
 **Changes:** 
 - Unified Real-Time Plane: Separated STOMP (/ws) and Raw (/notifications)
 - AI Integration: Updated to use STOMP destinations
