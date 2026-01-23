@@ -1,6 +1,6 @@
 # NeuralHealer Backend
 
-**Version:** 0.6.0 | **Tier:** 1 (Pre-production) | **Read Time:** ~15 min
+**Version:** 0.5.0 | **Tier:** 1 (Pre-production) | **Read Time:** ~15 min
 
 ## 📋 Overview
 
@@ -80,11 +80,11 @@ NONE → PENDING → ACTIVE → END_REQUESTED → ENDED
 
 | State | Entry Condition | Allowed Actions | Exit Condition |
 |-------|----------------|-----------------|----------------|
-| **PENDING** | Doctor calls `/initiate` | Patient: Verify start<br>Either: Cancel | Patient verifies OR Either cancels |
+| **PENDING** | Doctor calls `/initiate` | Patient: Verify start<br>Doctor: Cancel | Patient verifies OR Doctor cancels |
 | **ACTIVE** | Patient calls `/verify-start` | Both: Send messages<br>Either: Request end | One party requests end |
 | **END_REQUESTED** | Either calls `/end-request` | Other party: Verify end<br>Both: Continue messaging | Other party verifies end |
 | **ENDED** | Other party calls `/verify-end` | Both: View history only | Terminal state |
-| **CANCELLED** | Either calls `/{id}/cancel` | None | Terminal state |
+| **CANCELLED** | Doctor calls `DELETE /{id}` | None | Terminal state |
 
 > **Note:** State transitions are enforced via database triggers (`update_relationship_status_on_engagement`) for data integrity.
 
@@ -110,9 +110,7 @@ sequenceDiagram
     
     P->>API: POST /engagements/verify-start {token}
     API->>DB: Verify token & UPDATE status=ACTIVE
-    DB-->>DB: Set relationship_started_at (if first time)
-    DB-->>DB: relationship_status = FULL_ACCESS
-    API->>API: System Message: "🚫 Engagement started..."
+    DB-->>API: Engagement activated
     API->>API: WebSocket broadcast /topic/engagement/{id}
     API-->>P: Engagement active
     API-->>D: (WebSocket) Engagement activated
@@ -168,17 +166,14 @@ sequenceDiagram
     participant DB
     participant U2 as User 2
 
-    U1->>API: POST /engagements/{id}/end-request {reason}
-    API->>DB: Record event: END_REQUESTED
+    U1->>API: POST /engagements/{id}/end-request
     API->>DB: Generate verification token
-    API->>API: WebSocket broadcast (end_requested)
+    API->>API: WebSocket broadcast (end requested)
     API-->>U2: Notification: "User 1 wants to end"
     
     U2->>API: POST /engagements/{id}/verify-end {token}
     API->>DB: UPDATE status=ENDED
-    API->>DB: Record event: ENDED
-    DB->>DB: relationship_status = NO_ACCESS
-    API->>API: System Message: "🚫 Engagement ended..."
+    DB->>DB: Trigger: Archive messages (retention policy)
     API->>API: WebSocket broadcast (ended)
     API-->>U1: Engagement ended
     API-->>U2: Engagement ended
@@ -338,15 +333,12 @@ curl http://localhost:8080/api/actuator/health
 
 ## ✨ Feature Status
 
-### ✅ Completed (v0.6.0)
+### ✅ Completed (v0.4)
 - Secure authentication (HTTPOnly cookies)
 - Full engagement lifecycle with 2FA
-- **Audit Logging**: Comprehensive event recording (`INITIATED`, `VERIFIED`, `ENDED`, `CANCELLED`)
-- **Relationship Lifecycle**: First-activation timestamp tracking & status synchronization
-- **System Messaging**: Automated professional audit messages in chat history
-- Real-time WebSocket messaging (STOMP)
+- Real-time WebSocket messaging
 - Typing indicators
-- Engagement cancellation (Doctor & Patient unilateral termination)
+- Engagement cancellation (pending state)
 - REST fallback for messages
 - Database trigger enforcement
 - **Integrated AI Chatbot (STOMP-based, Unified session tracking, Heartbeat support)**

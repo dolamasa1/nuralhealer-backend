@@ -26,9 +26,6 @@ public class EngagementMessageService {
         private final EngagementMessageRepository messageRepository;
         private final EngagementRepository engagementRepository;
         private final NotificationService notificationService;
-        private final EngagementService engagementService; // To reuse access logic if needed, but repo is safer here
-                                                           // for
-                                                           // direct lookup
 
         @Transactional
         public MessageResponse sendMessage(User sender, UUID engagementId, SendMessageRequest request) {

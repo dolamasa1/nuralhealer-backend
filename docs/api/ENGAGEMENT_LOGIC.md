@@ -2,7 +2,7 @@
 
 ---
 **Document Type:** Complete Implementation Specification  
-**Version:** 0.6.0  
+**Version:** 2.0.0  
 **Last Updated:** 2026-01-22  
 **Status:** ✅ REQUIRED IMPLEMENTATION  
 **Purpose:** This document defines ALL required logic, behaviors, and rules for the Engagement system. Everything here MUST be implemented exactly as specified.
