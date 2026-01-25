@@ -1,6 +1,8 @@
 package com.neuralhealer.backend.controller;
 
-import com.neuralhealer.backend.model.dto.*;
+import com.neuralhealer.backend.model.dto.SendMessageRequest;
+import com.neuralhealer.backend.model.dto.TypingIndicator;
+import com.neuralhealer.backend.model.dto.WebSocketMessage;
 import com.neuralhealer.backend.model.entity.User;
 import com.neuralhealer.backend.model.enums.WebSocketMessageType;
 
