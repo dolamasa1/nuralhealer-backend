@@ -1,6 +1,7 @@
 package com.neuralhealer.backend.service;
 
-import com.neuralhealer.backend.model.enums.NotificationType;
+import com.neuralhealer.backend.notification.entity.NotificationType;
+import com.neuralhealer.backend.notification.service.NotificationService;
 
 import com.neuralhealer.backend.exception.UnauthorizedException;
 import com.neuralhealer.backend.model.dto.MessageResponse;
@@ -56,7 +57,7 @@ public class EngagementMessageService {
 
                 notificationService.notifyUser(
                                 recipient.getId(),
-                                NotificationType.NEW_MESSAGE,
+                                NotificationType.MESSAGE_RECEIVED,
                                 "New Message",
                                 sender.getFirstName() + " sent you a message");
 

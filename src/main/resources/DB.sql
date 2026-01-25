@@ -65,6 +65,15 @@ CREATE TYPE job_status AS ENUM (
   'retry'
 );
 
+CREATE TYPE notification_source AS ENUM (
+  'engagement',
+  'message',
+  'system',
+  'ai',
+  'reminder',
+  'admin'
+);
+
 -- ================================================================
 -- 1. ENGAGEMENT RULES SYSTEM
 -- ================================================================
@@ -472,6 +481,10 @@ CREATE TABLE notifications (
   title VARCHAR(255),
   message TEXT,
   payload JSONB,
+  priority VARCHAR(20) DEFAULT 'normal',
+  source VARCHAR(50) DEFAULT 'engagement',
+  delivery_status JSONB DEFAULT '{"sse": false, "email": false, "push": false}'::jsonb,
+  metadata JSONB DEFAULT '{}'::jsonb,
   is_read BOOLEAN DEFAULT false,
   sent_at TIMESTAMP DEFAULT now(),
   read_at TIMESTAMP,
@@ -479,6 +492,25 @@ CREATE TABLE notifications (
   
   created_at TIMESTAMP DEFAULT now()
 );
+
+-- 3. CREATE NOTIFICATION TEMPLATES TABLE
+CREATE TABLE notification_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  type VARCHAR(100) NOT NULL UNIQUE,
+  title_template TEXT NOT NULL,
+  message_template TEXT NOT NULL,
+  default_priority VARCHAR(20) DEFAULT 'normal',
+  default_channels JSONB DEFAULT '["sse"]'::jsonb,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Insert default templates
+INSERT INTO notification_templates (type, title_template, message_template, default_priority) VALUES
+('ENGAGEMENT_STARTED', 'Engagement Activated', 'Patient {patientName} has verified and started the engagement.', 'high'),
+('ENGAGEMENT_CANCELLED', 'Engagement Cancelled', '{actorName} has cancelled the engagement.', 'high'),
+('MESSAGE_RECEIVED', 'New Message', 'You have a new message from {senderName}.', 'normal'),
+('AI_RESPONSE_READY', 'AI Analysis Ready', 'Your AI health analysis is ready.', 'normal'),
+('SYSTEM_ALERT', 'System Alert', '{alertMessage}', 'critical');
 
 -- ================================================================
 -- INDEXES FOR PERFORMANCE
@@ -527,6 +559,15 @@ CREATE INDEX idx_auth_tokens_expires_at ON security_authentication_tokens(expire
 -- Notification indexes
 CREATE INDEX idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX idx_notifications_is_read ON notifications(is_read);
+
+-- Create index for polling
+CREATE INDEX idx_notifications_unpushed 
+ON notifications(user_id, sent_at) 
+WHERE (delivery_status->>'sse')::boolean = false;
+
+-- Create index for priority
+CREATE INDEX idx_notifications_priority 
+ON notifications(priority, sent_at DESC);
 
 -- Performance optimization indexes
 CREATE INDEX idx_engagements_doctor_patient_status 
@@ -724,6 +765,106 @@ AFTER UPDATE OF relationship_status ON doctor_patients
 FOR EACH ROW
 WHEN (OLD.relationship_status IS DISTINCT FROM NEW.relationship_status)
 EXECUTE FUNCTION notify_access_rule_change();
+
+-- 🏗️ ENHANCED TRIGGER SYSTEM
+-- Trigger for Engagement Notifications
+CREATE OR REPLACE FUNCTION create_engagement_notification()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_patient_name TEXT;
+    v_doctor_name TEXT;
+    v_actor_name TEXT;
+    v_target_user_id UUID;
+    v_notification_type VARCHAR(100);
+    v_title TEXT;
+    v_message TEXT;
+    v_priority VARCHAR(20);
+BEGIN
+    -- Get names (joining with users table)
+    SELECT CONCAT(u.first_name, ' ', u.last_name) INTO v_patient_name
+    FROM users u
+    JOIN patient_profiles p ON u.id = p.user_id
+    WHERE p.id = NEW.patient_id;
+    
+    SELECT CONCAT(u.first_name, ' ', u.last_name) INTO v_doctor_name
+    FROM users u
+    JOIN doctor_profiles d ON u.id = d.user_id
+    WHERE d.id = NEW.doctor_id;
+    
+    -- Determine notification type and priority
+    IF NEW.status = 'active' AND OLD.status = 'pending' THEN
+        v_notification_type := 'ENGAGEMENT_STARTED';
+        v_title := 'Engagement Activated';
+        v_message := FORMAT('Patient %s has verified and started the engagement.', v_patient_name);
+        v_priority := 'high';
+        v_target_user_id := (SELECT user_id FROM doctor_profiles WHERE id = NEW.doctor_id);
+        
+    ELSIF NEW.status = 'cancelled' THEN
+        v_notification_type := 'ENGAGEMENT_CANCELLED';
+        v_title := 'Engagement Cancelled';
+        
+        -- Who cancelled?
+        IF NEW.ended_by = (SELECT user_id FROM doctor_profiles WHERE id = NEW.doctor_id) THEN
+            v_actor_name := FORMAT('Dr. %s', v_doctor_name);
+            v_target_user_id := (SELECT user_id FROM patient_profiles WHERE id = NEW.patient_id);
+        ELSE
+            v_actor_name := v_patient_name;
+            v_target_user_id := (SELECT user_id FROM doctor_profiles WHERE id = NEW.doctor_id);
+        END IF;
+        
+        v_message := FORMAT('%s has cancelled the engagement.', v_actor_name);
+        v_priority := 'high';
+        
+        -- For cancelled, notify BOTH parties
+        INSERT INTO notifications (
+            user_id, type, title, message, payload, priority, source, sent_at
+        ) VALUES (
+            (SELECT user_id FROM patient_profiles WHERE id = NEW.patient_id),
+            v_notification_type,
+            v_title,
+            v_message,
+            jsonb_build_object('engagementId', NEW.id, 'actor', v_actor_name, 'status', NEW.status),
+            v_priority,
+            'engagement',
+            NOW()
+        ), (
+            (SELECT user_id FROM doctor_profiles WHERE id = NEW.doctor_id),
+            v_notification_type,
+            v_title,
+            v_message,
+            jsonb_build_object('engagementId', NEW.id, 'actor', v_actor_name, 'status', NEW.status),
+            v_priority,
+            'engagement',
+            NOW()
+        );
+        
+        RETURN NEW;
+    END IF;
+    
+    -- Insert single notification
+    IF v_target_user_id IS NOT NULL THEN
+        INSERT INTO notifications (
+            user_id, type, title, message, payload, priority, source, sent_at
+        ) VALUES (
+            v_target_user_id,
+            v_notification_type,
+            v_title,
+            v_message,
+            jsonb_build_object('engagementId', NEW.id, 'patientName', v_patient_name, 'doctorName', v_doctor_name),
+            v_priority,
+            'engagement',
+            NOW()
+        );
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER engagement_notification_trigger
+AFTER UPDATE OF status ON engagements
+FOR EACH ROW
+EXECUTE FUNCTION create_engagement_notification();
 
 -- ================================================================
 -- HELPER FUNCTIONS - ACCESS CONTROL

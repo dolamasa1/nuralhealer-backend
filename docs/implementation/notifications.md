@@ -1,3 +1,12 @@
+---
+AUDIENCE: Backend Implementation Team  
+EXTERNAL_REF: ../api/overview.md
+STATUS: Complete Specification
+---
+
+This document contains detailed implementation rules.
+For API documentation and external usage, see [External API Guide](../api/overview.md)
+
 # Notification System - Goal Specification
 ## NeuralHealer Platform
 

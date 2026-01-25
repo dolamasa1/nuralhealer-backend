@@ -3,7 +3,7 @@ package com.neuralhealer.backend.controller;
 import com.neuralhealer.backend.model.dto.NotificationCountResponse;
 import com.neuralhealer.backend.model.dto.NotificationResponse;
 import com.neuralhealer.backend.model.entity.User;
-import com.neuralhealer.backend.service.NotificationService;
+import com.neuralhealer.backend.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
