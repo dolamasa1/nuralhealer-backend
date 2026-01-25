@@ -14,5 +14,6 @@ public enum NotificationType {
     AI_RESPONSE_READY,
     SYSTEM_ALERT,
     SYSTEM_BROADCAST,
+    SECURITY_ALERT,
     REMINDER_ALERT;
 }

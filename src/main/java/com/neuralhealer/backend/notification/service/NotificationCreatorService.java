@@ -16,9 +16,9 @@ public class NotificationCreatorService {
 
     private final NotificationService notificationService;
 
-    // Placeholder for manual notification creation logic
-    // This will standardize creation from different sources (AI, System, etc.)
-
+    /**
+     * Standardized method for system alerts.
+     */
     public void createSystemNotification(UUID userId, String title, String message, NotificationPriority priority) {
         notificationService.createNotification(
                 userId,
@@ -26,6 +26,55 @@ public class NotificationCreatorService {
                 title,
                 message,
                 priority,
+                NotificationSource.SYSTEM,
+                null);
+    }
+
+    /**
+     * Create notification for new messages.
+     */
+    public void createMessageNotification(UUID userId, UUID senderId, String senderName, String messagePreview) {
+        Map<String, Object> payload = Map.of(
+                "senderId", senderId,
+                "senderName", senderName,
+                "preview", messagePreview);
+
+        notificationService.createNotification(
+                userId,
+                NotificationType.MESSAGE_RECEIVED,
+                "New Message",
+                senderName + ": " + messagePreview,
+                NotificationPriority.NORMAL,
+                NotificationSource.MESSAGE,
+                payload);
+    }
+
+    /**
+     * Create notification for AI results.
+     */
+    public void createAiNotification(UUID userId, String title, String summary, UUID resultId) {
+        Map<String, Object> payload = Map.of("resultId", resultId);
+
+        notificationService.createNotification(
+                userId,
+                NotificationType.AI_RESPONSE_READY,
+                title,
+                summary,
+                NotificationPriority.NORMAL,
+                NotificationSource.AI,
+                payload);
+    }
+
+    /**
+     * Create notification for security events (MFA, Login).
+     */
+    public void createSecurityNotification(UUID userId, String title, String message) {
+        notificationService.createNotification(
+                userId,
+                NotificationType.SECURITY_ALERT,
+                title,
+                message,
+                NotificationPriority.HIGH,
                 NotificationSource.SYSTEM,
                 null);
     }
