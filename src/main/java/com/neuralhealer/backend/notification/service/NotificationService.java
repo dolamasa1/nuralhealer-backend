@@ -15,14 +15,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,11 +32,34 @@ public class NotificationService {
     private final UserRepository userRepository;
 
     /**
-     * Get paginated notifications for a user.
+     * Get paginated notifications for a user with optional filters.
      */
     @Transactional(readOnly = true)
-    public Page<NotificationResponse> getUserNotifications(UUID userId, Pageable pageable) {
-        return notificationRepository.findByUserId(userId, pageable)
+    public Page<NotificationResponse> getUserNotifications(
+            UUID userId,
+            NotificationType type,
+            NotificationPriority priority,
+            Boolean isRead,
+            NotificationSource source,
+            Pageable pageable) {
+
+        Specification<Notification> spec = (root, query, cb) -> {
+            List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("user").get("id"), userId));
+
+            if (type != null)
+                predicates.add(cb.equal(root.get("type"), type));
+            if (priority != null)
+                predicates.add(cb.equal(root.get("priority"), priority));
+            if (isRead != null)
+                predicates.add(cb.equal(root.get("isRead"), isRead));
+            if (source != null)
+                predicates.add(cb.equal(root.get("source"), source));
+
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
+
+        return notificationRepository.findAll(spec, pageable)
                 .map(this::mapToResponse);
     }
 
@@ -54,8 +75,27 @@ public class NotificationService {
     }
 
     /**
-     * Get unread count for a user.
+     * Get notification statistics for a user.
      */
+    @Transactional(readOnly = true)
+    public Map<String, Object> getNotificationStats(UUID userId) {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalCount", notificationRepository.countByUserId(userId)); // Need to add this to repo
+        stats.put("unreadCount", notificationRepository.countByUserIdAndIsReadFalse(userId));
+
+        Map<String, Long> priorityStats = new HashMap<>();
+        notificationRepository.countByPriorityForUser(userId)
+                .forEach(row -> priorityStats.put(row[0].toString(), (Long) row[1]));
+        stats.put("byPriority", priorityStats);
+
+        Map<String, Long> typeStats = new HashMap<>();
+        notificationRepository.countByTypeForUser(userId)
+                .forEach(row -> typeStats.put(row[0].toString(), (Long) row[1]));
+        stats.put("byType", typeStats);
+
+        return stats;
+    }
+
     @Transactional(readOnly = true)
     public NotificationCountResponse getUnreadCount(User user) {
         long count = notificationRepository.countByUserIdAndIsReadFalse(user.getId());
