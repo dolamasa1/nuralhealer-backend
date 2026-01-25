@@ -6,6 +6,7 @@ import com.neuralhealer.backend.model.entity.*;
 import com.neuralhealer.backend.model.enums.*;
 import com.neuralhealer.backend.repository.*;
 import lombok.RequiredArgsConstructor;
+import com.neuralhealer.backend.notification.entity.NotificationType;
 import com.neuralhealer.backend.notification.service.NotificationService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
