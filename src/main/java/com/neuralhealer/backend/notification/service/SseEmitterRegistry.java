@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,8 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SseEmitterRegistry {
 
     private final Map<UUID, SseEmitter> emitters = new ConcurrentHashMap<>();
+    private final java.util.concurrent.atomic.AtomicLong totalConnectionsCreated = new java.util.concurrent.atomic.AtomicLong(
+            0);
 
     public SseEmitter createEmitter(UUID userId) {
+        totalConnectionsCreated.incrementAndGet();
         // 30 minutes timeout
         SseEmitter emitter = new SseEmitter(30 * 60 * 1000L);
 
@@ -82,5 +86,12 @@ public class SseEmitterRegistry {
                 log.debug("Dead emitter removed during heartbeat for user: {}", userId);
             }
         });
+    }
+
+    public Map<String, Object> getMetrics() {
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("activeConnections", emitters.size());
+        metrics.put("totalConnectionsSinceStart", totalConnectionsCreated.get());
+        return metrics;
     }
 }

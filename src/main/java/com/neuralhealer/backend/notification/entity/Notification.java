@@ -61,10 +61,6 @@ public class Notification {
     @Builder.Default
     private Map<String, Object> deliveryStatus = Map.of("sse", false);
 
-    @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private Map<String, Object> metadata;
-
     @Column(name = "is_read")
     @Builder.Default
     private Boolean isRead = false;

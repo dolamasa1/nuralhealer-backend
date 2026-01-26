@@ -1,14 +1,12 @@
 package com.neuralhealer.backend.service;
 
-import com.neuralhealer.backend.notification.entity.NotificationType;
-import com.neuralhealer.backend.notification.service.NotificationService;
-
 import com.neuralhealer.backend.exception.UnauthorizedException;
 import com.neuralhealer.backend.model.dto.MessageResponse;
 import com.neuralhealer.backend.model.dto.SendMessageRequest;
 import com.neuralhealer.backend.model.entity.Engagement;
 import com.neuralhealer.backend.model.entity.EngagementMessage;
 import com.neuralhealer.backend.model.entity.User;
+import com.neuralhealer.backend.notification.service.NotificationCreatorService;
 import com.neuralhealer.backend.repository.EngagementMessageRepository;
 import com.neuralhealer.backend.repository.EngagementRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +24,7 @@ public class EngagementMessageService {
 
         private final EngagementMessageRepository messageRepository;
         private final EngagementRepository engagementRepository;
-        private final NotificationService notificationService;
+        private final NotificationCreatorService notificationCreatorService;
 
         @Transactional
         public MessageResponse sendMessage(User sender, UUID engagementId, SendMessageRequest request) {
@@ -53,13 +51,11 @@ public class EngagementMessageService {
 
                 message = messageRepository.save(message);
 
-                message = messageRepository.save(message);
-
-                notificationService.notifyUser(
+                notificationCreatorService.createMessageNotification(
                                 recipient.getId(),
-                                NotificationType.MESSAGE_RECEIVED,
-                                "New Message",
-                                sender.getFirstName() + " sent you a message");
+                                sender.getId(),
+                                sender.getFullName(),
+                                request.content());
 
                 return mapToResponse(message);
         }

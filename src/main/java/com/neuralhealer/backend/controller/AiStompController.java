@@ -4,6 +4,7 @@ import com.neuralhealer.backend.model.dto.AiChatRequest;
 import com.neuralhealer.backend.model.dto.AiChatResponse;
 import com.neuralhealer.backend.model.dto.WebSocketMessage;
 import com.neuralhealer.backend.model.enums.WebSocketMessageType;
+import com.neuralhealer.backend.notification.service.NotificationCreatorService;
 import com.neuralhealer.backend.service.AiChatbotService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +12,12 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * STOMP Controller for AI Chatbot.
@@ -27,6 +30,7 @@ public class AiStompController {
 
     private final AiChatbotService aiChatbotService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final NotificationCreatorService notificationCreatorService;
 
     /**
      * Handle AI questions via STOMP.
@@ -34,11 +38,18 @@ public class AiStompController {
      * Responses sent to: /user/queue/ai
      */
     @MessageMapping("/ai/ask")
-    public void askAi(@Payload AiChatRequest request, SimpMessageHeaderAccessor headerAccessor) {
+    public void askAi(@Payload AiChatRequest request, SimpMessageHeaderAccessor headerAccessor,
+            Authentication authentication) {
         String sessionId = headerAccessor.getSessionId();
-        String destination = "/queue/ai"; // Will be prefixed by /user by SimpMessagingTemplate
 
-        log.info("STOMP AI request received: session={}", sessionId);
+        // Extract userId if available from authentication
+        UUID userId = null;
+        if (authentication != null
+                && authentication.getPrincipal() instanceof com.neuralhealer.backend.model.entity.User) {
+            userId = ((com.neuralhealer.backend.model.entity.User) authentication.getPrincipal()).getId();
+        }
+
+        log.info("STOMP AI request received: session={}, user={}", sessionId, userId);
 
         if (!aiChatbotService.isAiAvailable()) {
             sendAiMessage(headerAccessor, WebSocketMessageType.AI_ERROR, "الذكاء الاصطناعي غير متاح حالياً");
@@ -63,6 +74,16 @@ public class AiStompController {
 
             // 4. Send RESPONSE
             sendAiMessage(headerAccessor, WebSocketMessageType.AI_RESPONSE, cleanAnswer);
+
+            // 5. Trigger persistent notification if user is logged in
+            if (userId != null) {
+                notificationCreatorService.createAiNotification(
+                        userId,
+                        "AI Analysis Ready",
+                        "Your smart medical assistant has provided a response.",
+                        null // No persistent AI interaction ID yet, using null
+                );
+            }
 
         } catch (Exception e) {
             log.error("AI Error in STOMP: {}", e.getMessage());
