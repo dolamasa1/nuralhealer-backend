@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,7 @@ public class NotificationPoller {
 
     private void processNotification(Notification notification) {
         // Skip LOW priority for SSE
-        if (notification.getPriority() == NotificationPriority.LOW) {
+        if (notification.getPriority() == NotificationPriority.low) {
             markAsPushed(notification, false); // Mark addressed but not pushed
             return;
         }
@@ -120,7 +119,7 @@ public class NotificationPoller {
         // "processed for SSE channel").
         // "delivery_status" usually means "attempted/processed".
 
-        if (!pushed && n.getPriority() == NotificationPriority.LOW) {
+        if (!pushed && n.getPriority() == NotificationPriority.low) {
             status.put("sse", "skipped_low_priority"); // Treat as strict JSONB later if needed, but Map allows value
             // If we put string, query `delivery_status->>'sse' = 'false'` might break if it
             // expects boolean.

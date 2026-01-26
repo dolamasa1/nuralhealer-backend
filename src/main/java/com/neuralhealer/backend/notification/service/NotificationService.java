@@ -203,7 +203,7 @@ public class NotificationService {
     // Helper to maintain backward compatibility if needed, or for simple usage
     @Transactional
     public void notifyUser(UUID userId, NotificationType type, String title, String message) {
-        createNotification(userId, type, title, message, NotificationPriority.NORMAL, NotificationSource.SYSTEM, null);
+        createNotification(userId, type, title, message, NotificationPriority.normal, NotificationSource.system, null);
     }
 
     private NotificationResponse mapToResponse(Notification n) {

@@ -1,6 +1,5 @@
 package com.neuralhealer.backend.notification.service;
 
-import com.neuralhealer.backend.model.entity.User;
 import com.neuralhealer.backend.notification.entity.NotificationPriority;
 import com.neuralhealer.backend.notification.entity.NotificationSource;
 import com.neuralhealer.backend.notification.entity.NotificationType;
@@ -26,7 +25,7 @@ public class NotificationCreatorService {
                 title,
                 message,
                 priority,
-                NotificationSource.SYSTEM,
+                NotificationSource.system,
                 null);
     }
 
@@ -44,8 +43,8 @@ public class NotificationCreatorService {
                 NotificationType.MESSAGE_RECEIVED,
                 "New Message",
                 senderName + ": " + messagePreview,
-                NotificationPriority.NORMAL,
-                NotificationSource.MESSAGE,
+                NotificationPriority.normal,
+                NotificationSource.message,
                 payload);
     }
 
@@ -53,15 +52,15 @@ public class NotificationCreatorService {
      * Create notification for AI results.
      */
     public void createAiNotification(UUID userId, String title, String summary, UUID resultId) {
-        Map<String, Object> payload = Map.of("resultId", resultId);
+        Map<String, Object> payload = Map.of("resultId", resultId != null ? resultId : UUID.randomUUID());
 
         notificationService.createNotification(
                 userId,
                 NotificationType.AI_RESPONSE_READY,
                 title,
                 summary,
-                NotificationPriority.NORMAL,
-                NotificationSource.AI,
+                NotificationPriority.normal,
+                NotificationSource.ai,
                 payload);
     }
 
@@ -74,8 +73,8 @@ public class NotificationCreatorService {
                 NotificationType.SECURITY_ALERT,
                 title,
                 message,
-                NotificationPriority.HIGH,
-                NotificationSource.SYSTEM,
+                NotificationPriority.high,
+                NotificationSource.system,
                 null);
     }
 }

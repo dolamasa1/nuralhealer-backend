@@ -19,7 +19,7 @@ public class SystemAlertService {
      */
     public void triggerCriticalAlert(UUID userId, String title, String message) {
         log.error("Critical Alert for User {}: {} - {}", userId, title, message);
-        notificationCreatorService.createSystemNotification(userId, title, message, NotificationPriority.CRITICAL);
+        notificationCreatorService.createSystemNotification(userId, title, message, NotificationPriority.critical);
     }
 
     /**
@@ -34,6 +34,6 @@ public class SystemAlertService {
      * Trigger a general system announcement/broadcast for a specific user.
      */
     public void triggerAnnouncement(UUID userId, String title, String message) {
-        notificationCreatorService.createSystemNotification(userId, title, message, NotificationPriority.NORMAL);
+        notificationCreatorService.createSystemNotification(userId, title, message, NotificationPriority.normal);
     }
 }

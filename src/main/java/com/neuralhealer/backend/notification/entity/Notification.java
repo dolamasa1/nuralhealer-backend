@@ -48,12 +48,12 @@ public class Notification {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     @Builder.Default
-    private NotificationPriority priority = NotificationPriority.NORMAL;
+    private NotificationPriority priority = NotificationPriority.normal;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50)
     @Builder.Default
-    private NotificationSource source = NotificationSource.SYSTEM;
+    private NotificationSource source = NotificationSource.system;
 
     // Stores delivery info e.g., {"sse": true/false, "email": true/false}
     @Type(JsonType.class)
