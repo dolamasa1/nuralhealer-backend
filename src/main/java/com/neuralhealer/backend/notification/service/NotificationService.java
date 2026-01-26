@@ -30,6 +30,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final SseEmitterRegistry sseEmitterRegistry;
 
     /**
      * Get paginated notifications for a user with optional filters.
@@ -197,7 +198,27 @@ public class NotificationService {
                 .sentAt(LocalDateTime.now())
                 .build();
 
-        return notificationRepository.save(notification);
+        notification = notificationRepository.save(notification);
+
+        // Push directly to SSE if user is connected (no polling needed)
+        if (priority != NotificationPriority.low) {
+            pushToSse(userId, notification);
+        }
+
+        return notification;
+    }
+
+    private void pushToSse(UUID userId, Notification notification) {
+        if (sseEmitterRegistry.isUserConnected(userId)) {
+            NotificationResponse response = mapToResponse(notification);
+            boolean sent = sseEmitterRegistry.send(userId, response);
+            if (sent) {
+                // Mark as delivered via SSE
+                notification.setDeliveryStatus(Map.of("sse", true));
+                notificationRepository.save(notification);
+                log.debug("Pushed notification {} to user {} via SSE", notification.getId(), userId);
+            }
+        }
     }
 
     // Helper to maintain backward compatibility if needed, or for simple usage

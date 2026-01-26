@@ -45,7 +45,7 @@ public class SseEmitterRegistry {
         return emitter;
     }
 
-    public void send(UUID userId, Object data) {
+    public boolean send(UUID userId, Object data) {
         SseEmitter emitter = emitters.get(userId);
         if (emitter != null) {
             try {
@@ -54,11 +54,13 @@ public class SseEmitterRegistry {
                         .id(UUID.randomUUID().toString())
                         .name("notification")
                         .reconnectTime(5000));
+                return true;
             } catch (IOException e) {
                 log.warn("Failed to send SSE to user {}, removing emitter: {}", userId, e.getMessage());
                 emitters.remove(userId);
             }
         }
+        return false;
     }
 
     public boolean isUserConnected(UUID userId) {
