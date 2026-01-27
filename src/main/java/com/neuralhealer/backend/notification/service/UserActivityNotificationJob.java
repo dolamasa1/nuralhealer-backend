@@ -1,7 +1,6 @@
 package com.neuralhealer.backend.notification.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.neuralhealer.backend.model.entity.SystemSetting;
 import com.neuralhealer.backend.model.entity.User;
 import com.neuralhealer.backend.notification.entity.NotificationPriority;
 import com.neuralhealer.backend.notification.entity.NotificationSource;
@@ -28,6 +27,7 @@ public class UserActivityNotificationJob {
     private final SystemSettingRepository systemSettingRepository;
     private final NotificationService notificationService;
     private final com.neuralhealer.backend.notification.repository.NotificationRepository notificationRepository;
+    private final com.neuralhealer.backend.repository.MessageQueueRepository messageQueueRepository;
     private final ObjectMapper objectMapper;
 
     /**
@@ -100,12 +100,26 @@ public class UserActivityNotificationJob {
             if (msg != null && msg.getTitle() != null) {
                 notificationService.createNotification(
                         user.getId(),
-                        NotificationType.SYSTEM_ALERT, // Fallback type if needed, but we can add new enum types
+                        NotificationType.SYSTEM_ALERT,
                         msg.getTitle(),
                         msg.getMessage(),
                         NotificationPriority.valueOf(msg.getPriority().toLowerCase()),
                         NotificationSource.system,
                         Map.of("userName", user.getFirstName(), "templateKey", templateKey));
+
+                // Queue Email Fallback
+                com.neuralhealer.backend.model.entity.MessageQueue emailJob = com.neuralhealer.backend.model.entity.MessageQueue
+                        .builder()
+                        .jobType("EMAIL_NOTIFICATION")
+                        .payload(Map.of(
+                                "userId", user.getId(),
+                                "templateKey", templateKey,
+                                "recipientEmail", user.getEmail(),
+                                "title", msg.getTitle(),
+                                "body", msg.getMessage()))
+                        .status("pending")
+                        .build();
+                messageQueueRepository.save(emailJob);
             }
         } catch (Exception e) {
             log.error("Failed to send localized notification {} to user {}: {}", templateKey, user.getId(),

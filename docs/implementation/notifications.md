@@ -447,5 +447,29 @@ graph TD
     Final --> Push[SSE Real-time Push]
 ```
 
+## 30. Notification Optimizations & Throttling
+
+### 30.1 Throttling Logic (Anti-Spam)
+To prevent overwhelming users with re-engagement alerts, a **7-day throttling window** is applied.
+- **Implementation**: The `UserRepository` native queries use a `NOT EXISTS` clause checking for similar notifications sent in the last 7 days.
+- **SQL Source**: 
+  ```sql
+  AND NOT EXISTS (
+    SELECT 1 FROM notifications n 
+    WHERE n.user_id = u.id AND n.type = 'USER_REENGAGE_ACTIVE' 
+    AND n.sent_at > NOW() - INTERVAL '7 days'
+  )
+  ```
+
+### 30.2 Email Fallback Protocol
+Lifecycle events (Welcome, Inactivity Warnings) are automatically mirrored as emails.
+- **Mechanism**: The `create_system_notification()` SQL helper and the `UserActivityNotificationJob` Spring component both insert localized email jobs into the `message_queues` table.
+- **Job Type**: `EMAIL_NOTIFICATION`
+- **Payload**: Contains `recipientEmail`, `title`, and `body`.
+
+### 30.3 SQL Helper: create_system_notification()
+A centralized helper function in `DB.sql` ensures consistent notification creation across all database triggers.
+- **Responsibilities**: Localized rendering, placeholder replacement, multi-channel queuing (SSE + Email), and priority resolution.
+
 ---
-**END OF MASTER SPECIFICATION - REVISION 5.0.0 (LIFECYCLE & INACTIVITY)**
+**END OF MASTER SPECIFICATION - REVISION 6.0.0 (OPTIMIZATIONS & THROTTLING)**

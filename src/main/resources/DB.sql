@@ -778,32 +778,66 @@ CREATE TRIGGER set_engagement_id BEFORE INSERT ON engagements
 FOR EACH ROW EXECUTE FUNCTION generate_engagement_id();
 
 -- Trigger for Welcome Notification
-CREATE OR REPLACE FUNCTION send_welcome_notification()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION create_system_notification(
+    p_user_id UUID,
+    p_template_key VARCHAR(100),
+    p_placeholders JSONB DEFAULT '{}'::jsonb,
+    p_source VARCHAR(50) DEFAULT 'system'
+) RETURNS UUID AS $$
 DECLARE
-    v_notification RECORD;
+    v_notification_id UUID;
+    v_msg RECORD;
 BEGIN
-    -- Only for patients (or all if context is generic, but plan says 'patient')
-    -- We'll default to 'patient' context for the welcome message
+    -- Get localized message content
+    SELECT * INTO v_msg
+    FROM get_notification_message(p_template_key, p_user_id, 'patient', p_placeholders);
     
-    SELECT * INTO v_notification
-    FROM get_notification_message('USER_WELCOME', NEW.id, 'patient', jsonb_build_object('userName', NEW.first_name));
-    
-    IF v_notification.title IS NOT NULL THEN
+    IF v_msg.title IS NOT NULL THEN
         INSERT INTO notifications (
             user_id, type, title, message, payload, priority, source, sent_at
         ) VALUES (
-            NEW.id,
-            'USER_WELCOME',
-            v_notification.title,
-            v_notification.message,
-            jsonb_build_object('userName', NEW.first_name),
-            v_notification.priority,
-            'system',
+            p_user_id,
+            p_template_key,
+            v_msg.title,
+            v_msg.message,
+            p_placeholders,
+            v_msg.priority,
+            p_source,
             NOW()
-        );
+        ) RETURNING id INTO v_notification_id;
+        
+        -- Queue Email for Lifecycle Notifications
+        IF p_template_key IN ('USER_WELCOME', 'USER_REENGAGE_ACTIVE', 'USER_INACTIVITY_WARNING') THEN
+            INSERT INTO message_queues (
+                job_type, status, payload, created_at
+            ) VALUES (
+                'EMAIL_NOTIFICATION',
+                'pending',
+                jsonb_build_object(
+                    'userId', p_user_id,
+                    'templateKey', p_template_key,
+                    'title', v_msg.title,
+                    'body', v_msg.message
+                ),
+                NOW()
+            );
+        END IF;
+
+        RETURN v_notification_id;
     END IF;
     
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION send_welcome_notification()
+RETURNS TRIGGER AS $$
+BEGIN
+    PERFORM create_system_notification(
+        NEW.id, 
+        'USER_WELCOME', 
+        jsonb_build_object('userName', NEW.first_name)
+    );
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
