@@ -15,26 +15,27 @@ public interface MessageQueueRepository extends JpaRepository<MessageQueue, UUID
 
     /**
      * Find message queue jobs by job type and status.
-     * Used by EmailQueueProcessor to fetch pending email notifications.
+     * Uses native query to handle Postgres custom enum type (job_status) casting.
      *
      * @param jobType  The job type to filter by (e.g., "EMAIL_NOTIFICATION")
      * @param status   The job status to filter by (e.g., "pending")
      * @param pageable Pagination parameters
      * @return List of matching message queue jobs
      */
-    @Query("SELECT mq FROM MessageQueue mq WHERE mq.jobType = :jobType AND mq.status = :status ORDER BY mq.createdAt ASC")
+    @Query(value = "SELECT * FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = :status ORDER BY created_at ASC", countQuery = "SELECT count(*) FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = :status", nativeQuery = true)
     List<MessageQueue> findByJobTypeAndStatus(@Param("jobType") String jobType, @Param("status") String status,
             Pageable pageable);
 
     /**
      * Find failed jobs that can be retried.
+     * Uses native query to handle Postgres custom enum type (job_status) casting.
      *
      * @param jobType    The job type to filter by
      * @param maxRetries Maximum number of retries allowed
      * @param pageable   Pagination parameters
      * @return List of failed jobs with retry count below max
      */
-    @Query("SELECT mq FROM MessageQueue mq WHERE mq.jobType = :jobType AND mq.status = 'failed' AND mq.retryCount < :maxRetries ORDER BY mq.createdAt ASC")
+    @Query(value = "SELECT * FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = 'failed' AND retry_count < :maxRetries ORDER BY created_at ASC", countQuery = "SELECT count(*) FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = 'failed' AND retry_count < :maxRetries", nativeQuery = true)
     List<MessageQueue> findFailedJobsForRetry(@Param("jobType") String jobType, @Param("maxRetries") int maxRetries,
             Pageable pageable);
 }
