@@ -51,6 +51,10 @@ public class User implements UserDetails {
     @Column(length = 20)
     private String phone;
 
+    @Column(length = 10, nullable = false)
+    @Builder.Default
+    private String language = "en";
+
     @Column(length = 50)
     @Builder.Default
     private String timezone = "UTC";

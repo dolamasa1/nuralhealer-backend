@@ -85,7 +85,7 @@ public class SseEmitterRegistry {
             try {
                 emitter.send(SseEmitter.event()
                         .name("heartbeat")
-                        .data((Object) heartbeatData)
+                        .data(heartbeatData)
                         .comment("keep-alive"));
             } catch (IOException e) {
                 emitters.remove(userId);
