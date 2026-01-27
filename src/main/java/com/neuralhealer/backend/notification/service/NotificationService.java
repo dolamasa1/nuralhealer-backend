@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -222,7 +223,12 @@ public class NotificationService {
     private void pushToSse(UUID userId, Notification notification) {
         if (sseEmitterRegistry.isUserConnected(userId)) {
             NotificationResponse response = mapToResponse(notification);
-            boolean sent = sseEmitterRegistry.send(userId, response);
+
+            // Format: uuid_epoch (e.g., 550e8400-e29b-41d4-a716-446655440000_1706173200)
+            String eventId = notification.getId().toString() + "_" +
+                    notification.getSentAt().toEpochSecond(ZoneOffset.UTC);
+
+            boolean sent = sseEmitterRegistry.send(userId, eventId, response);
             if (sent) {
                 // Mark as delivered via SSE
                 notification.setDeliveryStatus(Map.of("sse", true));
@@ -235,7 +241,25 @@ public class NotificationService {
     // Helper to maintain backward compatibility if needed, or for simple usage
     @Transactional
     public void notifyUser(UUID userId, NotificationType type, String title, String message) {
-        createNotification(userId, type, title, message, NotificationPriority.normal, NotificationSource.system, null);
+        NotificationPriority priority = NotificationPriority.normal;
+
+        // Phase 5 Priority Fix: started/cancelled engagement events are HIGH priority
+        if (type == NotificationType.ENGAGEMENT_STARTED || type == NotificationType.ENGAGEMENT_CANCELLED) {
+            priority = NotificationPriority.high;
+        }
+
+        createNotification(userId, type, title, message, priority, NotificationSource.engagement, null);
+    }
+
+    @Transactional
+    public void pushMissedNotifications(UUID userId, LocalDateTime lastSeenAt) {
+        log.debug("Pushing missed notifications for user: {} since {}", userId, lastSeenAt);
+        List<Notification> missed = notificationRepository.findMissedNotifications(userId, lastSeenAt);
+        missed.forEach(n -> {
+            if (n.getPriority() != NotificationPriority.low) {
+                pushToSse(userId, n);
+            }
+        });
     }
 
     private NotificationResponse mapToResponse(Notification n) {

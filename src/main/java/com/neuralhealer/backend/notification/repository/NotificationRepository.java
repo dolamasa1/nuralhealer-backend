@@ -60,4 +60,12 @@ public interface NotificationRepository
 
     // Fetch notifications for a user, newest first (basic list support)
     List<Notification> findByUserIdOrderByCreatedAtDesc(UUID userId);
+
+    /**
+     * Finds notifications missed by a user since a specific timestamp.
+     * Orders by sent_at asc to ensure correct event sequence during replay.
+     */
+    @Query("SELECT n FROM Notification n WHERE n.user.id = :userId AND n.sentAt > :lastSeenAt ORDER BY n.sentAt ASC")
+    List<Notification> findMissedNotifications(@Param("userId") UUID userId,
+            @Param("lastSeenAt") LocalDateTime lastSeenAt);
 }

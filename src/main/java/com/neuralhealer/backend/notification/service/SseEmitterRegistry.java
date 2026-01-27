@@ -45,13 +45,13 @@ public class SseEmitterRegistry {
         return emitter;
     }
 
-    public boolean send(UUID userId, Object data) {
+    public boolean send(UUID userId, String eventId, Object data) {
         SseEmitter emitter = emitters.get(userId);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
                         .data(data)
-                        .id(UUID.randomUUID().toString())
+                        .id(eventId)
                         .name("notification")
                         .reconnectTime(5000));
                 return true;
@@ -85,7 +85,7 @@ public class SseEmitterRegistry {
             try {
                 emitter.send(SseEmitter.event()
                         .name("heartbeat")
-                        .data(heartbeatData)
+                        .data((Object) heartbeatData)
                         .comment("keep-alive"));
             } catch (IOException e) {
                 emitters.remove(userId);
