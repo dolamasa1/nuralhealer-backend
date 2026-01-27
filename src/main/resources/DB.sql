@@ -591,6 +591,137 @@ CREATE INDEX idx_engagements_doctor_patient_status
 ON engagements(doctor_id, patient_id, status) 
 WHERE status IN ('active', 'pending');
 
+-- 13. NOTIFICATION RENDERER HELPER
+CREATE OR REPLACE FUNCTION get_notification_message(
+    p_template_key VARCHAR,
+    p_recipient_user_id UUID,
+    p_recipient_context VARCHAR,
+    p_placeholders JSONB DEFAULT '{}'::jsonb
+)
+RETURNS TABLE(title TEXT, message TEXT, priority VARCHAR) AS $$
+DECLARE
+    v_language VARCHAR(10);
+    v_title TEXT;
+    v_message TEXT;
+    v_priority VARCHAR(20);
+    v_placeholder_key TEXT;
+    v_placeholder_value TEXT;
+BEGIN
+    -- Get user's preferred language
+    SELECT language INTO v_language
+    FROM users
+    WHERE id = p_recipient_user_id;
+    
+    -- Default to English if not found
+    v_language := COALESCE(v_language, 'en');
+    
+    -- Get template
+    SELECT 
+        nmt.title,
+        nmt.message,
+        nmt.default_priority
+    INTO v_title, v_message, v_priority
+    FROM notification_message_templates nmt
+    WHERE nmt.template_key = p_template_key
+      AND nmt.language_code = v_language
+      AND nmt.recipient_context = p_recipient_context;
+    
+    -- Fallback to English if language not found
+    IF v_title IS NULL THEN
+        SELECT 
+            nmt.title,
+            nmt.message,
+            nmt.default_priority
+        INTO v_title, v_message, v_priority
+        FROM notification_message_templates nmt
+        WHERE nmt.template_key = p_template_key
+          AND nmt.language_code = 'en'
+          AND nmt.recipient_context = p_recipient_context;
+    END IF;
+    
+    -- Replace placeholders in title and message
+    FOR v_placeholder_key, v_placeholder_value IN
+        SELECT key, value FROM jsonb_each_text(p_placeholders)
+    LOOP
+        v_title := REPLACE(v_title, '{' || v_placeholder_key || '}', v_placeholder_value);
+        v_message := REPLACE(v_message, '{' || v_placeholder_key || '}', v_placeholder_value);
+    END LOOP;
+    
+    RETURN QUERY SELECT v_title, v_message, v_priority;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 14. INITIAL NOTIFICATION TEMPLATES
+-- ENGAGEMENT_STARTED
+INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority) VALUES
+('ENGAGEMENT_STARTED', 'en', 'doctor', 'Engagement Activated', 'Patient {patientName} has verified and started the engagement.', 'high'),
+('ENGAGEMENT_STARTED', 'ar', 'doctor', 'تم تفعيل المتابعة', 'المريض {patientName} قام بالتحقق وبدأ المتابعة.', 'high');
+
+-- ENGAGEMENT_CANCELLED (context-aware)
+INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority) VALUES
+('ENGAGEMENT_CANCELLED', 'en', 'initiator', 'Engagement Cancelled', 'You have cancelled the engagement with {otherPartyName}.', 'high'),
+('ENGAGEMENT_CANCELLED', 'ar', 'initiator', 'تم إلغاء المتابعة', 'لقد قمت بإلغاء المتابعة مع {otherPartyName}.', 'high'),
+('ENGAGEMENT_CANCELLED', 'en', 'target', 'Engagement Cancelled', '{otherPartyName} has cancelled the engagement.', 'high'),
+('ENGAGEMENT_CANCELLED', 'ar', 'target', 'تم إلغاء المتابعة', '{otherPartyName} قام بإلغاء المتابعة.', 'high');
+
+-- ENGAGEMENT_ENDED
+INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority) VALUES
+('ENGAGEMENT_ENDED', 'en', 'doctor', 'Engagement Ended', 'Your engagement with {patientName} has ended.', 'normal'),
+('ENGAGEMENT_ENDED', 'ar', 'doctor', 'انتهت المتابعة', 'انتهت متابعتك مع المريض {patientName}.', 'normal'),
+('ENGAGEMENT_ENDED', 'en', 'patient', 'Engagement Ended', 'Your engagement with Dr. {doctorName} has ended.', 'normal'),
+('ENGAGEMENT_ENDED', 'ar', 'patient', 'انتهت المتابعة', 'انتهت متابعتك مع الدكتور {doctorName}.', 'normal');
+
+-- MESSAGE_RECEIVED
+INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority) VALUES
+('MESSAGE_RECEIVED', 'en', 'doctor', 'New Message', 'You received a message from {patientName}.', 'normal'),
+('MESSAGE_RECEIVED', 'ar', 'doctor', 'رسالة جديدة', 'لديك رسالة جديدة من {patientName}.', 'normal'),
+('MESSAGE_RECEIVED', 'en', 'patient', 'New Message', 'You received a message from Dr. {doctorName}.', 'normal'),
+('MESSAGE_RECEIVED', 'ar', 'patient', 'رسالة جديدة', 'لديك رسالة جديدة من الدكتور {doctorName}.', 'normal');
+
+-- AI_RESPONSE_READY
+INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority) VALUES
+('AI_RESPONSE_READY', 'en', 'patient', 'AI Analysis Ready', 'Your AI health analysis is ready to view.', 'normal'),
+('AI_RESPONSE_READY', 'ar', 'patient', 'التحليل الذكي جاهز', 'تحليل صحتك بالذكاء الاصطناعي جاهز للعرض.', 'normal');
+
+-- SYSTEM_ALERT
+INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority) VALUES
+('SYSTEM_ALERT', 'en', 'doctor', 'System Alert', '{alertMessage}', 'critical'),
+('SYSTEM_ALERT', 'ar', 'doctor', 'تنبيه النظام', '{alertMessage}', 'critical'),
+('SYSTEM_ALERT', 'en', 'patient', 'System Alert', '{alertMessage}', 'critical'),
+('SYSTEM_ALERT', 'ar', 'patient', 'تنبيه النظام', '{alertMessage}', 'critical');
+
+-- ACCESS_LEVEL_CHANGED
+INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority) VALUES
+('ACCESS_LEVEL_CHANGED', 'en', 'doctor', 'Access Updated', 'Access level changed from "{oldAccess}" to "{newAccess}" for patient {patientName}.', 'normal'),
+('ACCESS_LEVEL_CHANGED', 'ar', 'doctor', 'تم تحديث الصلاحيات', 'تم تغيير مستوى الوصول من "{oldAccess}" إلى "{newAccess}" للمريض {patientName}.', 'normal');
+
+-- USER_WELCOME (Triggered on user creation)
+INSERT INTO notification_message_templates (template_key, language_code, title, message, recipient_context, default_priority) VALUES 
+('USER_WELCOME', 'en', 'Welcome to NeuralHealer! 🎉', 'Hi {userName}, we''re thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.', 'patient', 'normal'),
+('USER_WELCOME', 'ar', 'مرحباً بك في NeuralHealer! 🎉', 'مرحباً {userName}، يسعدنا انضمامك! رحلتك نحو صحة أفضل تبدأ الآن. أخبرنا إذا احتجت أي مساعدة للبدء.', 'patient', 'normal');
+
+-- Re-engagement for Active Users (3 days inactive)
+INSERT INTO notification_message_templates (template_key, language_code, title, message, recipient_context, default_priority) VALUES
+('USER_REENGAGE_ACTIVE', 'en', 'We miss you! 👋', 'Hey {userName}, it''s been 3 days since your last visit. How are you feeling today? Check in with your health companion!', 'patient', 'normal'),
+('USER_REENGAGE_ACTIVE', 'ar', 'نفتقدك! 👋', 'مرحباً {userName}، مضى 3 أيام منذ زيارتك الأخيرة. كيف حالك اليوم؟ تحقق من حالتك الصحية معنا!', 'patient', 'normal');
+
+-- Warning Before Becoming Inactive (14 days for inactive users)
+INSERT INTO notification_message_templates (template_key, language_code, title, message, recipient_context, default_priority) VALUES
+('USER_INACTIVITY_WARNING', 'en', 'Stay Connected with Your Health', 'Hi {userName}, we noticed you haven''t logged in for 14 days. Your health journey matters to us - come back and see what''s new!', 'patient', 'normal'),
+('USER_INACTIVITY_WARNING', 'ar', 'ابقَ على تواصل مع صحتك', 'مرحباً {userName}، لاحظنا أنك لم تسجل دخولك لمدة 14 يوماً. صحتك تهمنا - عد وشاهد ما الجديد!', 'patient', 'normal');
+
+-- 15. SYSTEM SETTINGS FOR NOTIFICATIONS
+INSERT INTO system_settings (setting_key, setting_value, description, is_public) VALUES
+('notification_active_user_threshold_days', '3', 'Days of inactivity before re-engagement notification for active users', false),
+('notification_inactive_warning_days', '14', 'Days of inactivity before warning notification', false),
+('notification_inactive_status_days', '4', 'Days after warning before user marked as inactive (total 18 days)', false);
+
+-- 16. USER ACTIVITY TRACKING
+ALTER TABLE users ADD COLUMN activity_status VARCHAR(20) DEFAULT 'active';
+ALTER TABLE users ADD COLUMN last_activity_check TIMESTAMP DEFAULT NOW();
+CREATE INDEX idx_users_activity_status ON users(activity_status, last_login_at);
+COMMENT ON COLUMN users.activity_status IS 'User activity life-cycle status (active, dormant, inactive)';
+
 -- ================================================================
 -- TRIGGERS
 -- ================================================================
@@ -645,6 +776,42 @@ $$ LANGUAGE plpgsql;
 CREATE SEQUENCE engagement_id_seq;
 CREATE TRIGGER set_engagement_id BEFORE INSERT ON engagements
 FOR EACH ROW EXECUTE FUNCTION generate_engagement_id();
+
+-- Trigger for Welcome Notification
+CREATE OR REPLACE FUNCTION send_welcome_notification()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_notification RECORD;
+BEGIN
+    -- Only for patients (or all if context is generic, but plan says 'patient')
+    -- We'll default to 'patient' context for the welcome message
+    
+    SELECT * INTO v_notification
+    FROM get_notification_message('USER_WELCOME', NEW.id, 'patient', jsonb_build_object('userName', NEW.first_name));
+    
+    IF v_notification.title IS NOT NULL THEN
+        INSERT INTO notifications (
+            user_id, type, title, message, payload, priority, source, sent_at
+        ) VALUES (
+            NEW.id,
+            'USER_WELCOME',
+            v_notification.title,
+            v_notification.message,
+            jsonb_build_object('userName', NEW.first_name),
+            v_notification.priority,
+            'system',
+            NOW()
+        );
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER user_welcome_notification
+AFTER INSERT ON users
+FOR EACH ROW
+EXECUTE FUNCTION send_welcome_notification();
 
 -- ================================================================
 -- SAMPLE DATA - ENGAGEMENT ACCESS RULES

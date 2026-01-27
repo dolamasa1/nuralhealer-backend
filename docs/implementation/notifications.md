@@ -424,28 +424,28 @@ sequenceDiagram
 ## 29. Notification Content Architecture (The Main Brain)
 
 ### 29.1 Architecture Concept: DB vs. Backend Logic
-The system uses a hybridized approach to content generation, ensuring high scalability and consistency across different triggers.
+The system uses a hybridized approach to content generation:
 
 | Logic Layer | Responsibility | Component |
 |-------------|----------------|-----------|
 | **Main Brain (DB)** | Engagement State & Lifecycle | `create_engagement_notification()` (Trigger) |
+| **Lifecycle Logic (DB)** | Welcome Messages | `send_welcome_notification()` (Trigger) |
+| **Time-Based Logic (App)** | Inactivity (3d, 14d) | `UserActivityNotificationJob` (Spring) |
 | **Logic Layer (API)** | Real-time Operations & AI | `NotificationCreatorService` (Spring) |
 | **I18n Engine** | Centralized Templates & Rendering | `get_notification_message()` (SQL Helper) |
 
 ### 29.2 Content Flow Diagram
 ```mermaid
 graph TD
-    TriggerSource[Engagement Status Update] -- SQL Trigger --> Engine[SQL get_notification_message]
-    Engine -- Fetch Template --> DB_Templates[(Template Table)]
-    Engine -- Fetch User Lang --> DB_Users[(Users Table)]
-    Engine -- Render --> Final[Notification Record]
-    Final -- Push --> SseRegistry[Spring SSE Sender]
+    Signup[User Signup] -- DB Trigger --> Welcome[Welcome Notification]
+    DailyJob[Spring Scheduled Job] -- Scan Users --> Inactivity[Re-engagement/Warning]
+    StatusUpdate[Engagement Change] -- DB Trigger --> Engagement[Engagement Notif]
+    Welcome --> Render[SQL get_notification_message]
+    Inactivity --> Render
+    Engagement --> Render
+    Render --> Final[Notification Record]
+    Final --> Push[SSE Real-time Push]
 ```
 
-### 29.3 Scalability & Extension
-1. **Adding Languages**: Simply insert new rows into `notification_message_templates` with the new `language_code`. No code changes required.
-2. **Context Awareness**: Templates support `initiator` vs. `target` perspectives, allowing the system to say "You cancelled" to the actor and "{Name} cancelled" to the recipient automatically.
-3. **Dynamic Placeholders**: Uses `{placeholderName}` syntax in SQL templates, replaced at runtime via JSONB payloads.
-
 ---
-**END OF MASTER SPECIFICATION - REVISION 4.0.0 (CENTRALIZED I18N)**
+**END OF MASTER SPECIFICATION - REVISION 5.0.0 (LIFECYCLE & INACTIVITY)**

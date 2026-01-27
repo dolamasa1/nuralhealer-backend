@@ -76,6 +76,14 @@ public class User implements UserDetails {
     @Builder.Default
     private Boolean mfaEnabled = false;
 
+    @Column(name = "activity_status", length = 20)
+    @Builder.Default
+    private String activityStatus = "active";
+
+    @Column(name = "last_activity_check")
+    @Builder.Default
+    private LocalDateTime lastActivityCheck = LocalDateTime.now();
+
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
