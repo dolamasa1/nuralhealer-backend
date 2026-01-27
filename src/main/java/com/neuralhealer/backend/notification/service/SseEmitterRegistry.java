@@ -71,17 +71,21 @@ public class SseEmitterRegistry {
      * Send heartbeat to keep connections alive and detect disconnected clients.
      * Scheduled every 30 seconds.
      */
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedDelay = 30000)
     public void sendHeartbeat() {
         if (emitters.isEmpty())
             return;
 
         log.debug("Sending heartbeat to {} connections", emitters.size());
+        Map<String, Object> heartbeatData = Map.of(
+                "status", "ping",
+                "timestamp", java.time.LocalDateTime.now().toString());
+
         emitters.forEach((userId, emitter) -> {
             try {
                 emitter.send(SseEmitter.event()
                         .name("heartbeat")
-                        .data("ping")
+                        .data(heartbeatData)
                         .comment("keep-alive"));
             } catch (IOException e) {
                 emitters.remove(userId);

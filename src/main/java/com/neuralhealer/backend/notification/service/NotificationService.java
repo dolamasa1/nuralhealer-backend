@@ -208,6 +208,17 @@ public class NotificationService {
         return notification;
     }
 
+    @Transactional
+    public void pushUnreadNotifications(UUID userId) {
+        log.debug("Pushing undelivered notifications for user: {}", userId);
+        List<Notification> undelivered = notificationRepository.findUndeliveredSseNotificationsForUser(userId);
+        undelivered.forEach(n -> {
+            if (n.getPriority() != NotificationPriority.low) {
+                pushToSse(userId, n);
+            }
+        });
+    }
+
     private void pushToSse(UUID userId, Notification notification) {
         if (sseEmitterRegistry.isUserConnected(userId)) {
             NotificationResponse response = mapToResponse(notification);
