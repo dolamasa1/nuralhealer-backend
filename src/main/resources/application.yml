@@ -33,7 +33,7 @@ spring:
   
   mail:
     host: smtp.gmail.com
-    port: 465
+    port: 587
     username: ${GMAIL_USERNAME:}
     password: ${GMAIL_APP_PASSWORD:}
     properties:
@@ -43,9 +43,11 @@ spring:
           starttls:
             enable: true
             required: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
+          ssl:
+            trust: smtp.gmail.com
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
 
 server:
   port: 8080

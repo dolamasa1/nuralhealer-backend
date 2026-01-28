@@ -34,6 +34,15 @@ public class EmailTestController {
         private String token = "test-token-123";
     }
 
+    @Data
+    public static class SpecialThanksRequest {
+        private String email;
+        private String name = "Ahmed";
+        private String acknowledgment = "For the one whose vision turns silence into symphony";
+        private String message = "Today, Neural Healer's voice learned to speak on its own. Our words now flow without pause, reaching those who need them most, exactly when they need to hear us.";
+        private String note = "You hold the very first breath of this new chapter.";
+    }
+
     @Operation(summary = "Send test verification email")
     @PostMapping("/verification")
     public ResponseEntity<Map<String, String>> testVerificationEmail(@RequestBody VerificationRequest request) {
@@ -48,5 +57,18 @@ public class EmailTestController {
         log.info("Sending password reset email to: {}", request.email);
         directEmailService.sendPasswordResetEmail(request.email, request.token);
         return ResponseEntity.ok(Map.of("message", "Password reset email sent to " + request.email));
+    }
+
+    @Operation(summary = "Send special thanks email")
+    @PostMapping("/special-thanks")
+    public ResponseEntity<Map<String, String>> testSpecialThanksEmail(@RequestBody SpecialThanksRequest request) {
+        log.info("Sending special thanks email to: {}", request.email);
+        directEmailService.sendSpecialThanksEmail(
+                request.email,
+                request.name,
+                request.acknowledgment,
+                request.message,
+                request.note);
+        return ResponseEntity.ok(Map.of("message", "Special thanks email sent to " + request.email));
     }
 }

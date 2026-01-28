@@ -64,6 +64,31 @@ public class DirectEmailService {
     }
 
     /**
+     * Send a special thanks email with custom messages.
+     *
+     * @param email          Recipient email address
+     * @param name           Recipient name
+     * @param acknowledgment Personal acknowledgment text
+     * @param milestone      Milestone message text
+     * @param note           Exclusive note text
+     * @throws EmailSendException if email fails to send
+     */
+    public void sendSpecialThanksEmail(String email, String name, String acknowledgment, String milestone,
+            String note) {
+        try {
+            String subject = "A Moment Just For You - NeuralHealer";
+            String htmlBody = renderSpecialThanksTemplate(name, acknowledgment, milestone, note);
+
+            gmailSmtpService.sendEmail(email, subject, htmlBody);
+            log.info("Special thanks email sent to: {}", email);
+
+        } catch (Exception e) {
+            log.error("Error sending special thanks email to {}: {}", email, e.getMessage());
+            throw new EmailSendException(e.getMessage(), e);
+        }
+    }
+
+    /**
      * Build the password reset link.
      */
     private String buildResetLink(String resetToken) {
@@ -92,6 +117,19 @@ public class DirectEmailService {
         return template
                 .replace("{VERIFICATION_CODE}", verificationCode)
                 .replace("{USER_EMAIL}", email);
+    }
+
+    /**
+     * Render the special thanks email HTML template.
+     */
+    private String renderSpecialThanksTemplate(String name, String acknowledgment, String milestone, String note) {
+        String template = loadTemplate("special-thanks.html");
+
+        return template
+                .replace("{RECIPIENT_NAME}", name)
+                .replace("{PERSONAL_ACKNOWLEDGMENT}", acknowledgment)
+                .replace("{MILESTONE_MESSAGE}", milestone)
+                .replace("{EXCLUSIVE_NOTE}", note);
     }
 
     /**
@@ -141,6 +179,23 @@ public class DirectEmailService {
                             <div style="font-size: 32px; font-weight: bold; color: #4CAF50; padding: 20px; background-color: #f9f9f9; text-align: center; border-radius: 4px; margin: 20px 0;">{VERIFICATION_CODE}</div>
                             <p style="color: #666; font-size: 14px;">Enter this code in the verification page to complete your registration.</p>
                             <p style="color: #999; font-size: 12px; margin-top: 30px;">If you didn't create an account, please ignore this email.</p>
+                        </div>
+                    </body>
+                    </html>
+                    """;
+        } else if (templateName.equals("special-thanks.html")) {
+            return """
+                    <!DOCTYPE html>
+                    <html>
+                    <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #1A1625; color: #ECE8F5;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: #241D30; padding: 30px; border-radius: 8px; border: 1px solid #3F3651;">
+                            <h2 style="text-align: center; font-weight: 300;">{RECIPIENT_NAME}</h2>
+                            <p style="text-align: center; font-style: italic; color: #C5B8D9;">{PERSONAL_ACKNOWLEDGMENT}</p>
+                            <p style="text-align: center;">{MILESTONE_MESSAGE}</p>
+                            <p style="text-align: center; color: #D8CFE8;">{EXCLUSIVE_NOTE}</p>
+                            <div style="margin-top: 30px; text-align: center; border-top: 1px solid #3F3651; padding-top: 20px;">
+                                <p>With gratitude & pride,<br/>The Neural Healer Team</p>
+                            </div>
                         </div>
                     </body>
                     </html>
