@@ -109,13 +109,12 @@ public class EmailQueueProcessor {
         }
 
         // Send email via Gmail SMTP
-        boolean emailSent = gmailSmtpService.sendEmail(recipientEmail, title, body);
-
-        if (emailSent) {
+        try {
+            gmailSmtpService.sendEmail(recipientEmail, title, body);
             handleJobSuccess(job);
             return true;
-        } else {
-            handleJobFailure(job, "SMTP send failed");
+        } catch (Exception e) {
+            handleJobFailure(job, e.getMessage());
             return false;
         }
     }

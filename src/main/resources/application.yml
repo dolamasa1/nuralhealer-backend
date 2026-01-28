@@ -33,7 +33,7 @@ spring:
   
   mail:
     host: smtp.gmail.com
-    port: 587
+    port: 465
     username: ${GMAIL_USERNAME:}
     password: ${GMAIL_APP_PASSWORD:}
     properties:
@@ -101,7 +101,7 @@ logging:
 # AI Chatbot Configuration
 ai:
   chatbot:
-    base-url: ${AI_SERVICE_URL:https://unenticed-huong-creedless.ngrok-free.dev}
+    base-url: ${AI_SERVICE_URL:http://localhost:5000}
     health-endpoint: /health
     ask-endpoint: /ask
     timeout-seconds: ${AI_SERVICE_TIMEOUT_SECONDS:90}

@@ -25,9 +25,9 @@ public class GmailSmtpService {
      * @param to       Recipient email address
      * @param subject  Email subject
      * @param htmlBody HTML content of the email
-     * @return true if email was sent successfully, false otherwise
+     * @throws RuntimeException if email fails to send with specific cause
      */
-    public boolean sendEmail(String to, String subject, String htmlBody) {
+    public void sendEmail(String to, String subject, String htmlBody) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -37,16 +37,19 @@ public class GmailSmtpService {
             helper.setText(htmlBody, true); // true = HTML content
 
             mailSender.send(message);
-
             log.info("Email sent successfully to: {}, subject: {}", to, subject);
-            return true;
 
+        } catch (org.springframework.mail.MailAuthenticationException e) {
+            log.error("Authentication failed for Gmail SMTP: {}", e.getMessage());
+            throw new RuntimeException(
+                    "Email Authentication Failed: Please verify your GMAIL_USERNAME and GMAIL_APP_PASSWORD in .env. Note: App Passwords must be generated in Google Security settings and should not contain spaces.",
+                    e);
         } catch (MessagingException e) {
             log.error("Failed to send email to: {}, subject: {}, error: {}", to, subject, e.getMessage());
-            return false;
+            throw new RuntimeException("SMTP Error: " + e.getMessage(), e);
         } catch (Exception e) {
             log.error("Unexpected error sending email to: {}, error: {}", to, e.getMessage());
-            return false;
+            throw new RuntimeException("Unexpected Email Error: " + e.getMessage(), e);
         }
     }
 

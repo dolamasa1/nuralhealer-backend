@@ -33,17 +33,12 @@ public class DirectEmailService {
             String resetLink = buildResetLink(resetToken);
             String htmlBody = renderPasswordResetTemplate(resetLink, email);
 
-            boolean success = gmailSmtpService.sendEmail(email, subject, htmlBody);
-
-            if (!success) {
-                throw new EmailSendException("Failed to send password reset email to: " + email);
-            }
-
+            gmailSmtpService.sendEmail(email, subject, htmlBody);
             log.info("Password reset email sent to: {}", email);
 
         } catch (Exception e) {
             log.error("Error sending password reset email to {}: {}", email, e.getMessage());
-            throw new EmailSendException("Failed to send password reset email", e);
+            throw new EmailSendException(e.getMessage(), e);
         }
     }
 
@@ -59,17 +54,12 @@ public class DirectEmailService {
             String subject = "Verify Your Email - NeuralHealer";
             String htmlBody = renderVerificationTemplate(verificationCode, email);
 
-            boolean success = gmailSmtpService.sendEmail(email, subject, htmlBody);
-
-            if (!success) {
-                throw new EmailSendException("Failed to send verification email to: " + email);
-            }
-
+            gmailSmtpService.sendEmail(email, subject, htmlBody);
             log.info("Verification email sent to: {}", email);
 
         } catch (Exception e) {
             log.error("Error sending verification email to {}: {}", email, e.getMessage());
-            throw new EmailSendException("Failed to send verification email", e);
+            throw new EmailSendException(e.getMessage(), e);
         }
     }
 
