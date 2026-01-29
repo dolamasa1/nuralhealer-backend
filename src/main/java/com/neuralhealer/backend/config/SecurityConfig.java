@@ -68,6 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/quizzes/**").permitAll()
                         .requestMatchers("/quizzes/**").permitAll() // Quiz endpoints (no auth)
                         .requestMatchers("/api/test/**").permitAll() // Test endpoints
+                        .requestMatchers("/api/diagnostic/**").permitAll() // Diagnostic endpoints
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 

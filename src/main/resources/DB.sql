@@ -563,7 +563,8 @@ CREATE TABLE notification_message_templates (
   -- Metadata
   default_priority VARCHAR(20) DEFAULT 'normal',
   notes TEXT,
-  
+  channels JSONB DEFAULT '{"email": false, "push": false, "sse": true}'::jsonb, 
+
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   
@@ -672,16 +673,21 @@ $$ LANGUAGE plpgsql;
 
 -- 14. INITIAL NOTIFICATION TEMPLATES
 -- ENGAGEMENT_STARTED
-INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority) VALUES
-('ENGAGEMENT_STARTED', 'en', 'doctor', 'Engagement Activated', 'Patient {patientName} has verified and started the engagement.', 'high'),
-('ENGAGEMENT_STARTED', 'ar', 'doctor', 'تم تفعيل المتابعة', 'المريض {patientName} قام بالتحقق وبدأ المتابعة.', 'high');
+INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority, channels) VALUES
+('ENGAGEMENT_STARTED', 'en', 'doctor', 'Engagement Activated', 'Patient {patientName} has verified and started the engagement.', 'high', '{"email": true, "sse": true}'::jsonb),
+('ENGAGEMENT_STARTED', 'ar', 'doctor', 'تم تفعيل المتابعة', 'المريض {patientName} قام بالتحقق وبدأ المتابعة.', 'high', '{"email": true, "sse": true}'::jsonb)
+ON CONFLICT (template_key, language_code, recipient_context) DO UPDATE SET
+    title = EXCLUDED.title,
+    message = EXCLUDED.message,
+    channels = EXCLUDED.channels,
+    updated_at = NOW();
 
 -- ENGAGEMENT_CANCELLED (context-aware)
-INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority) VALUES
-('ENGAGEMENT_CANCELLED', 'en', 'initiator', 'Engagement Cancelled', 'You have cancelled the engagement with {otherPartyName}.', 'high'),
-('ENGAGEMENT_CANCELLED', 'ar', 'initiator', 'تم إلغاء المتابعة', 'لقد قمت بإلغاء المتابعة مع {otherPartyName}.', 'high'),
-('ENGAGEMENT_CANCELLED', 'en', 'target', 'Engagement Cancelled', '{otherPartyName} has cancelled the engagement.', 'high'),
-('ENGAGEMENT_CANCELLED', 'ar', 'target', 'تم إلغاء المتابعة', '{otherPartyName} قام بإلغاء المتابعة.', 'high');
+INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority, channels) VALUES
+('ENGAGEMENT_CANCELLED', 'en', 'initiator', 'Engagement Cancelled', 'You have cancelled the engagement with {otherPartyName}.', 'high', '{"email": true, "sse": true}'::jsonb),
+('ENGAGEMENT_CANCELLED', 'ar', 'initiator', 'تم إلغاء المتابعة', 'لقد قمت بإلغاء المتابعة مع {otherPartyName}.', 'high', '{"email": true, "sse": true}'::jsonb),
+('ENGAGEMENT_CANCELLED', 'en', 'target', 'Engagement Cancelled', '{otherPartyName} has cancelled the engagement.', 'high', '{"email": true, "sse": true}'::jsonb),
+('ENGAGEMENT_CANCELLED', 'ar', 'target', 'تم إلغاء المتابعة', '{otherPartyName} قام بإلغاء المتابعة.', 'high', '{"email": true, "sse": true}'::jsonb);
 
 -- ENGAGEMENT_ENDED
 INSERT INTO notification_message_templates (template_key, language_code, recipient_context, title, message, default_priority) VALUES
@@ -715,23 +721,34 @@ INSERT INTO notification_message_templates (template_key, language_code, recipie
 ('ACCESS_LEVEL_CHANGED', 'ar', 'doctor', 'تم تحديث الصلاحيات', 'تم تغيير مستوى الوصول من "{oldAccess}" إلى "{newAccess}" للمريض {patientName}.', 'normal');
 
 -- USER_WELCOME (Triggered on user creation)
-INSERT INTO notification_message_templates (template_key, language_code, title, message, recipient_context, default_priority) VALUES 
-('USER_WELCOME', 'en', 'Welcome to NeuralHealer! 🎉', 'Hi {userName}, we''re thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.', 'patient', 'normal'),
-('USER_WELCOME', 'ar', 'مرحباً بك في NeuralHealer! 🎉', 'مرحباً {userName}، يسعدنا انضمامك! رحلتك نحو صحة أفضل تبدأ الآن. أخبرنا إذا احتجت أي مساعدة للبدء.', 'patient', 'normal')
+INSERT INTO notification_message_templates (template_key, language_code, title, message, recipient_context, default_priority, channels) VALUES 
+('USER_WELCOME', 'en', 'Welcome to NeuralHealer! 🎉', 'Hi {userName}, we''re thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.', 'patient', 'normal', '{"email": true, "sse": true}'::jsonb),
+('USER_WELCOME', 'ar', 'مرحباً بك في NeuralHealer! 🎉', 'مرحباً {userName}، يسعدنا انضمامك! رحلتك نحو صحة أفضل تبدأ الآن. أخبرنا إذا احتجت أي مساعدة للبدء.', 'patient', 'normal', '{"email": true, "sse": true}'::jsonb)
 ON CONFLICT (template_key, language_code, recipient_context) DO UPDATE SET
     title = EXCLUDED.title,
     message = EXCLUDED.message,
+    channels = EXCLUDED.channels,
     updated_at = NOW();
 
 -- Re-engagement for Active Users (3 days inactive)
-INSERT INTO notification_message_templates (template_key, language_code, title, message, recipient_context, default_priority) VALUES
-('USER_REENGAGE_ACTIVE', 'en', 'We miss you! 👋', 'Hey {userName}, it''s been 3 days since your last visit. How are you feeling today? Check in with your health companion!', 'patient', 'normal'),
-('USER_REENGAGE_ACTIVE', 'ar', 'نفتقدك! 👋', 'مرحباً {userName}، مضى 3 أيام منذ زيارتك الأخيرة. كيف حالك اليوم؟ تحقق من حالتك الصحية معنا!', 'patient', 'normal');
+INSERT INTO notification_message_templates (template_key, language_code, title, message, recipient_context, default_priority, channels) VALUES
+('USER_REENGAGE_ACTIVE', 'en', 'We miss you! 👋', 'Hey {userName}, it''s been 3 days since your last visit. How are you feeling today? Check in with your health companion!', 'patient', 'normal', '{"email": true, "sse": true}'::jsonb),
+('USER_REENGAGE_ACTIVE', 'ar', 'نفتقدك! 👋', 'مرحباً {userName}، مضى 3 أيام منذ زيارتك الأخيرة. كيف حالك اليوم؟ تحقق من حالتك الصحية معنا!', 'patient', 'normal', '{"email": true, "sse": true}'::jsonb)
+ON CONFLICT (template_key, language_code, recipient_context) DO UPDATE SET
+    title = EXCLUDED.title,
+    message = EXCLUDED.message,
+    channels = EXCLUDED.channels,
+    updated_at = NOW();
 
 -- Warning Before Becoming Inactive (14 days for inactive users)
-INSERT INTO notification_message_templates (template_key, language_code, title, message, recipient_context, default_priority) VALUES
-('USER_INACTIVITY_WARNING', 'en', 'Stay Connected with Your Health', 'Hi {userName}, we noticed you haven''t logged in for 14 days. Your health journey matters to us - come back and see what''s new!', 'patient', 'normal'),
-('USER_INACTIVITY_WARNING', 'ar', 'ابقَ على تواصل مع صحتك', 'مرحباً {userName}، لاحظنا أنك لم تسجل دخولك لمدة 14 يوماً. صحتك تهمنا - عد وشاهد ما الجديد!', 'patient', 'normal');
+INSERT INTO notification_message_templates (template_key, language_code, title, message, recipient_context, default_priority, channels) VALUES
+('USER_INACTIVITY_WARNING', 'en', 'Stay Connected with Your Health', 'Hi {userName}, we noticed you haven''t logged in for 14 days. Your health journey matters to us - come back and see what''s new!', 'patient', 'normal', '{"email": true, "sse": true}'::jsonb),
+('USER_INACTIVITY_WARNING', 'ar', 'ابقَ على تواصل مع صحتك', 'مرحباً {userName}، لاحظنا أنك لم تسجل دخولك لمدة 14 يوماً. صحتك تهمنا - عد وشاهد ما الجديد!', 'patient', 'normal', '{"email": true, "sse": true}'::jsonb)
+ON CONFLICT (template_key, language_code, recipient_context) DO UPDATE SET
+    title = EXCLUDED.title,
+    message = EXCLUDED.message,
+    channels = EXCLUDED.channels,
+    updated_at = NOW();
 
 -- 15. SYSTEM SETTINGS FOR NOTIFICATIONS
 INSERT INTO system_settings (setting_key, setting_value, description, is_public) VALUES
@@ -872,7 +889,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Central creation function with logic to flag emails
+
 CREATE OR REPLACE FUNCTION create_system_notification(
     p_user_id UUID,
     p_template_key VARCHAR(100),
@@ -883,35 +900,126 @@ DECLARE
     v_notification_id UUID;
     v_msg RECORD;
     v_send_email BOOLEAN := FALSE;
+    v_delivery_status JSONB;
+    v_language VARCHAR(10);
+    v_recipient_context VARCHAR(50);
+    v_key TEXT;
+    v_value TEXT;
 BEGIN
-    -- Determine if this event type needs an email alert
-    IF p_template_key IN (
-        'USER_WELCOME', 
-        'USER_REENGAGE_ACTIVE', 
-        'USER_INACTIVITY_WARNING', 
-        'ENGAGEMENT_STARTED', 
-        'ENGAGEMENT_CANCELLED'
-    ) THEN
-        v_send_email := TRUE;
-    END IF;
-
-    -- Get localized message content
-    SELECT * INTO v_msg FROM get_notification_message(p_template_key, p_user_id, 'patient', p_placeholders);
+    -- Get user info
+    SELECT 
+        COALESCE(NULLIF(language, ''), 'en'),
+        CASE 
+            WHEN EXISTS (SELECT 1 FROM doctor_profiles WHERE user_id = p_user_id) THEN 'doctor'
+            ELSE 'patient'
+        END
+    INTO v_language, v_recipient_context
+    FROM users WHERE id = p_user_id;
     
-    -- Insert notification with email flag
+    RAISE NOTICE 'NOTIFICATION DEBUG: Searching for template %, lang %, context %', p_template_key, v_language, v_recipient_context;
+    
+    -- Get template with channels
+    WITH template_search AS (
+        SELECT 
+            nmt.title, 
+            nmt.message, 
+            nmt.default_priority,
+            COALESCE(nmt.channels, '{"email": false, "push": false, "sse": true}'::jsonb) as channels
+        FROM notification_message_templates nmt
+        WHERE LOWER(nmt.template_key) = LOWER(p_template_key)
+          AND nmt.language_code = COALESCE(v_language, 'en')
+          AND LOWER(nmt.recipient_context) = LOWER(v_recipient_context)
+        UNION ALL
+        SELECT 
+            nmt.title, 
+            nmt.message, 
+            nmt.default_priority,
+            COALESCE(nmt.channels, '{"email": false, "push": false, "sse": true}'::jsonb) as channels
+        FROM notification_message_templates nmt
+        WHERE LOWER(nmt.template_key) = LOWER(p_template_key)
+          AND nmt.language_code = 'en'
+          AND LOWER(nmt.recipient_context) = LOWER(v_recipient_context)
+        UNION ALL
+        SELECT 
+            nmt.title, 
+            nmt.message, 
+            nmt.default_priority,
+            COALESCE(nmt.channels, '{"email": false, "push": false, "sse": true}'::jsonb) as channels
+        FROM notification_message_templates nmt
+        WHERE LOWER(nmt.template_key) = LOWER(p_template_key)
+          AND nmt.language_code = 'en'
+        LIMIT 1
+    )
+    SELECT * INTO v_msg FROM template_search LIMIT 1;
+    
+    -- Absolute fallback
+    IF v_msg.title IS NULL THEN
+        RAISE NOTICE 'NOTIFICATION DEBUG: Template NOT found. using absolute fallback.';
+        v_msg.title := INITCAP(REPLACE(p_template_key, '_', ' '));
+        v_msg.message := 'Notification: ' || p_template_key;
+        v_msg.default_priority := 'normal';
+        v_msg.channels := '{"email": false, "push": false, "sse": true}'::jsonb;
+    ELSE
+        RAISE NOTICE 'NOTIFICATION DEBUG: Template FOUND. Channels: %', v_msg.channels;
+    END IF;
+    
+    -- Replace placeholders
+    IF p_placeholders IS NOT NULL THEN
+        FOR v_key, v_value IN SELECT * FROM jsonb_each_text(p_placeholders) LOOP
+            v_msg.title := REPLACE(v_msg.title, '{' || v_key || '}', COALESCE(v_value, ''));
+            v_msg.message := REPLACE(v_msg.message, '{' || v_key || '}', COALESCE(v_value, ''));
+        END LOOP;
+    END IF;
+    
+    -- Set email flag based on template channels
+    v_send_email := COALESCE((v_msg.channels->>'email')::boolean, false);
+    
+    RAISE NOTICE 'NOTIFICATION DEBUG: Calculated email flag: %', v_send_email;
+    
+    -- Build delivery_status JSONB from channels
+    v_delivery_status := jsonb_build_object(
+        'sse', COALESCE((v_msg.channels->>'sse')::boolean, true),
+        'email', v_send_email,
+        'push', COALESCE((v_msg.channels->>'push')::boolean, false),
+        'sms', COALESCE((v_msg.channels->>'sms')::boolean, false),
+        'whatsapp', COALESCE((v_msg.channels->>'whatsapp')::boolean, false)
+    );
+    
+    -- Insert notification
     INSERT INTO notifications (
-        user_id, type, title, message, payload, priority, source, send_email, sent_at
+        user_id, 
+        type, 
+        title, 
+        message, 
+        payload, 
+        priority, 
+        source, 
+        send_email, 
+        delivery_status,
+        sent_at
     ) VALUES (
-        p_user_id, p_template_key, v_msg.title, v_msg.message, p_placeholders, 
-        v_msg.priority, p_source, v_send_email, NOW()
+        p_user_id,
+        p_template_key,
+        v_msg.title,
+        v_msg.message,
+        p_placeholders,
+        COALESCE(v_msg.default_priority, 'normal'),
+        p_source,
+        v_send_email,
+        v_delivery_status,
+        NOW()
     ) RETURNING id INTO v_notification_id;
     
+    RAISE NOTICE 'NOTIFICATION DEBUG: Notification record created with ID % and status %', v_notification_id, v_delivery_status;
+    
     RETURN v_notification_id;
+    
 EXCEPTION WHEN OTHERS THEN
     RAISE WARNING 'NOTIFICATION ERROR: Failed to create % notification for user %: %', p_template_key, p_user_id, SQLERRM;
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
+
 
 -- Automated Email Queuing Trigger
 CREATE OR REPLACE FUNCTION trigger_queue_email_job()

@@ -465,19 +465,13 @@ To prevent overwhelming users with re-engagement alerts, a **7-day throttling wi
   )
   ```
 
-### 30.2 Email Fallback Protocol (✅ SIMPLIFIED & IMPLEMENTED)
-The system uses the `notifications` table as the single source of truth for email delivery.
-- **The Flag**: A `send_email` boolean column determines if an email job is generated.
+### 30.2 Email Fallback Protocol (✅ TEMPLATE-DRIVEN)
+The system uses the `notifications` table as the single source of truth for delivery, but **configures** that delivery via the template system.
+- **Template Channels**: The `notification_message_templates` table now includes a `channels` JSONB column (e.g., `{"email": true, "sse": true}`).
+- **Dynamic Flagging**: `create_system_notification()` reads these channels from the resolved template and sets the `send_email` flag accordingly.
 - **The Trigger**: `trg_auto_queue_email` automatically inserts jobs into `message_queues` when `send_email` is `TRUE`.
-- **Logic**: `create_system_notification()` sets the flag for:
-  - `USER_WELCOME`
-  - `USER_REENGAGE_ACTIVE`
-  - `USER_INACTIVITY_WARNING`
-  - `ENGAGEMENT_STARTED`
-  - `ENGAGEMENT_CANCELLED`
-- **Recipients**: The trigger automatically constructs the job payload, ensuring `userName` and `doctorName` are passed for template rendering.
-- **Processor**: `EmailQueueProcessor` runs every **15 seconds**, provides sub-minute delivery latency.
-- **Tracking**: `delivery_status->>'email'` is updated to `true` upon success.
+- **Latency**: `EmailQueueProcessor` runs every **15 seconds** for near real-time email fallback.
+- **Tracking**: `delivery_status->>'email'` is updated to `true` upon success by the Java processor.
 
 ### 30.3 SQL Helper: create_system_notification()
 A centralized helper function in `DB.sql` ensures consistent notification creation across all database triggers.
