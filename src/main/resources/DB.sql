@@ -486,6 +486,7 @@ CREATE TABLE notifications (
   delivery_status JSONB DEFAULT '{"sse": false, "email": false, "push": false}'::jsonb,
   metadata JSONB DEFAULT '{}'::jsonb,
   is_read BOOLEAN DEFAULT false,
+  send_email BOOLEAN DEFAULT false, -- Controls if an email job should be queued
   sent_at TIMESTAMP DEFAULT now(),
   read_at TIMESTAMP,
   expires_at TIMESTAMP,
@@ -498,6 +499,11 @@ CREATE TABLE notifications (
 -- ================================================================
 -- INDEXES FOR PERFORMANCE
 -- ================================================================
+
+-- Fast lookup for pending email jobs
+CREATE INDEX IF NOT EXISTS idx_queue_pending 
+ON message_queues(job_type, status, created_at) 
+WHERE status = 'pending';
 
 -- Users indexes
 CREATE INDEX idx_users_email ON users(email);
@@ -607,47 +613,60 @@ DECLARE
     v_placeholder_key TEXT;
     v_placeholder_value TEXT;
 BEGIN
-    -- Get user's preferred language
-    SELECT language INTO v_language
+    -- Get user's preferred language with fallback
+    SELECT COALESCE(NULLIF(language, ''), 'en') INTO v_language
     FROM users
     WHERE id = p_recipient_user_id;
     
-    -- Default to English if not found
     v_language := COALESCE(v_language, 'en');
     
-    -- Get template
+    -- Try to find template (case-insensitive for key and context)
     SELECT 
-        nmt.title,
-        nmt.message,
-        nmt.default_priority
+        nmt.title, nmt.message, nmt.default_priority
     INTO v_title, v_message, v_priority
     FROM notification_message_templates nmt
-    WHERE nmt.template_key = p_template_key
+    WHERE LOWER(nmt.template_key) = LOWER(p_template_key)
       AND nmt.language_code = v_language
-      AND nmt.recipient_context = p_recipient_context;
+      AND LOWER(nmt.recipient_context) = LOWER(p_recipient_context);
     
-    -- Fallback to English if language not found
-    IF v_title IS NULL THEN
+    -- Fallback 1: English version of same context
+    IF v_title IS NULL AND v_language != 'en' THEN
         SELECT 
-            nmt.title,
-            nmt.message,
-            nmt.default_priority
+            nmt.title, nmt.message, nmt.default_priority
         INTO v_title, v_message, v_priority
         FROM notification_message_templates nmt
-        WHERE nmt.template_key = p_template_key
+        WHERE LOWER(nmt.template_key) = LOWER(p_template_key)
           AND nmt.language_code = 'en'
-          AND nmt.recipient_context = p_recipient_context;
+          AND LOWER(nmt.recipient_context) = LOWER(p_recipient_context);
+    END IF;
+
+    -- Fallback 2: Any English version of this template key (if context mismatch)
+    IF v_title IS NULL THEN
+        SELECT 
+            nmt.title, nmt.message, nmt.default_priority
+        INTO v_title, v_message, v_priority
+        FROM notification_message_templates nmt
+        WHERE LOWER(nmt.template_key) = LOWER(p_template_key)
+          AND nmt.language_code = 'en'
+        LIMIT 1;
+    END IF;
+
+    -- Absolute Fallback: Hardcoded defaults so the system NEVER returns NULL title
+    IF v_title IS NULL THEN
+        v_title := INITCAP(REPLACE(p_template_key, '_', ' '));
+        v_message := 'New system notification: ' || p_template_key;
+        v_priority := 'normal';
     END IF;
     
-    -- Replace placeholders in title and message
+    -- Replace placeholders
     FOR v_placeholder_key, v_placeholder_value IN
         SELECT key, value FROM jsonb_each_text(p_placeholders)
     LOOP
-        v_title := REPLACE(v_title, '{' || v_placeholder_key || '}', v_placeholder_value);
-        v_message := REPLACE(v_message, '{' || v_placeholder_key || '}', v_placeholder_value);
+        v_title := REPLACE(v_title, '{' || v_placeholder_key || '}', COALESCE(v_placeholder_value, ''));
+        v_message := REPLACE(v_message, '{' || v_placeholder_key || '}', COALESCE(v_placeholder_value, ''));
     END LOOP;
     
-    RETURN QUERY SELECT v_title, v_message, v_priority;
+    RETURN QUERY SELECT v_title, v_message, COALESCE(v_priority, 'normal');
 END;
 $$ LANGUAGE plpgsql;
 
@@ -698,7 +717,11 @@ INSERT INTO notification_message_templates (template_key, language_code, recipie
 -- USER_WELCOME (Triggered on user creation)
 INSERT INTO notification_message_templates (template_key, language_code, title, message, recipient_context, default_priority) VALUES 
 ('USER_WELCOME', 'en', 'Welcome to NeuralHealer! 🎉', 'Hi {userName}, we''re thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.', 'patient', 'normal'),
-('USER_WELCOME', 'ar', 'مرحباً بك في NeuralHealer! 🎉', 'مرحباً {userName}، يسعدنا انضمامك! رحلتك نحو صحة أفضل تبدأ الآن. أخبرنا إذا احتجت أي مساعدة للبدء.', 'patient', 'normal');
+('USER_WELCOME', 'ar', 'مرحباً بك في NeuralHealer! 🎉', 'مرحباً {userName}، يسعدنا انضمامك! رحلتك نحو صحة أفضل تبدأ الآن. أخبرنا إذا احتجت أي مساعدة للبدء.', 'patient', 'normal')
+ON CONFLICT (template_key, language_code, recipient_context) DO UPDATE SET
+    title = EXCLUDED.title,
+    message = EXCLUDED.message,
+    updated_at = NOW();
 
 -- Re-engagement for Active Users (3 days inactive)
 INSERT INTO notification_message_templates (template_key, language_code, title, message, recipient_context, default_priority) VALUES
@@ -777,7 +800,79 @@ CREATE SEQUENCE engagement_id_seq;
 CREATE TRIGGER set_engagement_id BEFORE INSERT ON engagements
 FOR EACH ROW EXECUTE FUNCTION generate_engagement_id();
 
--- Trigger for Welcome Notification
+-- ================================================================
+-- 17. ROBUST NOTIFICATION COMPONENTS (IDEMPOTENT)
+-- ================================================================
+
+-- Bulletproof message renderer
+CREATE OR REPLACE FUNCTION get_notification_message(
+    p_template_key VARCHAR,
+    p_recipient_user_id UUID,
+    p_recipient_context VARCHAR,
+    p_placeholders JSONB DEFAULT '{}'::jsonb
+)
+RETURNS TABLE(title TEXT, message TEXT, priority VARCHAR) AS $$
+DECLARE
+    v_language VARCHAR(10);
+    v_title TEXT;
+    v_message TEXT;
+    v_priority VARCHAR(20);
+    v_placeholder_key TEXT;
+    v_placeholder_value TEXT;
+BEGIN
+    -- 1. Language detection
+    SELECT COALESCE(NULLIF(language, ''), 'en') INTO v_language
+    FROM users WHERE id = p_recipient_user_id;
+    v_language := COALESCE(v_language, 'en');
+    
+    -- 2. Primary lookup
+    SELECT nmt.title, nmt.message, nmt.default_priority
+    INTO v_title, v_message, v_priority
+    FROM notification_message_templates nmt
+    WHERE LOWER(nmt.template_key) = LOWER(p_template_key)
+      AND nmt.language_code = v_language
+      AND LOWER(nmt.recipient_context) = LOWER(p_recipient_context);
+    
+    -- 3. Language Fallback
+    IF v_title IS NULL AND v_language != 'en' THEN
+        SELECT nmt.title, nmt.message, nmt.default_priority
+        INTO v_title, v_message, v_priority
+        FROM notification_message_templates nmt
+        WHERE LOWER(nmt.template_key) = LOWER(p_template_key)
+          AND nmt.language_code = 'en'
+          AND LOWER(nmt.recipient_context) = LOWER(p_recipient_context);
+    END IF;
+
+    -- 4. Context Fallback
+    IF v_title IS NULL THEN
+        SELECT nmt.title, nmt.message, nmt.default_priority
+        INTO v_title, v_message, v_priority
+        FROM notification_message_templates nmt
+        WHERE LOWER(nmt.template_key) = LOWER(p_template_key)
+          AND nmt.language_code = 'en'
+        LIMIT 1;
+    END IF;
+
+    -- 5. Absolute Safety
+    IF v_title IS NULL THEN
+        v_title := INITCAP(REPLACE(p_template_key, '_', ' '));
+        v_message := 'Notification: ' || p_template_key;
+        v_priority := 'normal';
+    END IF;
+    
+    -- 6. Placeholder replacement
+    FOR v_placeholder_key, v_placeholder_value IN
+        SELECT key, value FROM jsonb_each_text(p_placeholders)
+    LOOP
+        v_title := REPLACE(v_title, '{' || v_placeholder_key || '}', COALESCE(v_placeholder_value, ''));
+        v_message := REPLACE(v_message, '{' || v_placeholder_key || '}', COALESCE(v_placeholder_value, ''));
+    END LOOP;
+    
+    RETURN QUERY SELECT v_title, v_message, COALESCE(v_priority, 'normal');
+END;
+$$ LANGUAGE plpgsql;
+
+-- Central creation function with logic to flag emails
 CREATE OR REPLACE FUNCTION create_system_notification(
     p_user_id UUID,
     p_template_key VARCHAR(100),
@@ -787,61 +882,84 @@ CREATE OR REPLACE FUNCTION create_system_notification(
 DECLARE
     v_notification_id UUID;
     v_msg RECORD;
+    v_send_email BOOLEAN := FALSE;
 BEGIN
-    -- Get localized message content
-    SELECT * INTO v_msg
-    FROM get_notification_message(p_template_key, p_user_id, 'patient', p_placeholders);
-    
-    IF v_msg.title IS NOT NULL THEN
-        INSERT INTO notifications (
-            user_id, type, title, message, payload, priority, source, sent_at
-        ) VALUES (
-            p_user_id,
-            p_template_key,
-            v_msg.title,
-            v_msg.message,
-            p_placeholders,
-            v_msg.priority,
-            p_source,
-            NOW()
-        ) RETURNING id INTO v_notification_id;
-        
-        -- Queue Email for Lifecycle Notifications
-        IF p_template_key IN ('USER_WELCOME', 'USER_REENGAGE_ACTIVE', 'USER_INACTIVITY_WARNING') THEN
-            INSERT INTO message_queues (
-                job_type, status, payload, created_at
-            ) VALUES (
-                'EMAIL_NOTIFICATION',
-                'pending',
-                jsonb_build_object(
-                    'userId', p_user_id,
-                    'templateKey', p_template_key,
-                    'title', v_msg.title,
-                    'body', v_msg.message
-                ),
-                NOW()
-            );
-        END IF;
-
-        RETURN v_notification_id;
+    -- Determine if this event type needs an email alert
+    IF p_template_key IN (
+        'USER_WELCOME', 
+        'USER_REENGAGE_ACTIVE', 
+        'USER_INACTIVITY_WARNING', 
+        'ENGAGEMENT_STARTED', 
+        'ENGAGEMENT_CANCELLED'
+    ) THEN
+        v_send_email := TRUE;
     END IF;
+
+    -- Get localized message content
+    SELECT * INTO v_msg FROM get_notification_message(p_template_key, p_user_id, 'patient', p_placeholders);
     
+    -- Insert notification with email flag
+    INSERT INTO notifications (
+        user_id, type, title, message, payload, priority, source, send_email, sent_at
+    ) VALUES (
+        p_user_id, p_template_key, v_msg.title, v_msg.message, p_placeholders, 
+        v_msg.priority, p_source, v_send_email, NOW()
+    ) RETURNING id INTO v_notification_id;
+    
+    RETURN v_notification_id;
+EXCEPTION WHEN OTHERS THEN
+    RAISE WARNING 'NOTIFICATION ERROR: Failed to create % notification for user %: %', p_template_key, p_user_id, SQLERRM;
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
+-- Automated Email Queuing Trigger
+CREATE OR REPLACE FUNCTION trigger_queue_email_job()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.send_email = TRUE THEN
+        INSERT INTO message_queues (
+            job_type, status, payload, created_at
+        ) VALUES (
+            'EMAIL_NOTIFICATION',
+            'pending',
+            jsonb_build_object(
+                'notificationId', NEW.id,
+                'userId', NEW.user_id,
+                'templateKey', NEW.type,
+                'userName', COALESCE(NEW.payload->>'userName', 'User'),
+                'doctorName', COALESCE(NEW.payload->>'doctorName', 'Doctor'),
+                'title', NEW.title,
+                'body', NEW.message
+            ),
+            NOW()
+        );
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_auto_queue_email ON notifications;
+CREATE TRIGGER trg_auto_queue_email
+AFTER INSERT ON notifications
+FOR EACH ROW
+EXECUTE FUNCTION trigger_queue_email_job();
+
+-- Trigger logic
 CREATE OR REPLACE FUNCTION send_welcome_notification()
 RETURNS TRIGGER AS $$
 BEGIN
+    RAISE NOTICE 'TRIGGER TRACE: firing send_welcome_notification for user %', NEW.id;
     PERFORM create_system_notification(
         NEW.id, 
         'USER_WELCOME', 
-        jsonb_build_object('userName', NEW.first_name)
+        jsonb_build_object('userName', COALESCE(NULLIF(NEW.first_name, ''), 'User'))
     );
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
+-- Re-attach trigger
 CREATE TRIGGER user_welcome_notification
 AFTER INSERT ON users
 FOR EACH ROW

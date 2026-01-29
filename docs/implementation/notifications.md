@@ -94,8 +94,9 @@ public class Notification {
     private Map<String, Object> payload; // JSONB
     private NotificationPriority priority;
     private NotificationSource source;
-    private Map<String, Object> deliveryStatus; // JSONB {"sse": boolean}
+    private Map<String, Object> deliveryStatus; // JSONB {"sse": boolean, "email": boolean}
     private Boolean isRead;
+    private Boolean sendEmail; // Controls if an email job should be queued
     private LocalDateTime sentAt;
 }
 ```
@@ -170,12 +171,14 @@ When a client reconnects with `Last-Event-ID`, the server:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Created
+    [*] --> Created: send_email=true/false
     Created --> PushedSSE: if user connected
-    Created --> QueuedEmail: if priority high
-    PushedSSE --> Read
-    QueuedEmail --> Delivered
-    Read --> Archived: after 30 days [Rule Implementation in 09.1]
+    Created --> AutoQueueTrigger: if send_email is true
+    AutoQueueTrigger --> message_queues: Insert job
+    message_queues --> EmailQueueProcessor: Polling (15s)
+    EmailQueueProcessor --> Delivered: Gmail SMTP
+    Delivered --> DeliveredStatus: true
+    Read --> Archived: after 30 days
 ```
 
 ---
@@ -199,6 +202,7 @@ Runs at 2 AM Daily:
 | **06** | `Last-Event-ID` Parser & Missed Replay Logic | ✅ Complete |
 | **07** | DB Indexing & Query Optimization | ✅ Complete |
 | **08-10** | Controller Consolidation & Master Documentation | ✅ Complete |
+| **11** | Simplified Trigger-Driven Email System | ✅ Complete |
 
 ---
 
@@ -461,15 +465,31 @@ To prevent overwhelming users with re-engagement alerts, a **7-day throttling wi
   )
   ```
 
-### 30.2 Email Fallback Protocol
-Lifecycle events (Welcome, Inactivity Warnings) are automatically mirrored as emails.
-- **Mechanism**: The `create_system_notification()` SQL helper and the `UserActivityNotificationJob` Spring component both insert localized email jobs into the `message_queues` table.
-- **Job Type**: `EMAIL_NOTIFICATION`
-- **Payload**: Contains `recipientEmail`, `title`, and `body`.
+### 30.2 Email Fallback Protocol (✅ SIMPLIFIED & IMPLEMENTED)
+The system uses the `notifications` table as the single source of truth for email delivery.
+- **The Flag**: A `send_email` boolean column determines if an email job is generated.
+- **The Trigger**: `trg_auto_queue_email` automatically inserts jobs into `message_queues` when `send_email` is `TRUE`.
+- **Logic**: `create_system_notification()` sets the flag for:
+  - `USER_WELCOME`
+  - `USER_REENGAGE_ACTIVE`
+  - `USER_INACTIVITY_WARNING`
+  - `ENGAGEMENT_STARTED`
+  - `ENGAGEMENT_CANCELLED`
+- **Recipients**: The trigger automatically constructs the job payload, ensuring `userName` and `doctorName` are passed for template rendering.
+- **Processor**: `EmailQueueProcessor` runs every **15 seconds**, provides sub-minute delivery latency.
+- **Tracking**: `delivery_status->>'email'` is updated to `true` upon success.
 
 ### 30.3 SQL Helper: create_system_notification()
 A centralized helper function in `DB.sql` ensures consistent notification creation across all database triggers.
 - **Responsibilities**: Localized rendering, placeholder replacement, multi-channel queuing (SSE + Email), and priority resolution.
 
+
 ---
-**END OF MASTER SPECIFICATION - REVISION 6.0.0 (OPTIMIZATIONS & THROTTLING)**
+
+## 31. Next Steps: Email Expansion
+To further integrate the email system:
+1.  **Lifecycle Templates**: Complete the `re-engage.html` and `inactivity-warning.html` templates.
+2.  **Trigger Expansion**: Add `ENGAGEMENT_*` types to the `create_system_notification` email filter in `DB.sql`.
+
+---
+**END OF MASTER SPECIFICATION - REVISION 8.0.0 (SIMPLIFIED EMAIL SYSTEM)**

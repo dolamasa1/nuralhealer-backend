@@ -289,6 +289,10 @@ Authorization: Bearer {token}
       "priority": "HIGH",
       "isRead": false,
       "sentAt": "2026-01-27T10:15:30Z",
+      "deliveryStatus": {
+        "sse": true,
+        "email": true
+      },
       "payload": {
         "engagementId": "abc-123",
         "doctorName": "Ahmed Raafat"
@@ -299,6 +303,11 @@ Authorization: Bearer {token}
   "totalPages": 3
 }
 ```
+
+**Delivery Status Field:**
+The `deliveryStatus` object tracks multi-channel delivery:
+- `sse`: `true` if pushed via Server-Sent Events
+- `email`: `true` if sent via Gmail SMTP (only for HIGH priority lifecycle notifications like `USER_WELCOME`)
 
 ### 5.4 Mark as Read
 
