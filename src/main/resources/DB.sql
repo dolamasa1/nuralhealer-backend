@@ -1010,7 +1010,7 @@ BEGIN
         NOW()
     ) RETURNING id INTO v_notification_id;
     
-    RAISE NOTICE 'NOTIFICATION DEBUG: Notification record created with ID % and status %', v_notification_id, v_delivery_status;
+    RAISE NOTICE 'NOTIFICATION DEBUG: Notification record created with ID % and send_email=%', v_notification_id, v_send_email;
     
     RETURN v_notification_id;
     
@@ -1021,11 +1021,15 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- Automated Email Queuing Trigger
 CREATE OR REPLACE FUNCTION trigger_queue_email_job()
 RETURNS TRIGGER AS $$
 BEGIN
+    RAISE NOTICE 'TRIGGER DEBUG: trg_auto_queue_email fired for notification %', NEW.id;
+    RAISE NOTICE 'TRIGGER DEBUG: send_email = %', NEW.send_email;
+    
     IF NEW.send_email = TRUE THEN
+        RAISE NOTICE 'TRIGGER DEBUG: Creating email job in message_queues';
+        
         INSERT INTO message_queues (
             job_type, status, payload, created_at
         ) VALUES (
@@ -1042,36 +1046,24 @@ BEGIN
             ),
             NOW()
         );
+        
+        RAISE NOTICE 'TRIGGER DEBUG: Email job created successfully';
+    ELSE
+        RAISE NOTICE 'TRIGGER DEBUG: send_email is FALSE, skipping email queue';
     END IF;
+    
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
+-- Drop and recreate the trigger
 DROP TRIGGER IF EXISTS trg_auto_queue_email ON notifications;
+
 CREATE TRIGGER trg_auto_queue_email
 AFTER INSERT ON notifications
 FOR EACH ROW
 EXECUTE FUNCTION trigger_queue_email_job();
 
--- Trigger logic
-CREATE OR REPLACE FUNCTION send_welcome_notification()
-RETURNS TRIGGER AS $$
-BEGIN
-    RAISE NOTICE 'TRIGGER TRACE: firing send_welcome_notification for user %', NEW.id;
-    PERFORM create_system_notification(
-        NEW.id, 
-        'USER_WELCOME', 
-        jsonb_build_object('userName', COALESCE(NULLIF(NEW.first_name, ''), 'User'))
-    );
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Re-attach trigger
-CREATE TRIGGER user_welcome_notification
-AFTER INSERT ON users
-FOR EACH ROW
-EXECUTE FUNCTION send_welcome_notification();
 
 -- ================================================================
 -- SAMPLE DATA - ENGAGEMENT ACCESS RULES
@@ -1209,6 +1201,41 @@ AFTER UPDATE OF relationship_status ON doctor_patients
 FOR EACH ROW
 WHEN (OLD.relationship_status IS DISTINCT FROM NEW.relationship_status)
 EXECUTE FUNCTION notify_access_rule_change();
+
+
+
+-- 3. Create a new, cleaner trigger function that calls create_system_notification directly
+CREATE OR REPLACE FUNCTION user_welcome_notification()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE NOTICE 'TRIGGER: Creating welcome notification for new user %', NEW.id;
+    
+    -- Direct call to the main notification creation function
+    PERFORM create_system_notification(
+        NEW.id, 
+        'USER_WELCOME', 
+        jsonb_build_object('userName', COALESCE(NULLIF(NEW.first_name, ''), 'User'))
+    );
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
+-- 4. Re-attach the trigger
+CREATE TRIGGER user_welcome_notification
+AFTER INSERT ON users
+FOR EACH ROW
+EXECUTE FUNCTION user_welcome_notification();
+
+-- Also, let's check if there are any other functions calling send_welcome_notification
+-- Since it was only used by this trigger, we're safe to remove it
+
+-- Optional: Add comment to document the change
+COMMENT ON FUNCTION user_welcome_notification() IS 'Creates welcome notification for new users using the centralized notification system';
+
 
 -- 🏗️ ENHANCED TRIGGER SYSTEM
 -- Trigger for Engagement Notifications (Centralized I18n)

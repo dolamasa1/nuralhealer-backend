@@ -6,33 +6,33 @@
 
 -- STEP 1: Add channels column if it doesn't exist
 ALTER TABLE notification_message_templates 
-ADD COLUMN IF NOT EXISTS channels JSONB DEFAULT '{\"email\": false, \"push\": false, \"sse\": true}'::jsonb;
+ADD COLUMN IF NOT EXISTS channels JSONB DEFAULT '{"email": false, "push": false, "sse": true}'::jsonb;
 
 -- STEP 2: Update existing templates that should send emails
 
 -- USER_WELCOME templates
 UPDATE notification_message_templates 
-SET channels = '{\"email\": true, \"sse\": true}'::jsonb
+SET channels = '{"email": true, "sse": true}'::jsonb
 WHERE template_key = 'USER_WELCOME';
 
 -- ENGAGEMENT_STARTED templates  
 UPDATE notification_message_templates 
-SET channels = '{\"email\": true, \"sse\": true}'::jsonb
+SET channels = '{"email": true, "sse": true}'::jsonb
 WHERE template_key = 'ENGAGEMENT_STARTED';
 
 -- ENGAGEMENT_CANCELLED templates
 UPDATE notification_message_templates 
-SET channels = '{\"email\": true, \"sse\": true}'::jsonb
+SET channels = '{"email": true, "sse": true}'::jsonb
 WHERE template_key = 'ENGAGEMENT_CANCELLED';
 
 -- USER_REENGAGE_ACTIVE templates
 UPDATE notification_message_templates 
-SET channels = '{\"email\": true, \"sse\": true}'::jsonb
+SET channels = '{"email": true, "sse": true}'::jsonb
 WHERE template_key = 'USER_REENGAGE_ACTIVE';
 
 -- USER_INACTIVITY_WARNING templates
 UPDATE notification_message_templates 
-SET channels = '{\"email\": true, \"sse\": true}'::jsonb
+SET channels = '{"email": true, "sse": true}'::jsonb
 WHERE template_key = 'USER_INACTIVITY_WARNING';
 
 -- STEP 3: Verify the fix
