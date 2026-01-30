@@ -15,5 +15,10 @@ public enum NotificationType {
     SYSTEM_ALERT,
     SYSTEM_BROADCAST,
     SECURITY_ALERT,
-    REMINDER_ALERT;
+    REMINDER_ALERT,
+
+    // User Lifecycle
+    USER_WELCOME,
+    USER_REENGAGE_ACTIVE,
+    USER_INACTIVITY_WARNING;
 }
