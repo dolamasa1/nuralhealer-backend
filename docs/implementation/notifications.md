@@ -9,8 +9,8 @@ STATUS: ✅ MASTER SPECIFICATION (COMPREHENSIVE)
 
 ---
 **Document Type:** Master Implementation & Design Specification  
-**Version:** 3.0.0  
-**Last Updated:** 2026-01-27  
+**Version:** 3.1.0  
+**Last Updated:** 2026-01-30  
 **Status:** ✅ FULLY IMPLEMENTED CORE / 🎯 EXPANDABLE  
 
 ---
@@ -477,13 +477,14 @@ High-performance, instant notification system using PostgreSQL primitives.
    - `EmailQueueProcessor` wakes up.
    - uses `native SQL` to lock job (`status='processing'`).
    - sends email via Gmail SMTP.
-   - updates status to `completed` in explicit transaction.
+   - updates status to `completed` using `TransactionTemplate` for explicit commitment.
 5. **No Polling**: System is purely event-driven. Polling removed.
 
 ### Reliability
 - **Startup Catch-up**: Listener processes any pending backlog immediately upon connection.
 - **Event-Scheduled Retries**: Failed jobs are scheduled for retry using internal `ScheduledExecutorService` (30s, 60s, 120s backoff).
-- **Transaction Isolation**: Each job processed in isolated transaction to prevent bulk failures.
+- **Transaction Isolation**: Uses `TransactionTemplate` to avoid proxy self-invocation issues and ensure atomic commits.
+- **Enum Synchronization**: The `NotificationType` Java enum MUST contain all constants used in the database triggers (e.g., `USER_WELCOME`) to prevent mapping-related rollbacks.
 
 ### Database Schema
 **notifications table**

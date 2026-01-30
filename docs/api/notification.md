@@ -3,8 +3,8 @@
 
 ---
 **Audience:** Frontend Developers, API Consumers, Integration Teams  
-**Version:** 3.0.0  
-**Last Updated:** January 27, 2026  
+**Version:** 3.1.0  
+**Last Updated:** January 30, 2026  
 **Status:** ✅ Production Ready
 
 ---
@@ -17,7 +17,7 @@
 4. [Real-Time Delivery (SSE)](#4-real-time-delivery-sse)
 5. [API Endpoints](#5-api-endpoints)
 6. [Notification Templates](#6-notification-templates)
-7. [Integration Guide](#7-integration-guide)
+7. [Delivery Flow & Email Integration](#7-delivery-flow--email-integration)
 8. [Troubleshooting](#8-troubleshooting)
 
 ---
@@ -26,17 +26,18 @@
 
 ### 1.1 What is the Notification System?
 
-The Notification System delivers **real-time alerts** about important platform events using Server-Sent Events (SSE) for instant delivery.
+The Notification System delivers **real-time alerts** about important platform events using Server-Sent Events (SSE) for instant delivery, with automatic email fallback for critical notifications.
 
 ### 1.2 Key Features
 
 | Feature | Description |
 |---------|-------------|
 | ⚡ Real-time Push | Instant delivery via SSE (no polling) |
+| 📧 Email Fallback | Automatic email sending for critical notifications |
 | 🔄 Auto Reconnection | Automatic catch-up after network issues |
 | 📊 Full History | Persistent notification records |
 | 🎯 Priority-based | HIGH/NORMAL/LOW with different UI treatment |
-| 📧 Multi-channel | SSE (primary) + Email (backup for HIGH priority) |
+| 🌐 I18n Support | Localized templates for English & Arabic |
 
 ### 1.3 Core Entities
 
@@ -75,6 +76,7 @@ graph TB
         BE1[Scheduled Jobs]
         BE2[NotificationCreatorService]
         BE3[Real-time Services]
+        BE4[EmailQueueProcessor]
     end
 
     subgraph "STORAGE"
@@ -85,6 +87,7 @@ graph TB
     subgraph "DELIVERY"
         D1[SSE Stream]
         D2[Email Job Processor]
+        D3[Gmail SMTP]
     end
 
     T1 --> DB1
@@ -106,10 +109,11 @@ graph TB
     ST1 --> ST2
 
     ST1 --> D1
-    ST2 --> D2
+    ST2 --> BE4
+    BE4 --> D3
 
     D1 --> U[👤 User Browser]
-    D2 --> U
+    D3 --> U
 
     style DB1 fill:#4CAF50,color:#fff
     style DB2 fill:#4CAF50,color:#fff
@@ -118,6 +122,7 @@ graph TB
     style BE1 fill:#2196F3,color:#fff
     style BE2 fill:#2196F3,color:#fff
     style BE3 fill:#2196F3,color:#fff
+    style BE4 fill:#FF9800,color:#fff
 ```
 
 ### 2.2 Responsibility Matrix
@@ -129,11 +134,13 @@ graph TB
 | **Time-Based Logic (App)** | Inactivity (3d, 14d) | `UserActivityNotificationJob` (Spring) |
 | **Logic Layer (API)** | Real-time Operations & AI | `NotificationCreatorService` (Spring) |
 | **I18n Engine** | Centralized Templates & Rendering | `get_notification_message()` (SQL Helper) |
+| **Email Processor** | Async Email Delivery | `EmailQueueProcessor` (Spring) |
 
 ### 2.3 Why Two Brains?
 
 ✅ **Database Triggers** react instantly to data changes (microseconds)  
 ✅ **Backend Services** handle complex logic and scheduled tasks  
+✅ **Email Processor** ensures reliable email delivery  
 ✅ **Combined** they provide reliability and flexibility
 
 ---
@@ -148,6 +155,7 @@ graph TD
     A --> C[MESSAGE]
     A --> D[SYSTEM]
     A --> E[AI]
+    A --> F[USER_WELCOME]
 
     B --> B1[ENGAGEMENT_PENDING]
     B --> B2[ENGAGEMENT_STARTED]
@@ -165,21 +173,27 @@ graph TD
     E --> E1[AI_RESPONSE_READY]
     E --> E2[ANALYSIS_COMPLETE]
 
+    F --> F1[USER_WELCOME]
+
     style B fill:#FFC107
     style C fill:#2196F3
     style D fill:#F44336
     style E fill:#9C27B0
+    style F fill:#4CAF50
 ```
 
-### 3.2 Priority Mapping
+### 3.2 Priority & Delivery Mapping
 
-| Type | Priority | SSE | Email | Sound |
-|------|----------|-----|-------|-------|
-| `ENGAGEMENT_*` | **HIGH** | ✅ | ✅ | ✅ |
-| `SECURITY_ALERT` | **HIGH** | ✅ | ✅ | ✅ |
-| `MESSAGE_RECEIVED` | NORMAL | ✅ | ❌ | ✅ |
-| `USER_REENGAGE` | NORMAL | ✅ | ✅ | ❌ |
-| `ACCOUNT_UPDATE` | LOW | ✅ | ❌ | ❌ |
+| Type | Priority | SSE | Email | Sound | Created By |
+|------|----------|-----|-------|-------|------------|
+| `USER_WELCOME` | **HIGH** | ✅ | ✅ | ✅ | Database Trigger |
+| `ENGAGEMENT_*` | **HIGH** | ✅ | ✅ | ✅ | Database Trigger |
+| `SECURITY_ALERT` | **HIGH** | ✅ | ✅ | ✅ | Backend Service |
+| `USER_REENGAGE` | NORMAL | ✅ | ✅ | ❌ | Scheduled Job |
+| `USER_INACTIVE_WARNING` | NORMAL | ✅ | ✅ | ❌ | Scheduled Job |
+| `MESSAGE_RECEIVED` | NORMAL | ✅ | ❌ | ✅ | Backend Service |
+| `ACCOUNT_UPDATE` | LOW | ✅ | ❌ | ❌ | Backend Service |
+| `AI_RESPONSE_READY` | NORMAL | ✅ | ❌ | ✅ | Backend Service |
 
 ---
 
@@ -192,6 +206,7 @@ sequenceDiagram
     participant Client
     participant Server
     participant DB
+    participant EmailQueue
 
     Client->>Server: GET /api/notifications/stream
     Server-->>Client: 200 OK (Connection open)
@@ -200,11 +215,16 @@ sequenceDiagram
         Server-->>Client: ♥ heartbeat
     end
 
-    Note over DB: New notification created
+    Note over DB: New USER_WELCOME notification
     
     DB->>Server: Notify event
     Server->>Server: Find active user connections
     Server-->>Client: Push notification
+    DB->>EmailQueue: Add email job
+    
+    EmailQueue->>EmailQueue: Process async
+    EmailQueue->>Server: Gmail SMTP success
+    Server->>DB: Update delivery_status.email=true
     
     Client->>Client: Show toast & update badge
 ```
@@ -222,10 +242,33 @@ data: {JSON_PAYLOAD}
 ```
 id: 550e8400-e29b-41d4-a716-446655440000_1737981600
 event: notification
-data: {"id":"550e8400-...","type":"MESSAGE_RECEIVED","title":"New Message","message":"You have a message from Dr. Smith","priority":"NORMAL","isRead":false}
+data: {"id":"550e8400-...","type":"USER_WELCOME","title":"Welcome to NeuralHealer!","message":"Welcome to NeuralHealer, Ahmed! Complete your profile to get started.","priority":"HIGH","isRead":false,"deliveryStatus":{"sse":true,"email":false}}
 ```
 
-### 4.3 Reconnection & Catch-up
+### 4.3 Delivery Status Tracking
+
+The `deliveryStatus` field tracks multi-channel delivery:
+
+```json
+{
+  "deliveryStatus": {
+    "sse": true,
+    "email": false,
+    "emailQueuedAt": "2026-01-30T17:11:34.959+02:00",
+    "emailSentAt": null,
+    "emailError": null
+  }
+}
+```
+
+**States:**
+- `sse`: `true` if pushed via Server-Sent Events (instantly)
+- `email`: `true` if successfully sent via Gmail SMTP (async, 1-10 seconds delay)
+- `emailQueuedAt`: When email job was created
+- `emailSentAt`: When email was successfully sent
+- `emailError`: Any email delivery error message
+
+### 4.4 Reconnection & Catch-up
 
 ```mermaid
 sequenceDiagram
@@ -257,6 +300,7 @@ sequenceDiagram
 | `GET` | `/api/notifications` | Get notification history |
 | `PUT` | `/api/notifications/{id}/read` | Mark as read |
 | `GET` | `/api/notifications/unread-count` | Get unread count |
+| `GET` | `/api/notifications/{id}/delivery-status` | Get delivery status |
 
 ### 5.2 SSE Stream
 
@@ -283,19 +327,24 @@ Authorization: Bearer {token}
   "content": [
     {
       "id": "uuid",
-      "type": "ENGAGEMENT_STARTED",
-      "title": "Engagement Activated",
-      "message": "Dr. Ahmed has started your engagement",
+      "type": "USER_WELCOME",
+      "title": "Welcome to NeuralHealer!",
+      "message": "Welcome to NeuralHealer, Ahmed! Complete your profile to get started.",
       "priority": "HIGH",
       "isRead": false,
-      "sentAt": "2026-01-27T10:15:30Z",
+      "sentAt": "2026-01-30T17:11:34.959+02:00",
       "deliveryStatus": {
         "sse": true,
-        "email": true
+        "email": true,
+        "emailQueuedAt": "2026-01-30T17:11:34.959+02:00",
+        "emailSentAt": "2026-01-30T17:11:34.960+02:00",
+        "emailError": null
       },
       "payload": {
-        "engagementId": "abc-123",
-        "doctorName": "Ahmed Raafat"
+        "userId": "user-uuid",
+        "userType": "PATIENT",
+        "firstName": "Ahmed",
+        "email": "ahmed@example.com"
       }
     }
   ],
@@ -304,12 +353,35 @@ Authorization: Bearer {token}
 }
 ```
 
-**Delivery Status Field:**
-The `deliveryStatus` object tracks multi-channel delivery:
-- `sse`: `true` if pushed via Server-Sent Events
-- `email`: `true` if sent via Gmail SMTP (only for HIGH priority lifecycle notifications like `USER_WELCOME`)
+### 5.4 Get Delivery Status
 
-### 5.4 Mark as Read
+**Request:**
+```http
+GET /api/notifications/{id}/delivery-status
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "notificationId": "uuid",
+  "sseDelivered": true,
+  "emailStatus": "SENT",
+  "emailQueuedAt": "2026-01-30T17:11:34.959+02:00",
+  "emailSentAt": "2026-01-30T17:11:34.960+02:00",
+  "emailErrorMessage": null,
+  "lastUpdated": "2026-01-30T17:11:34.970+02:00"
+}
+```
+
+**Email Status Values:**
+- `QUEUED`: Added to message_queues table
+- `PROCESSING`: Email job is being processed
+- `SENT`: Successfully sent via Gmail SMTP
+- `FAILED`: Email delivery failed (check error message)
+- `RETRY`: Scheduled for retry
+
+### 5.5 Mark as Read
 
 **Request:**
 ```http
@@ -323,12 +395,13 @@ Authorization: Bearer {token}
   "success": true,
   "notification": {
     "id": "uuid",
-    "isRead": true
+    "isRead": true,
+    "readAt": "2026-01-30T17:15:00.000+02:00"
   }
 }
 ```
 
-### 5.5 Get Unread Count
+### 5.6 Get Unread Count
 
 **Request:**
 ```http
@@ -339,7 +412,9 @@ Authorization: Bearer {token}
 **Response:**
 ```json
 {
-  "count": 5
+  "count": 5,
+  "highPriority": 2,
+  "normalPriority": 3
 }
 ```
 
@@ -347,53 +422,53 @@ Authorization: Bearer {token}
 
 ## 6. Notification Templates
 
-### 6.1 Template Structure
+### 6.1 Template System
 
-All notification messages use **I18n templates** stored in the database via `get_notification_message()` SQL function.
+All notification messages use **I18n templates** stored in the database via `get_notification_message()` SQL function, which handles localization and variable substitution.
 
-### 6.2 Engagement Templates
+### 6.2 Welcome Templates
 
-| Type | English Template | Arabic Template |
-|------|------------------|-----------------|
-| `ENGAGEMENT_PENDING` | "Dr. {doctorName} wants to start an engagement with you" | "د. {doctorName} يريد بدء متابعة معك" |
-| `ENGAGEMENT_STARTED` | "Your engagement with Dr. {doctorName} is now active" | "متابعتك مع د. {doctorName} نشطة الآن" |
-| `ENGAGEMENT_CANCELLED` | "Dr. {doctorName} cancelled the engagement" | "د. {doctorName} ألغى المتابعة" |
-| `ENGAGEMENT_ENDED` | "Your engagement with Dr. {doctorName} has ended" | "انتهت متابعتك مع د. {doctorName}" |
+| Type | English Template | Arabic Template | Delivery |
+|------|------------------|-----------------|----------|
+| `USER_WELCOME` (Patient) | "Welcome to NeuralHealer, {firstName}! Complete your profile to get started." | "مرحباً بك في NeuralHealer، {firstName}! أكمل ملفك الشخصي للبدء." | SSE + Email |
+| `USER_WELCOME` (Doctor) | "Welcome Dr. {lastName}! Your account is now active." | "مرحباً د. {lastName}! حسابك نشط الآن." | SSE + Email |
 
-### 6.3 Welcome Templates
+### 6.3 Engagement Templates
 
-| Type | English Template | Arabic Template |
-|------|------------------|-----------------|
-| `WELCOME_PATIENT` | "Welcome to NeuralHealer, {firstName}! Complete your profile to get started." | "مرحباً بك في NeuralHealer، {firstName}! أكمل ملفك الشخصي للبدء." |
-| `WELCOME_DOCTOR` | "Welcome Dr. {lastName}! Your account is now active." | "مرحباً د. {lastName}! حسابك نشط الآن." |
+| Type | English Template | Arabic Template | Delivery |
+|------|------------------|-----------------|----------|
+| `ENGAGEMENT_PENDING` | "Dr. {doctorName} wants to start an engagement with you" | "د. {doctorName} يريد بدء متابعة معك" | SSE + Email |
+| `ENGAGEMENT_STARTED` | "Your engagement with Dr. {doctorName} is now active" | "متابعتك مع د. {doctorName} نشطة الآن" | SSE + Email |
+| `ENGAGEMENT_CANCELLED` | "Dr. {doctorName} cancelled the engagement" | "د. {doctorName} ألغى المتابعة" | SSE + Email |
+| `ENGAGEMENT_ENDED` | "Your engagement with Dr. {doctorName} has ended" | "انتهت متابعتك مع د. {doctorName}" | SSE + Email |
 
 ### 6.4 Re-engagement Templates
 
-| Type | English Template | Arabic Template | Trigger |
-|------|------------------|-----------------|---------|
-| `USER_REENGAGE_ACTIVE` | "We miss you, {firstName}! Check your health dashboard." | "نفتقدك، {firstName}! تحقق من لوحة الصحة الخاصة بك." | 3 days inactive |
-| `USER_INACTIVE_WARNING` | "Your account will be deactivated soon. Log in to keep it active." | "سيتم تعطيل حسابك قريباً. سجل الدخول للحفاظ عليه نشطاً." | 14 days inactive |
+| Type | English Template | Arabic Template | Trigger | Delivery |
+|------|------------------|-----------------|---------|----------|
+| `USER_REENGAGE` | "We miss you, {firstName}! Check your health dashboard." | "نفتقدك، {firstName}! تحقق من لوحة الصحة الخاصة بك." | 3 days inactive | SSE + Email |
+| `USER_INACTIVE_WARNING` | "Your account will be deactivated soon. Log in to keep it active." | "سيتم تعطيل حسابك قريباً. سجل الدخول للحفاظ عليه نشطاً." | 14 days inactive | SSE + Email |
 
 ### 6.5 System Templates
 
-| Type | English Template | Arabic Template |
-|------|------------------|-----------------|
-| `SECURITY_ALERT` | "New login from {location} at {time}" | "تسجيل دخول جديد من {location} في {time}" |
-| `ACCOUNT_UPDATE` | "Your profile has been updated successfully" | "تم تحديث ملفك الشخصي بنجاح" |
+| Type | English Template | Arabic Template | Delivery |
+|------|------------------|-----------------|----------|
+| `SECURITY_ALERT` | "New login from {location} at {time}" | "تسجيل دخول جديد من {location} في {time}" | SSE + Email |
+| `ACCOUNT_UPDATE` | "Your profile has been updated successfully" | "تم تحديث ملفك الشخصي بنجاح" | SSE Only |
 
 ### 6.6 Message Templates
 
-| Type | English Template | Arabic Template |
-|------|------------------|-----------------|
-| `MESSAGE_RECEIVED` | "New message from {senderName}" | "رسالة جديدة من {senderName}" |
-| `ATTACHMENT_RECEIVED` | "{senderName} sent you a file: {fileName}" | "{senderName} أرسل لك ملف: {fileName}" |
+| Type | English Template | Arabic Template | Delivery |
+|------|------------------|-----------------|----------|
+| `MESSAGE_RECEIVED` | "New message from {senderName}" | "رسالة جديدة من {senderName}" | SSE Only |
+| `ATTACHMENT_RECEIVED` | "{senderName} sent you a file: {fileName}" | "{senderName} أرسل لك ملف: {fileName}" | SSE Only |
 
 ### 6.7 AI Templates
 
-| Type | English Template | Arabic Template |
-|------|------------------|-----------------|
-| `AI_RESPONSE_READY` | "Your AI analysis is ready to view" | "تحليل الذكاء الاصطناعي الخاص بك جاهز للعرض" |
-| `ANALYSIS_COMPLETE` | "Analysis of {reportName} completed" | "اكتمل تحليل {reportName}" |
+| Type | English Template | Arabic Template | Delivery |
+|------|------------------|-----------------|----------|
+| `AI_RESPONSE_READY` | "Your AI analysis is ready to view" | "تحليل الذكاء الاصطناعي الخاص بك جاهز للعرض" | SSE Only |
+| `ANALYSIS_COMPLETE` | "Analysis of {reportName} completed" | "اكتمل تحليل {reportName}" | SSE Only |
 
 ### 6.8 Template Variables
 
@@ -412,71 +487,137 @@ Common placeholders used in templates:
 
 ---
 
-## 7. Integration Guide
+## 7. Delivery Flow & Email Integration
 
-### 7.1 Basic SSE Client
-
-```javascript
-// Connect to notification stream
-const eventSource = new EventSource('/api/notifications/stream');
-
-// Listen for notifications
-eventSource.addEventListener('notification', (event) => {
-  const notification = JSON.parse(event.data);
-  handleNotification(notification);
-});
-
-// Handle connection errors
-eventSource.onerror = () => {
-  // Browser auto-reconnects with Last-Event-ID
-};
-```
-
-### 7.2 Notification Lifecycle
+### 7.1 Complete Delivery Pipeline
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Created
-    Created --> Delivered: SSE Push
-    Created --> Queued: User Offline
-    Queued --> Delivered: User Reconnects
-    Delivered --> Read: User Clicks
-    Delivered --> Archived: 90 days (unread)
-    Read --> Archived: 30 days (read)
-    Archived --> [*]: Nightly Cleanup
+sequenceDiagram
+    participant DB as Database
+    participant Trigger as PostgreSQL Trigger
+    participant NotifService as Notification Service
+    participant SSE as SSE Stream
+    participant Queue as Message Queue
+    participant EmailProc as Email Processor
+    participant Gmail as Gmail SMTP
+
+    Note over DB,Trigger: USER_WELCOME Trigger Flow
+    
+    DB->>Trigger: User created
+    Trigger->>DB: Insert notification
+    Trigger->>Queue: Create email job
+    Queue->>NotifService: Job available
+    
+    par Real-time Push
+        NotifService->>SSE: Push notification
+        SSE->>User: Show toast
+    and Email Processing
+        NotifService->>EmailProc: Process email job
+        EmailProc->>Gmail: Send email
+        Gmail-->>EmailProc: Email sent
+        EmailProc->>Queue: Mark as completed
+        EmailProc->>DB: Update delivery_status.email=true
+    end
+    
+    Note over User: Receives both SSE & Email
 ```
 
-### 7.3 Implementation Steps
+### 7.2 Email Processing Logic
+
+The `EmailQueueProcessor` handles async email delivery with these characteristics:
+
+1. **Transaction Safety**: Each email processed in its own transaction
+2. **Retry Logic**: Failed emails are retried with exponential backoff
+3. **Status Tracking**: Updates `delivery_status.email` field
+4. **Error Handling**: Non-critical errors logged, job marked appropriately
+
+### 7.3 Sample Email Content
+
+**Subject:** Welcome to NeuralHealer! 🎉
+
+**Body:**
+```
+Welcome to NeuralHealer, Ahmed!
+
+We're excited to have you join our platform. Your account has been successfully created.
+
+To get started:
+1. Complete your profile
+2. Connect with healthcare providers
+3. Explore your health dashboard
+
+If you have any questions, please contact support@neuralhealer.com.
+
+Best regards,
+The NeuralHealer Team
+```
+
+### 7.4 Implementation Steps
 
 1. **Connect** to `/api/notifications/stream` on login
 2. **Listen** for `notification` events
-3. **Display** toast based on priority (HIGH = red, NORMAL = blue)
-4. **Update** badge count
-5. **Mark as read** when user interacts
-6. **Close** connection on logout
+3. **Display** toast based on priority:
+   - HIGH: Red border, bell icon, auto-expand
+   - NORMAL: Blue border, info icon
+   - LOW: Gray border, minimal display
+4. **Show delivery status**: Indicate if email is queued/sent/failed
+5. **Update** badge count with priority breakdown
+6. **Mark as read** when user interacts
+7. **Close** connection on logout
 
 ---
 
 ## 8. Troubleshooting
 
-### 8.1 Common Issues
+### 8.1 Common Issues & Solutions
 
-| Problem | Solution |
-|---------|----------|
-| Not receiving notifications | Check SSE connection in Network tab |
-| Duplicate notifications | Ensure only one EventSource instance |
-| Missing after reconnect | Verify `Last-Event-ID` header is sent |
-| 401 Unauthorized | Refresh auth token |
+| Problem | Solution | Log Pattern |
+|---------|----------|-------------|
+| Email sent but status not updated | Check `EmailQueueProcessor` logs for rollback errors | `Transaction silently rolled back because it has been marked as rollback-only` |
+| Missing notification type in enum | Add `USER_WELCOME` to `NotificationType` enum | `No enum constant com...NotificationType.USER_WELCOME` |
+| Not receiving SSE notifications | Check browser console for SSE connection errors | Network tab shows SSE stream disconnected |
+| Email delivery failed | Check Gmail SMTP configuration and quotas | `Email sent failed to: email@example.com` |
+| Duplicate notifications | Verify database triggers aren't firing multiple times | Multiple notifications with same payload |
 
 ### 8.2 Debug Checklist
 
-- [ ] SSE connection shows "open" status
-- [ ] Auth token is valid
-- [ ] No CORS errors in console
-- [ ] Browser supports EventSource API
-- [ ] Only one connection per user
+- [ ] SSE connection shows "open" status in Network tab
+- [ ] Auth token is valid and not expired
+- [ ] No CORS errors in browser console
+- [ ] `NotificationType.USER_WELCOME` exists in enum
+- [ ] Email jobs appear in `message_queues` table
+- [ ] Gmail SMTP credentials are valid
+- [ ] Database triggers are correctly configured
 
-### 8.3 Connection States
+### 8.3 Monitoring & Logs
+
+**Key Log Patterns to Monitor:**
+
+1. **Successful Email:**
+```
+Email sent successfully to: email@example.com, subject: Welcome to NeuralHealer!
+Email sent successfully to email@example.com
+```
+
+2. **Email Status Update:**
+```
+UPDATE message_queues SET status = 'completed' WHERE id = ?
+Job {id} completed
+```
+
+3. **Errors:**
+```
+Failed to update notification delivery status: {error}
+Transaction silently rolled back
+No enum constant {type}
+```
+
+4. **Batch Processing:**
+```
+Batch completed: X successful, Y failed
+```
+
+### 8.4 Connection States
 
 ```mermaid
 stateDiagram-v2
@@ -488,16 +629,52 @@ stateDiagram-v2
     Reconnecting --> Connected: Success
     Reconnecting --> Failed: Max Retries
     Failed --> [*]
+    
+    note right of Connected
+        Receiving real-time
+        notifications
+    end note
+    
+    note right of Reconnecting
+        Sends Last-Event-ID
+        to catch up
+    end note
+```
+
+### 8.5 Quick Fix for USER_WELCOME Enum Issue
+
+If you encounter the `No enum constant NotificationType.USER_WELCOME` error:
+
+```java
+// Add to NotificationType enum:
+public enum NotificationType {
+    USER_WELCOME,          // For welcome emails
+    ENGAGEMENT_PENDING,
+    ENGAGEMENT_STARTED,
+    ENGAGEMENT_CANCELLED,
+    ENGAGEMENT_ENDED,
+    MESSAGE_RECEIVED,
+    ATTACHMENT_RECEIVED,
+    SECURITY_ALERT,
+    ACCOUNT_UPDATE,
+    USER_REENGAGE,
+    USER_INACTIVE_WARNING,
+    AI_RESPONSE_READY,
+    ANALYSIS_COMPLETE
+}
 ```
 
 ---
 
 **Need Help?**  
 📧 Backend Team: backend@neuralhealer.com  
+🔧 Support Channel: #notifications-support  
 📖 Full Spec: [Notification System Master](./notification-system-complete.md)
 
 ---
 
-**Version:** 3.0.0  
-**Last Updated:** January 27, 2026  
-**Status:** ✅ Production Ready
+**Version:** 3.1.0  
+**Last Updated:** January 30, 2026  
+**Status:** ✅ Production Ready  
+**Hotfix:** Added `USER_WELCOME` type to NotificationType enum  
+**Note:** All welcome emails now include SSE + Email delivery
