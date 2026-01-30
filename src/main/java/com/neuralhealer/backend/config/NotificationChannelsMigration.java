@@ -102,14 +102,47 @@ public class NotificationChannelsMigration implements CommandLineRunner {
             System.out.println("   Email enabled: " + emailEnabled);
             System.out.println("   Email disabled: " + (results.size() - emailEnabled));
 
+            // Step 4: Recreate the email queue trigger with NOTIFY support
+            System.out.println("\nEnsuring event-driven email trigger (NOTIFY) is active...");
+            String triggerFunctionSql = "CREATE OR REPLACE FUNCTION trigger_queue_email_job() " +
+                    "RETURNS TRIGGER AS $$ " +
+                    "BEGIN " +
+                    "    IF NEW.send_email = TRUE THEN " +
+                    "        INSERT INTO message_queues ( " +
+                    "            job_type, status, payload, created_at " +
+                    "        ) VALUES ( " +
+                    "            'EMAIL_NOTIFICATION', " +
+                    "            'pending', " +
+                    "            jsonb_build_object( " +
+                    "                'notificationId', NEW.id, " +
+                    "                'userId', NEW.user_id, " +
+                    "                'templateKey', NEW.type, " +
+                    "                'userName', COALESCE(NEW.payload->>'userName', 'User'), " +
+                    "                'doctorName', COALESCE(NEW.payload->>'doctorName', 'Doctor'), " +
+                    "                'title', NEW.title, " +
+                    "                'body', NEW.message " +
+                    "            ), " +
+                    "            NOW() " +
+                    "        ); " +
+                    "        PERFORM pg_notify('email_queue', 'new_job'); " +
+                    "    END IF; " +
+                    "    RETURN NEW; " +
+                    "END; " +
+                    "$$ LANGUAGE plpgsql;";
+
+            jdbcTemplate.execute(triggerFunctionSql);
+            jdbcTemplate.execute("DROP TRIGGER IF EXISTS trg_auto_queue_email ON notifications");
+            jdbcTemplate.execute(
+                    "CREATE TRIGGER trg_auto_queue_email " +
+                            "AFTER INSERT ON notifications " +
+                            "FOR EACH ROW " +
+                            "EXECUTE FUNCTION trigger_queue_email_job()");
+
+            System.out.println("✅ Trigger 'trg_auto_queue_email' recreated with pg_notify support");
+
             if (emailEnabled == results.size()) {
                 System.out.println("\n✅ SUCCESS: All notification templates are correctly configured!");
-                System.out.println("   Emails will now be sent for:");
-                System.out.println("   - USER_WELCOME (signup)");
-                System.out.println("   - ENGAGEMENT_STARTED");
-                System.out.println("   - ENGAGEMENT_CANCELLED");
-                System.out.println("   - USER_REENGAGE_ACTIVE (3 days inactive)");
-                System.out.println("   - USER_INACTIVITY_WARNING (14 days inactive)");
+                System.out.println("   Events will now be processed INSTANTLY via PG NOTIFY.");
             } else {
                 System.out.println("\n⚠️ WARNING: Some templates still have email disabled");
             }

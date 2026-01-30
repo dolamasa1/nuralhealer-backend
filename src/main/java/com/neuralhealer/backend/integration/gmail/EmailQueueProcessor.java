@@ -7,13 +7,16 @@ import com.neuralhealer.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Scheduled job that processes the message_queues table for email
@@ -29,22 +32,24 @@ public class EmailQueueProcessor {
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
     private final GmailSmtpService gmailSmtpService;
+    private final ScheduledExecutorService simpleScheduler = Executors.newSingleThreadScheduledExecutor();
+    private final org.springframework.transaction.support.TransactionTemplate transactionTemplate;
 
     private static final int BATCH_SIZE = 50;
     private static final int MAX_RETRIES = 3;
 
-    /**
-     * Process pending email notifications every minute.
-     * Queries message_queues table for EMAIL_NOTIFICATION jobs with
-     * status='pending'
-     * and sends them via Gmail SMTP.
-     */
-    @Scheduled(fixedRate = 15000) // Every 15 seconds
-    @Transactional
-    public void processPendingEmails() {
-        log.debug("Polling for pending email notifications...");
+    // Prevent scheduling same job multiple times in memory
+    private final Map<UUID, Boolean> scheduledRetries = new ConcurrentHashMap<>();
 
-        // Fetch pending email jobs
+    /**
+     * Triggered by PostgresNotificationListener when a NEW email job is created.
+     * This is purely event-driven. No polling.
+     */
+    // @Scheduled removed - purely event driven as requested
+    public void processPendingEmails() {
+        log.debug("📬 Polling for pending email notifications...");
+
+        // Fetch pending email jobs (no transactional needed for read)
         List<MessageQueue> pendingJobs = messageQueueRepository.findByJobTypeAndStatus(
                 "EMAIL_NOTIFICATION",
                 "pending",
@@ -54,105 +59,136 @@ public class EmailQueueProcessor {
             return;
         }
 
-        log.info("Found {} pending email jobs to process", pendingJobs.size());
+        log.info("📧 Found {} pending email jobs to process", pendingJobs.size());
 
         int successCount = 0;
         int failureCount = 0;
 
         for (MessageQueue job : pendingJobs) {
             try {
-                boolean success = processEmailJob(job);
-                if (success) {
+                // Process each job in its own transaction context
+                boolean result = processSingleJob(job);
+                if (result) {
                     successCount++;
                 } else {
                     failureCount++;
                 }
             } catch (Exception e) {
-                log.error("Unexpected error processing email job {}: {}", job.getId(), e.getMessage(), e);
-                handleJobFailure(job, "Unexpected error: " + e.getMessage());
+                log.error("❌ Unexpected error for job {}: {}", job.getId(), e.getMessage());
                 failureCount++;
             }
         }
 
-        log.info("Email queue processing completed: {} successful, {} failed", successCount, failureCount);
+        log.info("✅ Batch completed: {} successful, {} failed", successCount, failureCount);
+    }
+
+    /**
+     * Process a single job with explicit transaction management.
+     */
+    public boolean processSingleJob(MessageQueue job) {
+        return Boolean.TRUE.equals(transactionTemplate.execute(status -> {
+            // 1. Atomically lock the job
+            if (messageQueueRepository.updateStatusIfPending(job.getId(), "processing", "pending") == 0) {
+                log.debug("⏭️ Job {} already processing, skipping", job.getId());
+                return false;
+            }
+
+            try {
+                boolean success = processEmailJob(job);
+                if (success) {
+                    messageQueueRepository.markAsCompleted(job.getId());
+                    log.info("✅ Job {} completed", job.getId());
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                log.error("❌ Error in processEmailJob {}: {}", job.getId(), e.getMessage());
+                handleJobFailure(job, e.getMessage());
+                return false;
+            }
+        }));
     }
 
     /**
      * Process a single email job from the queue.
      *
-     * @param job The message queue job to process
+     * @param job The message queue job to process (must already be locked)
      * @return true if email was sent successfully, false otherwise
      */
     private boolean processEmailJob(MessageQueue job) {
         Map<String, Object> payload = job.getPayload();
-
-        // Extract required fields from payload
         String recipientEmail = extractString(payload, "recipientEmail");
-        String title = extractString(payload, "title");
-        String body = extractString(payload, "body");
 
-        // Fallback: Try to get email from userId if recipientEmail is missing
         if (recipientEmail == null || recipientEmail.isBlank()) {
             recipientEmail = getUserEmail(payload);
         }
 
-        // Validate payload
         if (recipientEmail == null || recipientEmail.isBlank()) {
-            log.error("Job {} missing recipientEmail and valid userId in payload", job.getId());
-            handleJobFailure(job, "Invalid payload: missing recipient email");
+            handleJobFailure(job, "Missing recipientEmail");
             return false;
         }
 
-        if (title == null || title.isBlank()) {
-            log.warn("Job {} has empty title, using default", job.getId());
-            title = "Notification";
-        }
+        String title = COALESCE(extractString(payload, "title"), "Notification");
+        String body = extractString(payload, "body");
 
         if (body == null || body.isBlank()) {
-            log.error("Job {} missing body in payload", job.getId());
-            handleJobFailure(job, "Invalid payload: missing body");
+            handleJobFailure(job, "Missing body");
             return false;
         }
 
-        // Send email via Gmail SMTP
         try {
-            // Check if this is a template-based notification
-            String templateKey = extractString(payload, "templateKey");
-            String emailBody = body;
-
-            // Get user name for personalization
-            String userName = extractString(payload, "userName");
-            if (userName == null) {
-                // Fallback: extract from userId
-                String userEmail = getUserEmail(payload);
-                if (userEmail != null) {
-                    userName = userEmail.split("@")[0];
-                }
-            }
-            if (userName == null)
-                userName = "User";
-
-            // Render appropriate template based on templateKey
-            String doctorName = extractString(payload, "doctorName");
-
-            if ("USER_WELCOME".equals(templateKey)) {
-                emailBody = renderTemplate("welcome.html", userName, null);
-            } else if ("USER_REENGAGE_ACTIVE".equals(templateKey)) {
-                emailBody = renderTemplate("re-engage.html", userName, null);
-            } else if ("USER_INACTIVITY_WARNING".equals(templateKey)) {
-                emailBody = renderTemplate("inactivity-warning.html", userName, null);
-            } else if ("ENGAGEMENT_STARTED".equals(templateKey)) {
-                emailBody = renderTemplate("engagement-started.html", userName, doctorName);
-            } else if ("ENGAGEMENT_CANCELLED".equals(templateKey)) {
-                emailBody = renderTemplate("engagement-cancelled.html", userName, doctorName);
-            }
-
-            gmailSmtpService.sendEmail(recipientEmail, title, emailBody);
-            handleJobSuccess(job);
+            renderAndSendEmail(recipientEmail, title, body, payload, job.getId());
+            updateNotificationStatus(payload);
             return true;
         } catch (Exception e) {
             handleJobFailure(job, e.getMessage());
             return false;
+        }
+    }
+
+    private String COALESCE(String val, String def) {
+        return (val == null || val.isBlank()) ? def : val;
+    }
+
+    private void renderAndSendEmail(String email, String title, String body, Map<String, Object> payload, UUID jobId) {
+        String templateKey = extractString(payload, "templateKey");
+        String userName = COALESCE(extractString(payload, "userName"), "User");
+        String doctorName = extractString(payload, "doctorName");
+
+        String emailBody = body;
+        if ("USER_WELCOME".equals(templateKey)) {
+            emailBody = renderTemplate("welcome.html", userName, null);
+        } else if ("USER_REENGAGE_ACTIVE".equals(templateKey)) {
+            emailBody = renderTemplate("re-engage.html", userName, null);
+        } else if ("USER_INACTIVITY_WARNING".equals(templateKey)) {
+            emailBody = renderTemplate("inactivity-warning.html", userName, null);
+        } else if ("ENGAGEMENT_STARTED".equals(templateKey)) {
+            emailBody = renderTemplate("engagement-started.html", userName, doctorName);
+        } else if ("ENGAGEMENT_CANCELLED".equals(templateKey)) {
+            emailBody = renderTemplate("engagement-cancelled.html", userName, doctorName);
+        }
+
+        log.info("📤 Sending email to {} for job {}", email, jobId);
+        gmailSmtpService.sendEmail(email, title, emailBody);
+        log.info("✅ Email sent successfully to {}", email);
+    }
+
+    private void updateNotificationStatus(Map<String, Object> payload) {
+        String notificationId = extractString(payload, "notificationId");
+        if (notificationId != null) {
+            try {
+                notificationRepository.findById(UUID.fromString(notificationId)).ifPresent(notification -> {
+                    Map<String, Object> status = notification.getDeliveryStatus();
+                    if (status == null)
+                        status = new java.util.HashMap<>();
+                    status.put("email", true);
+                    notification.setDeliveryStatus(status);
+                    notificationRepository.save(notification);
+                });
+            } catch (Exception e) {
+                log.warn("Non-critical: Failed to update notification delivery status: {}", e.getMessage());
+            }
         }
     }
 
@@ -198,57 +234,41 @@ public class EmailQueueProcessor {
     }
 
     /**
-     * Mark job as completed and update notification delivery status.
-     */
-    private void handleJobSuccess(MessageQueue job) {
-        job.setStatus("completed");
-        job.setProcessedAt(LocalDateTime.now());
-        job.setErrorMessage(null);
-        messageQueueRepository.save(job);
-
-        // Update notification delivery status
-        String notificationId = extractString(job.getPayload(), "notificationId");
-        if (notificationId != null) {
-            try {
-                java.util.UUID uuid = java.util.UUID.fromString(notificationId);
-                if (uuid == null)
-                    return;
-                notificationRepository.findById(uuid).ifPresent(notification -> {
-                    java.util.Map<String, Object> status = notification.getDeliveryStatus();
-                    if (status == null) {
-                        status = new java.util.HashMap<>();
-                    }
-                    status.put("email", true);
-                    notification.setDeliveryStatus(status);
-                    notificationRepository.save(notification);
-                    log.debug("Updated delivery status for notification {}", uuid);
-                });
-            } catch (Exception e) {
-                log.warn("Failed to update notification delivery status: {}", e.getMessage());
-            }
-        }
-        log.debug("Job {} marked as completed", job.getId());
-    }
-
-    /**
-     * Handle job failure with retry logic.
+     * Handle job failure with retry logic using native SQL and Event-Scheduled
+     * logic.
      */
     private void handleJobFailure(MessageQueue job, String errorMessage) {
         int currentRetryCount = job.getRetryCount() != null ? job.getRetryCount() : 0;
-        job.setRetryCount(currentRetryCount + 1);
-        job.setErrorMessage(errorMessage);
+        int nextRetryCount = currentRetryCount + 1;
+        String nextStatus = (nextRetryCount >= MAX_RETRIES) ? "failed" : "pending";
 
-        if (job.getRetryCount() >= MAX_RETRIES) {
-            job.setStatus("failed");
-            job.setProcessedAt(LocalDateTime.now());
-            log.error("Job {} failed after {} retries: {}", job.getId(), MAX_RETRIES, errorMessage);
+        messageQueueRepository.updateStatusAndError(job.getId(), nextStatus, nextRetryCount, errorMessage);
+
+        if ("failed".equals(nextStatus)) {
+            log.error("💀 Job {} failed permanently: {}", job.getId(), errorMessage);
+            scheduledRetries.remove(job.getId());
         } else {
-            // Keep status as 'pending' for retry
-            job.setStatus("pending");
-            log.warn("Job {} failed (retry {}/{}): {}", job.getId(), job.getRetryCount(), MAX_RETRIES, errorMessage);
-        }
+            // Event-Scheduled Retry: Schedule a run in the future without polling DB
+            // Exponential backoff: 30s, 60s, 120s...
+            long delaySeconds = (long) Math.pow(2, nextRetryCount) * 15;
+            log.warn("⏳ Job {} scheduled for retry ({}/{}) in {}s", job.getId(), nextRetryCount, MAX_RETRIES,
+                    delaySeconds);
 
-        messageQueueRepository.save(job);
+            if (!scheduledRetries.containsKey(job.getId())) {
+                scheduledRetries.put(job.getId(), true);
+
+                // Use internal scheduler instead of Spring bean to avoid conflicts
+                simpleScheduler.schedule(() -> {
+                    try {
+                        scheduledRetries.remove(job.getId());
+                        log.info("⏰ Waking up for retry of job {}", job.getId());
+                        processSingleJob(job);
+                    } catch (Exception e) {
+                        log.error("Error during scheduled retry of {}: {}", job.getId(), e.getMessage());
+                    }
+                }, delaySeconds, TimeUnit.SECONDS);
+            }
+        }
     }
 
     /**

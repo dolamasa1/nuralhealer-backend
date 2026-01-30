@@ -465,14 +465,39 @@ To prevent overwhelming users with re-engagement alerts, a **7-day throttling wi
   )
   ```
 
-### 30.2 Email Fallback Protocol (✅ TEMPLATE-DRIVEN)
-The system uses the `notifications` table as the single source of truth for delivery, but **configures** that delivery via the template system.
-- **Template Channels**: The `notification_message_templates` table now includes a `channels` JSONB column (e.g., `{"email": true, "sse": true}`).
-- **Dynamic Flagging**: `create_system_notification()` reads these channels from the resolved template and sets the `send_email` flag accordingly.
-- **The Trigger**: `trg_auto_queue_email` automatically inserts jobs into `message_queues` when `send_email` is `TRUE`.
-- **Latency**: `EmailQueueProcessor` runs every **15 seconds** for near real-time email fallback.
-- **Tracking**: `delivery_status->>'email'` is updated to `true` upon success by the Java processor.
+## System Architecture: Event-Driven
 
+High-performance, instant notification system using PostgreSQL primitives.
+
+### Workflow
+1. **Trigger**: `create_system_notification()` inserts into `notifications` table.
+2. **Auto-Queue**: `trg_auto_queue_email` fires -> inserts into `message_queues` -> executes `pg_notify('email_queue')`.
+3. **Instant Listener**: Java `PostgresNotificationListener` receives signal immediately.
+4. **Atomic Processing**: 
+   - `EmailQueueProcessor` wakes up.
+   - uses `native SQL` to lock job (`status='processing'`).
+   - sends email via Gmail SMTP.
+   - updates status to `completed` in explicit transaction.
+5. **No Polling**: System is purely event-driven. Polling removed.
+
+### Reliability
+- **Startup Catch-up**: Listener processes any pending backlog immediately upon connection.
+- **Event-Scheduled Retries**: Failed jobs are scheduled for retry using internal `ScheduledExecutorService` (30s, 60s, 120s backoff).
+- **Transaction Isolation**: Each job processed in isolated transaction to prevent bulk failures.
+
+### Database Schema
+**notifications table**
+- `delivery_status`: JSONB tracking `{"email": true, "sse": true}`
+
+**message_queues table**
+- `status`: `pending` -> `processing` -> `completed` / `failed`
+- `job_type`: `EMAIL_NOTIFICATION`
+- `payload`: Contains all template data
+
+### Code Components
+- **Listener**: `PostgresNotificationListener.java` (Handles `pg_notify`)
+- **Processor**: `EmailQueueProcessor.java` (Handles locking, sending, retries)
+- **Repository**: `MessageQueueRepository.java` (Native SQL for atomic updates)
 ### 30.3 SQL Helper: create_system_notification()
 A centralized helper function in `DB.sql` ensures consistent notification creation across all database triggers.
 - **Responsibilities**: Localized rendering, placeholder replacement, multi-channel queuing (SSE + Email), and priority resolution.

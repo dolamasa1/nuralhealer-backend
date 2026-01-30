@@ -1021,6 +1021,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+-- Automated Email Queuing Trigger
 CREATE OR REPLACE FUNCTION trigger_queue_email_job()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -1030,6 +1031,7 @@ BEGIN
     IF NEW.send_email = TRUE THEN
         RAISE NOTICE 'TRIGGER DEBUG: Creating email job in message_queues';
         
+        -- Insert the job and capture the ID
         INSERT INTO message_queues (
             job_type, status, payload, created_at
         ) VALUES (
@@ -1047,7 +1049,12 @@ BEGIN
             NOW()
         );
         
-        RAISE NOTICE 'TRIGGER DEBUG: Email job created successfully';
+        -- Send NOTIFY to wake up Java listener
+        -- We don't have the job ID easily without RETURNING, 
+        -- but we can just notify that a job exists or use the notification ID
+        PERFORM pg_notify('email_queue', 'new_job');
+        
+        RAISE NOTICE 'TRIGGER DEBUG: Email job created and NOTIFY sent';
     ELSE
         RAISE NOTICE 'TRIGGER DEBUG: send_email is FALSE, skipping email queue';
     END IF;
