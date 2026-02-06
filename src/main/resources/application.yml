@@ -108,3 +108,7 @@ ai:
     ask-endpoint: /ask
     timeout-seconds: ${AI_SERVICE_TIMEOUT_SECONDS:90}
 
+# Frontend Configuration
+frontend:
+  url: ${FRONTEND_URL:http://localhost:3000}
+

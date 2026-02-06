@@ -2,6 +2,7 @@ package com.neuralhealer.backend.integration.gmail;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,6 +20,9 @@ import java.nio.charset.StandardCharsets;
 public class DirectEmailService {
 
     private final GmailSmtpService gmailSmtpService;
+
+    @Value("${frontend.url}")
+    private String frontendBaseUrl;
 
     /**
      * Send a password reset email with a reset link.
@@ -92,9 +96,7 @@ public class DirectEmailService {
      * Build the password reset link.
      */
     private String buildResetLink(String resetToken) {
-        // TODO: Update with actual frontend URL
-        String baseUrl = "https://neuralhealer.com";
-        return baseUrl + "/reset-password?token=" + resetToken;
+        return frontendBaseUrl + "/reset-password?token=" + resetToken;
     }
 
     /**
