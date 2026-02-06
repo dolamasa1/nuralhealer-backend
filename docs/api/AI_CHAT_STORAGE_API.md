@@ -9,6 +9,9 @@ This document details the new APIs implemented for the persistent AI Chat Storag
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/api/chats` | Retrieve all chat sessions for the current user, ordered by most recent. |
+| `GET` | `/api/chats/with-doctors` | **NEW** Optimized endpoint returning sessions with embedded authorized doctors list methods. |
+| `GET` | `/api/chats/search?q={query}` | Search sessions by title or message content. |
+| `GET` | `/api/chats/authorized-doctors` | List doctors who have permission to view your chat history. |
 | `GET` | `/api/chats/{sessionId}/messages` | Retrieve full message history for a specific session. |
 | `PUT` | `/api/chats/{sessionId}/title` | Rename a chat session (e.g., "Anxiety Consultation"). |
 
@@ -26,6 +29,25 @@ PUT /api/chats/{sessionId}/title
 Content-Type: text/plain
 
 My New Session Title
+```
+
+**Get Sessions with Authorized Doctors (Optimized)**
+```http
+GET /api/chats/with-doctors
+Authorization: Bearer <token>
+```
+*Returns sessions with an embedded list of doctors who have access permission.*
+
+**Get Authorized Doctors List**
+```http
+GET /api/chats/authorized-doctors
+Authorization: Bearer <token>
+```
+
+**Search Sessions**
+```http
+GET /api/chats/search?q=anxiety
+Authorization: Bearer <token>
 ```
 
 ---
@@ -90,5 +112,39 @@ The existing AI chat flow has been enhanced to **automatically persist** all int
   "senderType": "PATIENT | AI",
   "content": "Hello, I need help.",
   "sentAt": "2023-10-27T10:00:05"
+}
+```
+### AuthorizedDoctorResponse
+```json
+{
+  "doctorId": "uuid",
+  "fullName": "Dr. Sarah Johnson",
+  "title": "Clinical Psychologist",
+  "specialities": ["CBT", "Anxiety Disorders"],
+  "accessLevel": "Full Access",
+  "isCurrentlyActive": true
+}
+```
+
+### SessionWithDoctorsResponse (Enriched)
+```json
+{
+  "sessionId": "uuid",
+  "sessionTitle": "Anxiety Management",
+  "sessionType": "general",
+  "startedAt": "2023-10-27T10:00:00",
+  "endedAt": null,
+  "isActive": true,
+  "messageCount": 12,
+  "authorizedDoctors": [
+    {
+      "doctorId": "uuid",
+      "fullName": "Dr. Sarah Johnson",
+      "title": "Clinical Psychologist",
+      "specialities": ["CBT"],
+      "accessLevel": "Full Access",
+      "isCurrentlyActive": true
+    }
+  ]
 }
 ```

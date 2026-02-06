@@ -4,6 +4,7 @@ import com.neuralhealer.backend.model.entity.AiChatMessage;
 import com.neuralhealer.backend.model.entity.AiChatSession;
 import com.neuralhealer.backend.model.entity.User;
 import com.neuralhealer.backend.model.dto.AuthorizedDoctorResponse;
+import com.neuralhealer.backend.model.dto.SessionWithDoctorsResponse;
 import com.neuralhealer.backend.service.ChatStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -80,5 +81,11 @@ public class ChatHistoryController {
     @Operation(summary = "Get authorized doctors", description = "Get list of doctors who can view my chat history based on engagement rules")
     public List<AuthorizedDoctorResponse> getAuthorizedDoctors(@AuthenticationPrincipal User user) {
         return chatStorageService.getAuthorizedDoctors(user.getId());
+    }
+
+    @GetMapping("/with-doctors")
+    @Operation(summary = "Get sessions with authorized doctors", description = "Retrieve all chat sessions with embedded list of doctors who can view each session. Optimized single-query endpoint.")
+    public List<SessionWithDoctorsResponse> getSessionsWithDoctors(@AuthenticationPrincipal User user) {
+        return chatStorageService.getSessionsWithAuthorizedDoctors(user.getId());
     }
 }
