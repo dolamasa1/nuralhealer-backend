@@ -36,16 +36,23 @@ public class ChatStorageService {
     public UUID getOrCreateSession(UUID patientId) {
         return sessionRepository.findByPatientIdAndIsActiveTrue(patientId)
                 .map(AiChatSession::getId)
-                .orElseGet(() -> {
-                    AiChatSession newSession = AiChatSession.builder()
-                            .patientId(patientId)
-                            .isActive(true)
-                            .startedAt(LocalDateTime.now())
-                            .messageCount(0)
-                            .sessionType("general")
-                            .build();
-                    return sessionRepository.save(newSession).getId();
-                });
+                .orElseGet(() -> createNewSession(patientId));
+    }
+
+    /**
+     * Force create a new active session for a patient.
+     */
+    @Transactional
+    public UUID createNewSession(UUID patientId) {
+        AiChatSession newSession = AiChatSession.builder()
+                .patientId(patientId)
+                .isActive(true)
+                .startedAt(LocalDateTime.now())
+                .messageCount(0)
+                .sessionType("general")
+                .sessionTitle("New AI Chat")
+                .build();
+        return sessionRepository.save(newSession).getId();
     }
 
     @Async

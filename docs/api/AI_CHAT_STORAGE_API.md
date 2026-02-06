@@ -9,6 +9,7 @@ This document details the new APIs implemented for the persistent AI Chat Storag
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/api/chats` | Retrieve all chat sessions for the current user, ordered by most recent. |
+| `POST` | `/api/chats` | **[TESTING ONLY]** Manually create a new session. Primarily for testing persistence and isolation. |
 | `GET` | `/api/chats/with-doctors` | **NEW** Optimized endpoint returning sessions with embedded authorized doctors list methods. |
 | `GET` | `/api/chats/search?q={query}` | Search sessions by title or message content. |
 | `GET` | `/api/chats/authorized-doctors` | List doctors who have permission to view your chat history. |
@@ -50,9 +51,51 @@ GET /api/chats/search?q=anxiety
 Authorization: Bearer <token>
 ```
 
+**Add Manual Session (Testing)**
+```http
+POST /api/chats
+Authorization: Bearer <token>
+```
+*Creates a new session and returns its UUID. Primarily used for verifying system behavior in isolation.*
+
 ---
 
-## 2. Doctor APIs
+## 2. REST AI Ask API
+**Base Path:** `/api/ai`
+
+The REST endpoints for AI communication now support session persistence.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/ai/ask` | Ask AI a question. **Starts a new session every time** and returns the session ID. |
+| `POST` | `/api/ai/ask/{sessionId}` | Ask AI a question within an existing session. Progresses that specific chat history. |
+
+### Examples
+
+**Ask AI (New Session)**
+```http
+POST /api/ai/ask
+Content-Type: application/json
+
+{
+  "question": "What are the early signs of burnout?"
+}
+```
+*Returns `AiSessionChatResponse` containing the new `sessionId`.*
+
+**Ask AI (In Existing Session)**
+```http
+POST /api/ai/ask/{sessionId}
+Content-Type: application/json
+
+{
+  "question": "Can you give me more details on that?"
+}
+```
+
+---
+
+## 3. Doctor APIs
 **Base Path:** `/api/doctors`  
 **Access:** Authenticated Doctors (Must have valid relationship with patient)
 
@@ -65,9 +108,11 @@ Authorization: Bearer <token>
 - Doctors can **strictly** only access data for patients they have an active or historical relationship with in the `doctor_patients` table.
 - Attempts to access unauthorized patients result in `403 Forbidden`.
 
+   - Saves AI Response to DB (Async).
+
 ---
 
-## 3. WebSocket Integration
+## 4. WebSocket Integration
 **Protocol:** STOMP over WebSocket  
 **Access:** Authenticated Users
 
@@ -146,5 +191,14 @@ The existing AI chat flow has been enhanced to **automatically persist** all int
       "isCurrentlyActive": true
     }
   ]
+}
+```
+
+### AiSessionChatResponse
+```json
+{
+  "sessionId": "uuid",
+  "answer": "Generated AI answer...",
+  "sources": ["source 1", "source 2"]
 }
 ```

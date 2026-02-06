@@ -31,6 +31,17 @@ public class ChatHistoryController {
         return chatStorageService.getUserSessions(user.getId());
     }
 
+    /**
+     * Manual session creation for testing.
+     * POST /api/chats
+     */
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Add manual session (Testing)", description = "Manually create a new chat session. Primarily for testing.")
+    public UUID createManualSession(@AuthenticationPrincipal User user) {
+        return chatStorageService.createNewSession(user.getId());
+    }
+
     @GetMapping("/search")
     @Operation(summary = "Search chats", description = "Search sessions by title or message content")
     public List<AiChatSession> searchChats(
