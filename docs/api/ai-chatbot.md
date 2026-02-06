@@ -82,6 +82,17 @@ Final answer from the AI service. Includes the full text answer.
 }
 ```
 
+#### AI Typing Stop
+Sent when the AI finishes processing or if an error occurs, to stop the typing indicator.
+```json
+{
+  "type": "AI_TYPING_STOP",
+  "senderName": "AI Assistant",
+  "content": null,
+  "sentAt": "2025-01-15T03:00:10"
+}
+```
+
 #### AI Error
 Sent if the AI service is unavailable, timed out, or if the question was invalid.
 ```json
@@ -95,7 +106,40 @@ Sent if the AI service is unavailable, timed out, or if the question was invalid
 
 ---
 
-## 4. Subscription Lifecycle & Policies
+## 4. HTTP REST API (Fallback)
+
+In environments where WebSockets are blocked or unstable, the standard REST API can be used.
+
+### 4.1 Check Health
+**GET** `/api/ai/health`
+**Response:**
+```json
+{
+  "isHealthy": true,
+  "message": "AI connected",
+  "lastCheck": "2025-01-21T10:00:00"
+}
+```
+
+### 4.2 Ask Question
+**POST** `/api/ai/ask`
+**Payload:**
+```json
+{
+  "question": "What is anxiety?"
+}
+```
+**Response:**
+```json
+{
+  "answer": "Anxiety is your body's natural response to stress...",
+  "sources": ["Mayo Clinic", "NIMH"]
+}
+```
+
+---
+
+## 5. Subscription Lifecycle & Policies
 
 ### Creation & Maintenance
 - **Creation**: Subscriptions are established client-side after a successful STOMP `CONNECT`.
@@ -108,14 +152,14 @@ Sent if the AI service is unavailable, timed out, or if the question was invalid
 - **Session Timeout**: Underlying JWT authentication must remain valid. Re-authentication on reconnect is mandatory.
 - **Maximum Idle Time**: Tested to support 30+ minutes of idle time provided heartbeats are maintained.
 
-## 5. Message Delivery Guarantees
+## 6. Message Delivery Guarantees
 - **Persistent Sessions**: Subscriptions remain active throughout the user session.
 - **Order Guarantees**: STOMP ensures FIFO (First-In-First-Out) ordering for messages within a single session.
 - **Disconnection**: Messages sent while a client is disconnected are **not queued** by the in-memory broker. Clients must reconnect and resubscribe.
 
 ---
 
-## 6. Client Example (JavaScript / StompJS)
+## 7. Client Example (JavaScript / StompJS)
 
 ```javascript
 /* 
@@ -155,7 +199,7 @@ client.activate();
 
 ---
 
-## 7. Troubleshooting Guide
+## 8. Troubleshooting Guide
 
 | Issue | Cause | Solution |
 | :--- | :--- | :--- |

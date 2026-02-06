@@ -6,6 +6,7 @@ import com.neuralhealer.backend.model.dto.WebSocketMessage;
 import com.neuralhealer.backend.model.enums.WebSocketMessageType;
 import com.neuralhealer.backend.notification.service.NotificationCreatorService;
 import com.neuralhealer.backend.service.AiChatbotService;
+import com.neuralhealer.backend.service.ChatStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -29,6 +30,7 @@ import java.util.UUID;
 public class AiStompController {
 
     private final AiChatbotService aiChatbotService;
+    private final ChatStorageService chatStorageService;
     private final SimpMessagingTemplate messagingTemplate;
     private final NotificationCreatorService notificationCreatorService;
 
@@ -40,7 +42,7 @@ public class AiStompController {
     @MessageMapping("/ai/ask")
     public void askAi(@Payload AiChatRequest request, SimpMessageHeaderAccessor headerAccessor,
             Authentication authentication) {
-        String sessionId = headerAccessor.getSessionId();
+        String wsSessionId = headerAccessor.getSessionId();
 
         // Extract userId if available from authentication
         UUID userId = null;
@@ -49,14 +51,22 @@ public class AiStompController {
             userId = ((com.neuralhealer.backend.model.entity.User) authentication.getPrincipal()).getId();
         }
 
-        log.info("STOMP AI request received: session={}, user={}", sessionId, userId);
+        log.info("STOMP AI request received: session={}, user={}", wsSessionId, userId);
 
         if (!aiChatbotService.isAiAvailable()) {
             sendAiMessage(headerAccessor, WebSocketMessageType.AI_ERROR, "الذكاء الاصطناعي غير متاح حالياً");
             return;
         }
 
-        // 1. Send TYPING_START
+        // 1. Get/Create Persistent Chat Session & Save User Message
+        UUID chatSessionId = null;
+        if (userId != null) {
+            chatSessionId = chatStorageService.getOrCreateSession(userId);
+            chatStorageService.saveMessage(chatSessionId, "patient", request.question());
+        }
+
+        // 2. Send TYPING_START (as step 2 in original flow, but conceptually step 1 in
+        // UI feedback)
         sendAiMessage(headerAccessor, WebSocketMessageType.AI_TYPING_START, "المساعد الذكي يكتب...");
 
         try {
@@ -75,7 +85,12 @@ public class AiStompController {
             // 4. Send RESPONSE
             sendAiMessage(headerAccessor, WebSocketMessageType.AI_RESPONSE, cleanAnswer);
 
-            // 5. Trigger persistent notification if user is logged in
+            // 5. Save AI Response
+            if (chatSessionId != null) {
+                chatStorageService.saveMessage(chatSessionId, "ai", cleanAnswer);
+            }
+
+            // 6. Trigger persistent notification if user is logged in
             if (userId != null) {
                 notificationCreatorService.createAiNotification(
                         userId,

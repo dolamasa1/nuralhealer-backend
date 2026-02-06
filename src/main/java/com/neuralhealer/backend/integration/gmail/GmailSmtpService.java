@@ -26,6 +26,8 @@ public class GmailSmtpService {
      * @param subject  Email subject
      * @param htmlBody HTML content of the email
      * @throws RuntimeException if email fails to send with specific cause
+     * 
+     * 
      */
     public void sendEmail(String to, String subject, String htmlBody) {
         try {
