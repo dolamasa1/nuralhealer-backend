@@ -3,6 +3,7 @@ package com.neuralhealer.backend.controller;
 import com.neuralhealer.backend.model.entity.AiChatMessage;
 import com.neuralhealer.backend.model.entity.AiChatSession;
 import com.neuralhealer.backend.model.entity.User;
+import com.neuralhealer.backend.model.dto.AuthorizedDoctorResponse;
 import com.neuralhealer.backend.service.ChatStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/chats")
+@RequestMapping("/chats")
 @RequiredArgsConstructor
 @Tag(name = "AI Chat History", description = "Endpoints for patients to view their AI chat history")
 public class ChatHistoryController {
@@ -73,5 +74,11 @@ public class ChatHistoryController {
         }
 
         chatStorageService.updateSessionTitle(sessionId, title);
+    }
+
+    @GetMapping("/authorized-doctors")
+    @Operation(summary = "Get authorized doctors", description = "Get list of doctors who can view my chat history based on engagement rules")
+    public List<AuthorizedDoctorResponse> getAuthorizedDoctors(@AuthenticationPrincipal User user) {
+        return chatStorageService.getAuthorizedDoctors(user.getId());
     }
 }

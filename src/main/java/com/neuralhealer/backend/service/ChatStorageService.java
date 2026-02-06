@@ -2,9 +2,14 @@ package com.neuralhealer.backend.service;
 
 import com.neuralhealer.backend.model.entity.AiChatMessage;
 import com.neuralhealer.backend.model.entity.AiChatSession;
+import com.neuralhealer.backend.model.entity.Engagement;
 import com.neuralhealer.backend.model.enums.ChatSenderType;
+import com.neuralhealer.backend.model.enums.EngagementStatus;
 import com.neuralhealer.backend.repository.AiChatMessageRepository;
 import com.neuralhealer.backend.repository.AiChatSessionRepository;
+import com.neuralhealer.backend.repository.EngagementRepository;
+import com.neuralhealer.backend.repository.DoctorProfileRepository;
+import com.neuralhealer.backend.model.dto.AuthorizedDoctorResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -23,6 +28,8 @@ public class ChatStorageService {
 
     private final AiChatSessionRepository sessionRepository;
     private final AiChatMessageRepository messageRepository;
+    private final EngagementRepository engagementRepository;
+    private final DoctorProfileRepository doctorProfileRepository;
 
     @Transactional
     public UUID getOrCreateSession(UUID patientId) {
@@ -86,5 +93,44 @@ public class ChatStorageService {
     @Transactional
     public void updateSessionTitle(UUID sessionId, String title) {
         sessionRepository.updateTitle(sessionId, title);
+    }
+
+    public List<AuthorizedDoctorResponse> getAuthorizedDoctors(UUID patientUserId) {
+        // Get all engagements for this patient
+        List<Engagement> engagements = engagementRepository.findByPatientUserId(patientUserId);
+
+        return engagements.stream()
+                .filter(engagement -> {
+                    // Only include engagements with active or ended status that allow chat viewing
+                    if (engagement.getStatus() == EngagementStatus.active) {
+                        return true; // Active engagements always have access
+                    }
+
+                    // For ended engagements, check if access rules permit history viewing
+                    if (engagement.getStatus() == EngagementStatus.ended) {
+                        var rule = engagement.getAccessRule();
+                        return rule != null && Boolean.TRUE.equals(rule.getRetainsHistoryAccess());
+                    }
+
+                    return false;
+                })
+                .map(engagement -> {
+                    var doctor = engagement.getDoctor();
+                    var user = doctor.getUser();
+                    var rule = engagement.getAccessRule();
+
+                    String accessLevel = engagement.getStatus() == EngagementStatus.active
+                            ? "Full Access"
+                            : (rule != null && rule.getRuleName() != null ? rule.getRuleName() : "Historical Access");
+
+                    return new AuthorizedDoctorResponse(
+                            doctor.getId(),
+                            user.getFullName(),
+                            doctor.getTitle(),
+                            doctor.getSpecialities(),
+                            accessLevel,
+                            engagement.getStatus() == EngagementStatus.active);
+                })
+                .toList();
     }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/doctors")
+@RequestMapping("/doctors")
 @RequiredArgsConstructor
 @Tag(name = "Doctors", description = "Doctor management and directory endpoints")
 public class DoctorController {
