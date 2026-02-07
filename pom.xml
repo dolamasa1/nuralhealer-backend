@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.neuralhealer</groupId>
 	<artifactId>backend</artifactId>
-	<version>0.5.0</version>
+	<version>2.0.0</version>
 	<name>neuralhealer-backend</name>
 	<description>NeuralHealer Healthcare Platform Backend</description>
 	

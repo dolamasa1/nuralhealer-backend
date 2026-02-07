@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -66,10 +65,24 @@ public class ChatStorageService {
                     .senderType(type)
                     .content(content)
                     .sentAt(LocalDateTime.now())
-                    .contentType("text")
                     .build();
 
             messageRepository.save(message);
+
+            // Update session: increment count and set title from first patient message
+            sessionRepository.findById(sessionId).ifPresent(session -> {
+                session.setMessageCount(session.getMessageCount() + 1);
+
+                // Auto-generate title from first patient message
+                if (type == ChatSenderType.patient && session.getMessageCount() == 1) { // Changed from 0 to 1 because
+                                                                                        // messageCount is incremented
+                                                                                        // before this check
+                    String autoTitle = generateSessionTitle(content);
+                    session.setSessionTitle(autoTitle);
+                }
+
+                sessionRepository.save(session);
+            });
 
             long duration = System.currentTimeMillis() - start;
             if (duration > 500) {
@@ -200,5 +213,42 @@ public class ChatStorageService {
                             doctors);
                 })
                 .toList();
+    }
+
+    /**
+     * Generate a meaningful session title from the first user message.
+     * Extracts the first sentence or phrase, limited to 50 characters.
+     */
+    private String generateSessionTitle(String firstMessage) {
+        if (firstMessage == null || firstMessage.isBlank()) {
+            return "New AI Chat";
+        }
+
+        // Clean and trim the message
+        String cleaned = firstMessage.trim();
+
+        // Extract first sentence (stop at . ! ? or newline)
+        int endIndex = Math.min(cleaned.length(), 50);
+        for (int i = 0; i < Math.min(cleaned.length(), 50); i++) {
+            char c = cleaned.charAt(i);
+            if (c == '.' || c == '!' || c == '?' || c == '\n') {
+                endIndex = i;
+                break;
+            }
+        }
+
+        String title = cleaned.substring(0, endIndex).trim();
+
+        // If title is too short or empty, use first 50 chars
+        if (title.length() < 5) {
+            title = cleaned.substring(0, Math.min(cleaned.length(), 50)).trim();
+        }
+
+        // Add ellipsis if truncated
+        if (title.length() < cleaned.length() && !title.endsWith(".") && !title.endsWith("!") && !title.endsWith("?")) {
+            title += "...";
+        }
+
+        return title.isEmpty() ? "New AI Chat" : title;
     }
 }
