@@ -1,196 +1,669 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>NeuralHealer AI Chat</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuralHealer AI | Advanced Diagnostic Suite</title>
+    <!-- Resilient Asset Loading -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet" onerror="this.removeAttribute('rel');">
+    <!-- Local Fallback for STOMP (Bypass CDN blocks) -->
+    <script src="stomp.js" onerror="console.warn('Local stomp.js not found, trying CDN fallback...');"></script>
+    <script src="https://unpkg.com/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
     <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #f4f4f9;
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --bg-gradient: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --user-bubble: #0ea5e9;
+            --ai-bubble: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --sidebar-width: 320px;
         }
 
-        .chat-container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            height: 100vh;
+            display: flex;
+            padding: 20px;
+            color: var(--text-main);
             overflow: hidden;
         }
 
-        .messages {
-            height: 400px;
-            overflow-y: auto;
-            padding: 20px;
-            border-bottom: 1px solid #eee;
+        .desktop-app {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            gap: 20px;
+        }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            overflow: hidden;
         }
 
-        .message {
-            padding: 10px 15px;
-            border-radius: 15px;
-            max-width: 80%;
-            line-height: 1.4;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-
-        .message.ai {
-            background-color: #e3f2fd;
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
-        }
-
-        .message.user {
-            background-color: #007bff;
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
-        }
-
-        .typing {
-            font-style: italic;
-            color: #888;
-            font-size: 0.9em;
-            margin-left: 10px;
-            display: none;
-        }
-
-        .input-area {
-            padding: 20px;
+        /* Sidebar Styles */
+        .sidebar {
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .status-off {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-stomp {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-rest {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .history-item {
+            padding: 14px 16px;
+            border-radius: 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: translateX(4px);
+        }
+
+        .history-item.active {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .history-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* Main Chat Area */
+        .chat-main {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        .chat-header {
+            padding: 20px 24px;
+            background: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .messages-view {
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .msg {
+            max-width: 75%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .msg-patient {
+            align-self: flex-end;
+            background: var(--user-bubble);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-ai {
+            align-self: flex-start;
+            background: var(--ai-bubble);
+            color: var(--text-main);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .msg-time {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            opacity: 0.6;
+        }
+
+        /* Input Area */
+        .input-toolbar {
+            padding: 20px 24px;
+            background: white;
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
 
         input {
             flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px 20px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
             outline: none;
+            font-size: 1rem;
+            transition: all 0.2s;
         }
 
-        button {
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 16px;
             border: none;
-            border-radius: 4px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        button:disabled {
-            background: #ccc;
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
 
-        .status {
-            padding: 5px 20px;
-            font-size: 0.8em;
-            color: #666;
-            text-align: center;
-            background: #f8f8f8;
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .glass-card:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        .glass-card.active {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 8px 16px rgba(14, 165, 233, 0.1);
+        }
+
+        /* Logs Overlay */
+        .logs-panel {
+            position: absolute;
+            bottom: 100px;
+            right: 40px;
+            width: 400px;
+            height: 300px;
+            background: rgba(15, 23, 42, 0.9);
+            color: #10b981;
+            padding: 16px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            border-radius: 16px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 2px;
+        }
+
+        /* Typing Anim */
+        .typing {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .t-dot {
+            width: 5px;
+            height: 5px;
+            background: currentColor;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .t-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .t-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
 </head>
 
 <body>
-    <div class="chat-container">
-        <div id="status" class="status">Connecting...</div>
-        <div id="messages" class="messages">
-            <div class="message ai">Hello! I am NeuralHealer AI. How can I help you today?</div>
+    <div class="desktop-app">
+        <!-- Sidebar -->
+        <div class="glass-panel sidebar">
+            <div class="sidebar-header">
+                <h1>NeuralHealer AI</h1>
+                <div id="statusBadge" class="status-pill status-off">
+                    <span class="dot"></span>
+                    <span id="statusLabel">Initializing...</span>
+                </div>
+                <div style="margin-top: 16px;">
+                    <input type="text" id="searchInput" placeholder="Search sessions..." oninput="searchHistory()"
+                        style="font-size: 0.8rem; padding: 8px 12px; border-radius: 12px;">
+                </div>
+            </div>
+
+            <div id="historyList" class="history-list">
+                <div style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.85rem;">
+                    Syncing history...
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-primary" onclick="createNewSession()" style="width: 100%;">+ New AI
+                    Session</button>
+            </div>
         </div>
-        <div id="typing" class="typing">AI is typing...</div>
-        <div class="input-area">
-            <input type="text" id="input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
-            <button onclick="send()" id="sendBtn" disabled>Send</button>
+
+        <!-- Main Chat Area -->
+        <div class="glass-panel chat-main">
+            <div class="chat-header">
+                <div>
+                    <div id="currentSessionTitle" style="font-weight: 600; font-size: 1.1rem;">Ready to Chat</div>
+                    <div id="currentSessionSubtitle" style="font-size: 0.8rem; color: var(--text-muted);">Secure
+                        Environment</div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn" style="background: #f1f5f9;" onclick="toggleLogs()">🔍 Logs</button>
+                    <button class="btn" style="background: #f1f5f9;" onclick="refreshHistory()">🔄 Sync</button>
+                </div>
+            </div>
+
+            <div id="messageView" class="messages-view">
+                <div class="msg msg-ai">
+                    Welcome back. Our AI system handles thousands of patient queries daily.
+                    I'm currently connected via Secure WebSocket.
+                    <div class="msg-time">System • Now</div>
+                </div>
+            </div>
+
+            <div id="typingIndicator" class="typing">
+                <div class="t-dot"></div>
+                <div class="t-dot"></div>
+                <div class="t-dot"></div>
+                <span style="margin-left: 8px;">AI Assistant is thinking...</span>
+            </div>
+
+            <div class="input-toolbar">
+                <input type="text" id="messageInput" placeholder="Message AI..." onkeypress="handleKey(event)">
+                <button id="sendBtn" class="btn btn-primary" onclick="send()">Send</button>
+            </div>
         </div>
     </div>
 
+    <!-- Logs Overlay -->
+    <div id="logsOverlay" class="logs-panel"></div>
+
     <script>
-        // CONFIGURATION
-        const WS_URL = "ws://localhost:8080/api/ai-ws";
+        // CONFIG
+        const WS_URL = 'ws://localhost:8080/api/ws';
+        const API_BASE = 'http://localhost:8080/api';
+        const API_PREFIX = API_BASE;
 
-        let socket = null;
+        // APP STATE
+        let stompClient = null;
+        let currentSessionId = null;
+        let authUser = null;
+        let history = [];
 
-        function connect() {
-            updateStatus("Connecting...");
-            socket = new WebSocket(WS_URL);
+        // DOM ELEMENTS
+        const logBox = document.getElementById('logsOverlay');
+        const historyList = document.getElementById('historyList');
+        const messageView = document.getElementById('messageView');
+        const statusBadge = document.getElementById('statusBadge');
+        const statusLabel = document.getElementById('statusLabel');
+        const messageInput = document.getElementById('messageInput');
+        const typingIndicator = document.getElementById('typingIndicator');
 
-            socket.onopen = function () {
-                updateStatus("Connected (Raw)");
-                document.getElementById('sendBtn').disabled = false;
-            };
-
-            socket.onmessage = function (event) {
-                const data = JSON.parse(event.data);
-                handleMessage(data);
-            };
-
-            socket.onclose = function () {
-                updateStatus("Disconnected - Retrying in 5s...");
-                document.getElementById('sendBtn').disabled = true;
-                setTimeout(connect, 5000);
-            };
-
-            socket.onerror = function (error) {
-                console.error("WS Error:", error);
-            };
+        function log(msg, type = 'SYS') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] [${type}] ${msg}`;
+            logBox.appendChild(entry);
+            logBox.scrollTop = logBox.scrollHeight;
+            console.log(`[${type}] ${msg}`);
         }
 
-        function handleMessage(data) {
-            const typingIndicator = document.getElementById('typing');
+        // --- CONNECTIVITY & STOMP ---
+        function initConnection() {
+            log('Initializing STOMP v7 over WebSocket...', 'STOMP');
+            stompClient = new StompJs.Client({
+                brokerURL: WS_URL,
+                reconnectDelay: 5000,
+                heartbeatIncoming: 10000,
+                heartbeatOutgoing: 10000,
+                debug: (m) => log(m, 'FRAME'),
+                onConnect: (frame) => {
+                    log('Connected Successfully', 'STOMP');
+                    updateStatus('STOMP Connected', 'status-stomp');
+                    stompClient.subscribe('/user/queue/ai', onAiMessage);
+                    refreshHistory();
+                },
+                onDisconnect: () => {
+                    log('Disconnected', 'STOMP');
+                    updateStatus('Standby (REST)', 'status-rest');
+                },
+                onStompError: (err) => {
+                    log('Error: ' + err.headers['message'], 'ERROR');
+                    updateStatus('Offline', 'status-off');
+                }
+            });
+            stompClient.activate();
+        }
 
-            if (data.type === 'AI_TYPING_START') {
-                typingIndicator.style.display = 'block';
-            } else if (data.type === 'AI_RESPONSE') {
-                typingIndicator.style.display = 'none';
-                addMessage(data.content, 'ai');
-            } else if (data.type === 'AI_ERROR') {
-                typingIndicator.style.display = 'none';
-                addMessage("Error: " + data.content, 'ai');
+        function updateStatus(text, className) {
+            statusBadge.className = `status-pill ${className}`;
+            statusLabel.textContent = text;
+        }
+
+        // --- HISTORY & SESSIONS ---
+        async function refreshHistory() {
+            try {
+                log('Fetching chat sessions...', 'API');
+                // Use Cache-Busting for testing
+                const res = await fetch(`${API_BASE}/chats?_t=${Date.now()}`);
+                if (!res.ok) throw new Error(`API Sync Failed: ${res.status}`);
+
+                history = await res.json();
+                renderHistory();
+            } catch (err) {
+                log(err.message, 'API_ERROR');
+                historyList.innerHTML = `
+                    <div style="color: #ef4444; padding: 20px; font-size: 0.8rem; text-align: center;">
+                        <p>Connection Error (404/500)</p>
+                        <button class="btn btn-outline" style="margin-top: 10px; font-size: 0.7rem; width: 100%;" onclick="refreshHistory()">Try Again</button>
+                    </div>`;
             }
         }
 
-        function send() {
-            const input = document.getElementById('input');
-            const text = input.value.trim();
-            if (!text) return;
+        function renderHistory(filter = '') {
+            historyList.innerHTML = '';
+            const filtered = history.filter(s =>
+                (s.sessionTitle || 'New Chat').toLowerCase().includes(filter.toLowerCase())
+            );
 
-            addMessage(text, 'user');
-
-            // Send raw JSON
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                socket.send(JSON.stringify({ question: text }));
+            if (filtered.length === 0) {
+                historyList.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.8rem;">No sessions found</div>`;
+                return;
             }
 
-            input.value = '';
+            filtered.forEach(session => {
+                const item = document.createElement('div');
+                item.className = `history-item glass-card ${currentSessionId === session.id ? 'active' : ''}`;
+                item.onclick = () => loadSession(session);
+
+                const date = new Date(session.startedAt);
+                const time = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                const fullTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                item.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div class="history-title">${session.sessionTitle || 'New AI Session'}</div>
+                        <div style="font-size: 0.65rem; background: var(--primary); color: white; padding: 2px 6px; border-radius: 6px;">
+                            ${session.messageCount || 0}
+                        </div>
+                    </div>
+                    <div class="history-meta">
+                        <span>Started: ${time} ${fullTime}</span>
+                    </div>
+                `;
+                historyList.appendChild(item);
+            });
         }
 
-        function addMessage(text, sender) {
-            const messages = document.getElementById('messages');
+        async function loadSession(session) {
+            currentSessionId = session.id;
+            log(`Loading session: ${session.id}`, 'UI');
+            document.getElementById('currentSessionTitle').textContent = session.sessionTitle || 'New AI Session';
+            renderHistory(); // Update active state
+
+            try {
+                const res = await fetch(`${API_PREFIX}/chats/${session.id}/messages`);
+                const messages = await res.json();
+                messageView.innerHTML = '';
+                messages.forEach(m => appendMessage(m.content, m.senderType.toLowerCase(), m.sentAt));
+            } catch (err) {
+                log('Failed to load messages', 'ERROR');
+            }
+        }
+
+        // --- MESSAGING ---
+        async function send() {
+            const content = messageInput.value.trim();
+            if (!content) return;
+
+            appendMessage(content, 'patient');
+            messageInput.value = '';
+
+            // HYBRID LOGIC: Try STOMP first, fallback to REST
+            if (stompClient && stompClient.connected) {
+                log('Pushing message via WebSocket...', 'STOMP');
+                stompClient.publish({
+                    destination: '/app/ai/ask' + (currentSessionId ? `?sessionId=${currentSessionId}` : ''),
+                    body: JSON.stringify({ question: content })
+                });
+            } else {
+                log('WebSocket Down. Falling back to REST...', 'REST_FALLBACK');
+                try {
+                    const url = currentSessionId ? `${API_PREFIX}/ai/ask/${currentSessionId}` : `${API_PREFIX}/ai/ask`;
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question: content })
+                    });
+                    const data = await res.json();
+
+                    if (!currentSessionId) {
+                        currentSessionId = data.sessionId;
+                        refreshHistory();
+                    }
+
+                    appendMessage(data.answer, 'ai');
+                } catch (err) {
+                    appendMessage('System Error: Unable to reach AI Service.', 'ai');
+                    log('REST Fallback failed: ' + err.message, 'REST_ERROR');
+                }
+            }
+        }
+
+        function onAiMessage(message) {
+            const event = JSON.parse(message.body);
+            log(`Inbound Event: ${event.type}`, 'WS_IN');
+
+            switch (event.type) {
+                case 'AI_TYPING_START':
+                    typingIndicator.style.display = 'flex';
+                    break;
+                case 'AI_TYPING_STOP':
+                    typingIndicator.style.display = 'none';
+                    break;
+                case 'AI_RESPONSE':
+                    typingIndicator.style.display = 'none';
+                    appendMessage(event.content, 'ai');
+                    if (!currentSessionId) refreshHistory(); // Auto-sync on first response
+                    break;
+                case 'AI_ERROR':
+                    typingIndicator.style.display = 'none';
+                    appendMessage(event.content, 'ai');
+                    break;
+            }
+        }
+
+        function appendMessage(text, sender, time = null) {
             const div = document.createElement('div');
-            div.className = `message ${sender}`;
-            div.textContent = text;
-            messages.appendChild(div);
-            messages.scrollTop = messages.scrollHeight;
+            div.className = `msg msg-${sender}`;
+            const timeStr = time ? new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now';
+
+            div.innerHTML = `
+                ${text}
+                <div class="msg-time">${sender.toUpperCase()} • ${timeStr}</div>
+            `;
+            messageView.appendChild(div);
+            messageView.scrollTop = messageView.scrollHeight;
         }
 
-        function updateStatus(text) {
-            document.getElementById('status').textContent = text;
+        // --- UI HELPERS ---
+        function toggleLogs() { logBox.style.display = logBox.style.display === 'none' ? 'block' : 'none'; }
+        function createNewSession() {
+            currentSessionId = null;
+            messageView.innerHTML = `<div class="msg msg-ai">Started new session. Your first message will automatically generate a title.<div class="msg-time">System • Now</div></div>`;
+            document.getElementById('currentSessionTitle').textContent = 'New AI Session';
+            renderHistory();
         }
+        function handleKey(e) { if (e.key === 'Enter') send(); }
+        function searchHistory() { renderHistory(document.getElementById('searchInput').value); }
 
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') send();
-        }
-
-        // Start connection on load
-        connect();
+        // START
+        initConnection();
     </script>
 </body>
 
