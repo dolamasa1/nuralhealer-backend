@@ -7,5 +7,6 @@ import jakarta.validation.constraints.NotBlank;
  * Supports Arabic text via UTF-8 encoding.
  */
 public record AiChatRequest(
-        @NotBlank(message = "Question cannot be empty") String question) {
+                @NotBlank(message = "Question cannot be empty") String question,
+                String country) {
 }

@@ -111,6 +111,21 @@ public class ChatStorageService {
         return messageRepository.findBySessionIdOrderBySentAt(sessionId);
     }
 
+    /**
+     * Get session messages with patient ID verification for security.
+     * Throws SecurityException if session doesn't belong to patient.
+     */
+    public List<AiChatMessage> getSessionMessages(UUID sessionId, UUID patientId) {
+        AiChatSession session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+
+        if (!session.getPatientId().equals(patientId)) {
+            throw new SecurityException("Session does not belong to this patient");
+        }
+
+        return messageRepository.findBySessionIdOrderBySentAt(sessionId);
+    }
+
     @Transactional
     public void updateSessionTitle(UUID sessionId, String title) {
         sessionRepository.updateTitle(sessionId, title);

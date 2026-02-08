@@ -60,23 +60,29 @@ public class AiChatbotController {
         try {
             log.info("REST AI request received - creating new session");
 
-            // 1. Force a new session
-            UUID sessionId = chatStorageService.createNewSession(user.getId());
+            // 1. Resolve Patient Profile (PatientId)
+            UUID patientId = user.getPatientProfile() != null ? user.getPatientProfile().getId() : null;
+            if (patientId == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(new ErrorResponse("بروفايل المريض غير موجود لهذا الحساب"));
+            }
 
-            // 2. Save User message
+            // 2. Force a new session
+            UUID sessionId = chatStorageService.createNewSession(patientId);
+
+            // 3. Save User message
             chatStorageService.saveMessage(sessionId, "PATIENT", request.question());
 
-            // 3. Get AI Response
+            // 4. Get AI Response
             AiChatResponse aiResponse = aiChatbotService.askQuestion(request.question());
 
-            // 4. Save AI Response (Async)
+            // 5. Save AI Response (Async)
             chatStorageService.saveMessage(sessionId, "AI", aiResponse.answer());
 
-            // 5. Wrap in session-aware response
+            // 6. Wrap in session-aware response
             AiSessionChatResponse response = new AiSessionChatResponse(
                     sessionId,
-                    aiResponse.answer(),
-                    aiResponse.sources());
+                    aiResponse.answer());
 
             return ResponseEntity.ok(response);
         } catch (RestClientException e) {
@@ -114,8 +120,7 @@ public class AiChatbotController {
             // 4. Wrap in session-aware response
             AiSessionChatResponse response = new AiSessionChatResponse(
                     sessionId,
-                    aiResponse.answer(),
-                    aiResponse.sources());
+                    aiResponse.answer());
 
             return ResponseEntity.ok(response);
         } catch (RestClientException e) {

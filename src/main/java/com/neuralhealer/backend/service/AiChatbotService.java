@@ -25,6 +25,8 @@ public class AiChatbotService {
     private final String baseUrl;
     private final String healthEndpoint;
     private final String askEndpoint;
+    private final String apiKey;
+    private final String ngrokSkipHeader;
 
     private LocalDateTime lastHealthCheck;
     private boolean lastHealthStatus = false;
@@ -33,11 +35,15 @@ public class AiChatbotService {
             RestTemplate aiRestTemplate,
             @Value("${ai.chatbot.base-url}") String baseUrl,
             @Value("${ai.chatbot.health-endpoint:/health}") String healthEndpoint,
-            @Value("${ai.chatbot.ask-endpoint:/ask}") String askEndpoint) {
+            @Value("${ai.chatbot.ask-endpoint:/ask}") String askEndpoint,
+            @Value("${ai.chatbot.api-key:}") String apiKey,
+            @Value("${ai.chatbot.ngrok-skip-browser-warning:false}") String ngrokSkipHeader) {
         this.aiRestTemplate = aiRestTemplate;
         this.baseUrl = baseUrl;
         this.healthEndpoint = healthEndpoint;
         this.askEndpoint = askEndpoint;
+        this.apiKey = apiKey;
+        this.ngrokSkipHeader = ngrokSkipHeader;
     }
 
     /**
@@ -94,13 +100,19 @@ public class AiChatbotService {
             log.info("Sending question to AI: {} (length: {} chars)",
                     question.substring(0, Math.min(50, question.length())), question.length());
 
-            // Create request with proper headers for Arabic text
+            // Create request with proper headers for Arabic text and API Key
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Accept-Charset", "UTF-8");
+            if (apiKey != null && !apiKey.isEmpty()) {
+                headers.set("x-api-key", apiKey);
+            }
+            if ("true".equalsIgnoreCase(ngrokSkipHeader)) {
+                headers.set("ngrok-skip-browser-warning", "true");
+            }
 
-            AiChatRequest request = new AiChatRequest(question);
-            HttpEntity<AiChatRequest> entity = new HttpEntity<>(request, headers);
+            AiChatRequest requestBody = new AiChatRequest(question, "egypt");
+            HttpEntity<AiChatRequest> entity = new HttpEntity<>(requestBody, headers);
 
             // Send POST request
             ResponseEntity<AiChatResponse> response = aiRestTemplate.exchange(
@@ -111,9 +123,8 @@ public class AiChatbotService {
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 AiChatResponse aiResponse = response.getBody();
-                log.info("AI response received: answer length={}, sources count={}",
-                        aiResponse.answer() != null ? aiResponse.answer().length() : 0,
-                        aiResponse.sources() != null ? aiResponse.sources().size() : 0);
+                log.info("AI response received: answer length={}",
+                        aiResponse.answer() != null ? aiResponse.answer().length() : 0);
                 return aiResponse;
             } else {
                 throw new RestClientException("AI returned non-successful status: " + response.getStatusCode());

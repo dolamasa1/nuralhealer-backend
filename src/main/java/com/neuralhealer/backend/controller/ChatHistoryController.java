@@ -28,7 +28,8 @@ public class ChatHistoryController {
     @GetMapping
     @Operation(summary = "Get my sessions", description = "Retrieve all chat sessions for the authenticated user")
     public List<AiChatSession> getMySessions(@AuthenticationPrincipal User user) {
-        return chatStorageService.getUserSessions(user.getId());
+        UUID id = user.getPatientProfile() != null ? user.getPatientProfile().getId() : user.getId();
+        return chatStorageService.getUserSessions(id);
     }
 
     /**
@@ -39,7 +40,8 @@ public class ChatHistoryController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Add manual session (Testing)", description = "Manually create a new chat session. Primarily for testing.")
     public UUID createManualSession(@AuthenticationPrincipal User user) {
-        return chatStorageService.createNewSession(user.getId());
+        UUID id = user.getPatientProfile() != null ? user.getPatientProfile().getId() : user.getId();
+        return chatStorageService.createNewSession(id);
     }
 
     @GetMapping("/search")
@@ -47,7 +49,8 @@ public class ChatHistoryController {
     public List<AiChatSession> searchChats(
             @RequestParam String q,
             @AuthenticationPrincipal User user) {
-        return chatStorageService.searchSessions(user.getId(), q);
+        UUID id = user.getPatientProfile() != null ? user.getPatientProfile().getId() : user.getId();
+        return chatStorageService.searchSessions(id, q);
     }
 
     @GetMapping("/{sessionId}/messages")
@@ -97,6 +100,7 @@ public class ChatHistoryController {
     @GetMapping("/with-doctors")
     @Operation(summary = "Get sessions with authorized doctors", description = "Retrieve all chat sessions with embedded list of doctors who can view each session. Optimized single-query endpoint.")
     public List<SessionWithDoctorsResponse> getSessionsWithDoctors(@AuthenticationPrincipal User user) {
-        return chatStorageService.getSessionsWithAuthorizedDoctors(user.getId());
+        UUID id = user.getPatientProfile() != null ? user.getPatientProfile().getId() : user.getId();
+        return chatStorageService.getSessionsWithAuthorizedDoctors(id);
     }
 }

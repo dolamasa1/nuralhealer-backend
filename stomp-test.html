@@ -387,8 +387,16 @@
                     <span id="statusLabel">Initializing...</span>
                 </div>
                 <div style="margin-top: 16px;">
+                    <label style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px;">JWT
+                        Authentication Token:</label>
+                    <input type="password" id="jwtInput" placeholder="Paste Bearer token here..."
+                        style="font-size: 0.8rem; padding: 8px 12px; border-radius: 12px; width: 100%; margin-bottom: 8px;">
+                    <button class="btn" style="font-size: 0.7rem; padding: 4px 8px; width: 100%;"
+                        onclick="connectWithToken()">Apply & Connect</button>
+                </div>
+                <div style="margin-top: 16px;">
                     <input type="text" id="searchInput" placeholder="Search sessions..." oninput="searchHistory()"
-                        style="font-size: 0.8rem; padding: 8px 12px; border-radius: 12px;">
+                        style="font-size: 0.8rem; padding: 8px 12px; border-radius: 12px; width: 100%;">
                 </div>
             </div>
 
@@ -473,11 +481,29 @@
             console.log(`[${type}] ${msg}`);
         }
 
+        function connectWithToken() {
+            const token = document.getElementById('jwtInput').value.trim();
+            if (stompClient) {
+                stompClient.deactivate();
+            }
+            initConnection(token);
+        }
+
         // --- CONNECTIVITY & STOMP ---
-        function initConnection() {
+        function initConnection(token = null) {
             log('Initializing STOMP v7 over WebSocket...', 'STOMP');
+            const connectHeaders = {};
+            if (token) {
+                // Remove 'Bearer ' prefix if accidentally pasted
+                const cleanToken = token.replace('Bearer ', '');
+                connectHeaders['Authorization'] = `Bearer ${cleanToken}`;
+                localStorage.setItem('diag_token', cleanToken);
+                log('Using provided JWT for authentication', 'AUTH');
+            }
+
             stompClient = new StompJs.Client({
                 brokerURL: WS_URL,
+                connectHeaders: connectHeaders,
                 reconnectDelay: 5000,
                 heartbeatIncoming: 10000,
                 heartbeatOutgoing: 10000,
@@ -509,8 +535,11 @@
         async function refreshHistory() {
             try {
                 log('Fetching chat sessions...', 'API');
-                // Use Cache-Busting for testing
-                const res = await fetch(`${API_BASE}/chats?_t=${Date.now()}`);
+                const token = localStorage.getItem('diag_token');
+                const headers = {};
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const res = await fetch(`${API_BASE}/chats?_t=${Date.now()}`, { headers });
                 if (!res.ok) throw new Error(`API Sync Failed: ${res.status}`);
 
                 history = await res.json();
@@ -519,7 +548,8 @@
                 log(err.message, 'API_ERROR');
                 historyList.innerHTML = `
                     <div style="color: #ef4444; padding: 20px; font-size: 0.8rem; text-align: center;">
-                        <p>Connection Error (404/500)</p>
+                        <p>Connection Error (404/500/403)</p>
+                        <p style="font-size: 0.6rem;">Check if token is valid and patient profile exists.</p>
                         <button class="btn btn-outline" style="margin-top: 10px; font-size: 0.7rem; width: 100%;" onclick="refreshHistory()">Try Again</button>
                     </div>`;
             }
@@ -567,12 +597,16 @@
             renderHistory(); // Update active state
 
             try {
-                const res = await fetch(`${API_PREFIX}/chats/${session.id}/messages`);
+                const token = localStorage.getItem('diag_token');
+                const headers = {};
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const res = await fetch(`${API_PREFIX}/chats/${session.id}/messages`, { headers });
                 const messages = await res.json();
                 messageView.innerHTML = '';
                 messages.forEach(m => appendMessage(m.content, m.senderType.toLowerCase(), m.sentAt));
             } catch (err) {
-                log('Failed to load messages', 'ERROR');
+                log('Failed to load messages: ' + err.message, 'ERROR');
             }
         }
 
@@ -589,16 +623,19 @@
                 log('Pushing message via WebSocket...', 'STOMP');
                 stompClient.publish({
                     destination: '/app/ai/ask' + (currentSessionId ? `?sessionId=${currentSessionId}` : ''),
-                    body: JSON.stringify({ question: content })
+                    body: JSON.stringify({ question: content, country: 'egypt' })
                 });
             } else {
-                log('WebSocket Down. Falling back to REST...', 'REST_FALLBACK');
                 try {
+                    const token = localStorage.getItem('diag_token');
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (token) headers['Authorization'] = `Bearer ${token}`;
+
                     const url = currentSessionId ? `${API_PREFIX}/ai/ask/${currentSessionId}` : `${API_PREFIX}/ai/ask`;
                     const res = await fetch(url, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ question: content })
+                        headers: headers,
+                        body: JSON.stringify({ question: content, country: 'egypt' })
                     });
                     const data = await res.json();
 
@@ -662,8 +699,14 @@
         function handleKey(e) { if (e.key === 'Enter') send(); }
         function searchHistory() { renderHistory(document.getElementById('searchInput').value); }
 
+        // Pre-fill token if available
+        const savedToken = localStorage.getItem('diag_token');
+        if (savedToken) {
+            document.getElementById('jwtInput').value = savedToken;
+        }
+
         // START
-        initConnection();
+        initConnection(savedToken);
     </script>
 </body>
 

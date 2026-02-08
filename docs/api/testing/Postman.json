@@ -6,183 +6,187 @@
   },
   "item": [
     {
-      "name": "Authentication & User Management",
-      "description": "User registration, login, and account management",
-      "item": [
-        {
-          "name": "Register Patient",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"patient@example.com\",\"password\":\"Test1234\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"role\":\"PATIENT\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/auth/register",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "register"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Register Doctor",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"doctor@example.com\",\"password\":\"Test1234\",\"firstName\":\"Dr. Sarah\",\"lastName\":\"Johnson\",\"role\":\"DOCTOR\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/auth/register",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "register"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Login",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"patient@test.com\",\"password\":\"Test1234\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/auth/login",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "login"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Logout",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/auth/logout",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "logout"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Current User",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/users/me",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "users",
-                "me"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Find User by Email",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/users/by-email?email={{user_email}}",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "users",
-                "by-email"
-              ],
-              "query": [
-                {
-                  "key": "email",
-                  "value": "{{user_email}}"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "AI Chat & History",
-      "description": "AI chatbot interactions and chat history management",
       "item": [
+        {
+          "name": "Doctor - Patient Chat Access",
+          "item": [
+            {
+              "name": "Get Patient Session Messages",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/patients/{{patient_id}}/chats/{{session_id}}/messages",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "patients",
+                    "{{patient_id}}",
+                    "chats",
+                    "{{session_id}}",
+                    "messages"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Get Patient Sessions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/patients/{{patient_id}}/chats",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "patients",
+                    "{{patient_id}}",
+                    "chats"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "AI Core",
+          "item": [
+            {
+              "name": "Ask Question (REST)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/ai/ask",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "ask"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"question\": \"How can I manage stress?\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Health Check",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/ai/health",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "health"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Ask in session",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/ai/ask/{sessionId}",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "ask",
+                    "{sessionId}"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        },
         {
           "name": "Patient - Chat History",
           "item": [
+            {
+              "name": "Get Authorized Doctors",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/chats/authorized-doctors",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "chats",
+                    "authorized-doctors"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
             {
               "name": "Get My Sessions",
               "request": {
@@ -191,6 +195,7 @@
                 "auth": {
                   "type": "noauth"
                 },
+                "description": "",
                 "url": {
                   "raw": "http://localhost:8080/api/chats",
                   "protocol": "http",
@@ -200,7 +205,35 @@
                   "path": [
                     "api",
                     "chats"
-                  ]
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Get Session Messages",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/chats/{{session_id}}/messages",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "chats",
+                    "{{session_id}}",
+                    "messages"
+                  ],
+                  "query": [],
+                  "variable": []
                 }
               }
             },
@@ -212,6 +245,7 @@
                 "auth": {
                   "type": "noauth"
                 },
+                "description": "",
                 "url": {
                   "raw": "http://localhost:8080/api/chats/with-doctors",
                   "protocol": "http",
@@ -222,7 +256,9 @@
                     "api",
                     "chats",
                     "with-doctors"
-                  ]
+                  ],
+                  "query": [],
+                  "variable": []
                 }
               }
             },
@@ -234,6 +270,7 @@
                 "auth": {
                   "type": "noauth"
                 },
+                "description": "",
                 "url": {
                   "raw": "http://localhost:8080/api/chats/search?q=anxiety",
                   "protocol": "http",
@@ -250,30 +287,8 @@
                       "key": "q",
                       "value": "anxiety"
                     }
-                  ]
-                }
-              }
-            },
-            {
-              "name": "Get Session Messages",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/chats/{{session_id}}/messages",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
                   ],
-                  "path": [
-                    "api",
-                    "chats",
-                    "{{session_id}}",
-                    "messages"
-                  ]
+                  "variable": []
                 }
               }
             },
@@ -285,10 +300,7 @@
                 "auth": {
                   "type": "noauth"
                 },
-                "body": {
-                  "mode": "raw",
-                  "raw": "My Wellness Journey"
-                },
+                "description": "",
                 "url": {
                   "raw": "http://localhost:8080/api/chats/{{session_id}}/title",
                   "protocol": "http",
@@ -300,142 +312,127 @@
                     "chats",
                     "{{session_id}}",
                     "title"
-                  ]
-                }
-              }
-            },
-            {
-              "name": "Get Authorized Doctors",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/chats/authorized-doctors",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
                   ],
-                  "path": [
-                    "api",
-                    "chats",
-                    "authorized-doctors"
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        {
-          "name": "Doctor - Patient Chat Access",
-          "item": [
-            {
-              "name": "Get Patient Sessions",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/doctors/patients/{{patient_id}}/chats",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "doctors",
-                    "patients",
-                    "{{patient_id}}",
-                    "chats"
-                  ]
-                }
-              }
-            },
-            {
-              "name": "Get Patient Session Messages",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/doctors/patients/{{patient_id}}/chats/{{session_id}}/messages",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "doctors",
-                    "patients",
-                    "{{patient_id}}",
-                    "chats",
-                    "{{session_id}}",
-                    "messages"
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        {
-          "name": "AI Core",
-          "item": [
-            {
-              "name": "Health Check",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/ai/health",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "ai",
-                    "health"
-                  ]
-                }
-              }
-            },
-            {
-              "name": "Ask Question (REST)",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
+                  "query": [],
+                  "variable": []
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"question\": \"How can I manage stress?\"}",
+                  "raw": "My Wellness Journey",
+                  "options": {
+                    "raw": {
+                      "language": "text"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "direct_AI_collab",
+          "item": [
+            {
+              "name": "health",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://nonevaporating-lora-nonranging.ngrok-free.dev/health",
+                  "protocol": "https",
+                  "host": [
+                    "nonevaporating-lora-nonranging",
+                    "ngrok-free",
+                    "dev"
+                  ],
+                  "path": [
+                    "health"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "query",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "dolamasa",
+                    "disabled": false,
+                    "type": "default"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://nonevaporating-lora-nonranging.ngrok-free.dev/query",
+                  "protocol": "https",
+                  "host": [
+                    "nonevaporating-lora-nonranging",
+                    "ngrok-free",
+                    "dev"
+                  ],
+                  "path": [
+                    "query"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"question\": \"What are COVID-19 symptoms?\",\n    \"country\": \"egypt\"\n  }",
                   "options": {
                     "raw": {
                       "language": "json"
                     }
                   }
+                }
+              }
+            },
+            {
+              "name": "reload",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "before_vone_model",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "noauth"
                 },
+                "description": "",
                 "url": {
-                  "raw": "http://localhost:8080/api/ai/ask",
-                  "protocol": "http",
+                  "raw": "https://nonevaporating-lora-nonranging.ngrok-free.dev/reload",
+                  "protocol": "https",
                   "host": [
-                    "localhost:8080"
+                    "nonevaporating-lora-nonranging",
+                    "ngrok-free",
+                    "dev"
                   ],
                   "path": [
-                    "api",
-                    "ai",
-                    "ask"
-                  ]
+                    "reload"
+                  ],
+                  "query": [],
+                  "variable": []
                 }
               }
             }
@@ -444,115 +441,224 @@
       ]
     },
     {
-      "name": "Doctor-Patient Engagement",
-      "description": "Engagement lifecycle and messaging between doctors and patients",
+      "name": "Authentication & User Management",
       "item": [
         {
-          "name": "Initiate Engagement",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\"patientId\": \"{{patient_id}}\", \"accessRuleName\": \"FULL_ACCESS\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/engagements/initiate",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "engagements",
-                "initiate"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Verify Start (Patient)",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\"token\": \"ABC123\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/engagements/verify-start",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "engagements",
-                "verify-start"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get My Engagements",
+          "name": "Find User by Email",
           "request": {
             "method": "GET",
             "header": [],
             "auth": {
               "type": "noauth"
             },
+            "description": "",
             "url": {
-              "raw": "http://localhost:8080/api/engagements/my-engagements",
+              "raw": "http://localhost:8080/api/users/by-email?email={{user_email}}",
               "protocol": "http",
               "host": [
                 "localhost:8080"
               ],
               "path": [
                 "api",
-                "engagements",
-                "my-engagements"
-              ]
+                "users",
+                "by-email"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "{{user_email}}"
+                }
+              ],
+              "variable": []
             }
           }
         },
         {
-          "name": "Get Engagement Details",
+          "name": "Get Current User",
           "request": {
             "method": "GET",
             "header": [],
             "auth": {
               "type": "noauth"
             },
+            "description": "",
             "url": {
-              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}",
+              "raw": "http://localhost:8080/api/users/me",
               "protocol": "http",
               "host": [
                 "localhost:8080"
               ],
               "path": [
                 "api",
-                "engagements",
-                "{{engagement_id}}"
-              ]
+                "users",
+                "me"
+              ],
+              "query": [],
+              "variable": []
             }
           }
         },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"patient@test.com\",\"password\":\"Test1234\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/auth/logout",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Register Doctor",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"doctor@example.com\",\"password\":\"Test1234\",\"firstName\":\"Dr. Sarah\",\"lastName\":\"Johnson\",\"role\":\"DOCTOR\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Register Patient",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"patient@example.com\",\"password\":\"Test1234\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"role\":\"PATIENT\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Doctor Directory",
+      "item": [
+        {
+          "name": "Get All Doctors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/doctors",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "doctors"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Doctor-Patient Engagement",
+      "item": [
         {
           "name": "Cancel Engagement",
           "request": {
@@ -561,15 +667,7 @@
             "auth": {
               "type": "noauth"
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\"reason\": \"Treatment completed\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
+            "description": "",
             "url": {
               "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/cancel",
               "protocol": "http",
@@ -581,7 +679,18 @@
                 "engagements",
                 "{{engagement_id}}",
                 "cancel"
-              ]
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"reason\": \"Treatment completed\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -593,6 +702,7 @@
             "auth": {
               "type": "noauth"
             },
+            "description": "",
             "url": {
               "raw": "http://localhost:8080/api/engagements/{{engagement_id}}",
               "protocol": "http",
@@ -603,29 +713,23 @@
                 "api",
                 "engagements",
                 "{{engagement_id}}"
-              ]
+              ],
+              "query": [],
+              "variable": []
             }
           }
         },
         {
-          "name": "Send Message",
+          "name": "Get Engagement Details",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [],
             "auth": {
               "type": "noauth"
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\"content\": \"How are you feeling today?\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
+            "description": "",
             "url": {
-              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/messages",
+              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}",
               "protocol": "http",
               "host": [
                 "localhost:8080"
@@ -633,9 +737,10 @@
               "path": [
                 "api",
                 "engagements",
-                "{{engagement_id}}",
-                "messages"
-              ]
+                "{{engagement_id}}"
+              ],
+              "query": [],
+              "variable": []
             }
           }
         },
@@ -647,6 +752,7 @@
             "auth": {
               "type": "noauth"
             },
+            "description": "",
             "url": {
               "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/messages",
               "protocol": "http",
@@ -658,29 +764,23 @@
                 "engagements",
                 "{{engagement_id}}",
                 "messages"
-              ]
+              ],
+              "query": [],
+              "variable": []
             }
           }
         },
         {
-          "name": "Request End",
+          "name": "Get My Engagements",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [],
             "auth": {
               "type": "noauth"
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\"reason\": \"Therapy completed successfully\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
+            "description": "",
             "url": {
-              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/end-request",
+              "raw": "http://localhost:8080/api/engagements/my-engagements",
               "protocol": "http",
               "host": [
                 "localhost:8080"
@@ -688,64 +788,10 @@
               "path": [
                 "api",
                 "engagements",
-                "{{engagement_id}}",
-                "end-request"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Verify End",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\"token\": \"END123\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/verify-end",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
+                "my-engagements"
               ],
-              "path": [
-                "api",
-                "engagements",
-                "{{engagement_id}}",
-                "verify-end"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Refresh Token",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/refresh-token",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "engagements",
-                "{{engagement_id}}",
-                "refresh-token"
-              ]
+              "query": [],
+              "variable": []
             }
           }
         },
@@ -757,6 +803,7 @@
             "auth": {
               "type": "noauth"
             },
+            "description": "",
             "url": {
               "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/token",
               "protocol": "http",
@@ -768,280 +815,241 @@
                 "engagements",
                 "{{engagement_id}}",
                 "token"
-              ]
+              ],
+              "query": [],
+              "variable": []
             }
           }
-        }
-      ]
-    },
-    {
-      "name": "Doctor Directory",
-      "description": "Browse and search available doctors",
-      "item": [
+        },
         {
-          "name": "Get All Doctors",
+          "name": "Initiate Engagement",
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [],
             "auth": {
               "type": "noauth"
             },
+            "description": "",
             "url": {
-              "raw": "http://localhost:8080/api/doctors",
+              "raw": "http://localhost:8080/api/engagements/initiate",
               "protocol": "http",
               "host": [
                 "localhost:8080"
               ],
               "path": [
                 "api",
-                "doctors"
-              ]
+                "engagements",
+                "initiate"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"patientId\": \"{{patient_id}}\", \"accessRuleName\": \"FULL_ACCESS\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/refresh-token",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "engagements",
+                "{{engagement_id}}",
+                "refresh-token"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Request End",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/end-request",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "engagements",
+                "{{engagement_id}}",
+                "end-request"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"reason\": \"Therapy completed successfully\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/messages",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "engagements",
+                "{{engagement_id}}",
+                "messages"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"content\": \"How are you feeling today?\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Verify End",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/verify-end",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "engagements",
+                "{{engagement_id}}",
+                "verify-end"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"token\": \"END123\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Verify Start (Patient)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/engagements/verify-start",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "engagements",
+                "verify-start"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"token\": \"ABC123\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         }
       ]
     },
     {
-      "name": "Psychological Assessments",
-      "description": "Personality and mental health assessment quizzes",
-      "item": [
-        {
-          "name": "IPIP-50 (Big Five Personality)",
-          "item": [
-            {
-              "name": "Start Quiz",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/quizzes/ipip50/start",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "quizzes",
-                    "ipip50",
-                    "start"
-                  ]
-                }
-              }
-            },
-            {
-              "name": "Get All Questions",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/quizzes/ipip50/questions",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "quizzes",
-                    "ipip50",
-                    "questions"
-                  ]
-                }
-              }
-            },
-            {
-              "name": "Submit Answer",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\"questionId\": 1, \"score\": 5}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/quizzes/ipip50/submit-question",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "quizzes",
-                    "ipip50",
-                    "submit-question"
-                  ]
-                }
-              }
-            },
-            {
-              "name": "Get Progress",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/quizzes/ipip50/progress",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "quizzes",
-                    "ipip50",
-                    "progress"
-                  ]
-                }
-              }
-            },
-            {
-              "name": "Get Saved Responses",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/quizzes/ipip50/responses",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "quizzes",
-                    "ipip50",
-                    "responses"
-                  ]
-                }
-              }
-            },
-            {
-              "name": "Submit Quiz",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/quizzes/ipip50/submit-quiz",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "quizzes",
-                    "ipip50",
-                    "submit-quiz"
-                  ]
-                }
-              }
-            },
-            {
-              "name": "Reset Quiz",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/quizzes/ipip50/reset",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "quizzes",
-                    "ipip50",
-                    "reset"
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        {
-          "name": "IPIP-120 (Extended Personality)",
-          "item": [
-            {
-              "name": "Start Quiz",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/quizzes/ipip120/start",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "quizzes",
-                    "ipip120",
-                    "start"
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        {
-          "name": "PHQ-9 (Depression Screening)",
-          "item": [
-            {
-              "name": "Start Quiz",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "auth": {
-                  "type": "noauth"
-                },
-                "url": {
-                  "raw": "http://localhost:8080/api/quizzes/phq9/start",
-                  "protocol": "http",
-                  "host": [
-                    "localhost:8080"
-                  ],
-                  "path": [
-                    "api",
-                    "quizzes",
-                    "phq9",
-                    "start"
-                  ]
-                }
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
       "name": "Notifications",
-      "description": "User notifications and real-time updates",
       "item": [
+        {
+          "name": "Delete Notification",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/notifications/{{notification_id}}",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{notification_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
         {
           "name": "Get Notifications (Paginated)",
           "request": {
@@ -1050,6 +1058,7 @@
             "auth": {
               "type": "noauth"
             },
+            "description": "",
             "url": {
               "raw": "http://localhost:8080/api/notifications?page=0&size=20",
               "protocol": "http",
@@ -1071,87 +1080,18 @@
                 },
                 {
                   "key": "type",
-                  "value": "",
-                  "disabled": true
+                  "value": ""
                 },
                 {
                   "key": "priority",
-                  "value": "",
-                  "disabled": true
+                  "value": ""
                 },
                 {
                   "key": "isRead",
-                  "value": "",
-                  "disabled": true
+                  "value": ""
                 }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Unread Count",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/notifications/unread-count",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
               ],
-              "path": [
-                "api",
-                "notifications",
-                "unread-count"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Mark as Read",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/notifications/{{notification_id}}/read",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "notifications",
-                "{{notification_id}}",
-                "read"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Mark All as Read",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/notifications/mark-all-read",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "notifications",
-                "mark-all-read"
-              ]
+              "variable": []
             }
           }
         },
@@ -1163,6 +1103,7 @@
             "auth": {
               "type": "noauth"
             },
+            "description": "",
             "url": {
               "raw": "http://localhost:8080/api/notifications/stats",
               "protocol": "http",
@@ -1173,20 +1114,23 @@
                 "api",
                 "notifications",
                 "stats"
-              ]
+              ],
+              "query": [],
+              "variable": []
             }
           }
         },
         {
-          "name": "Delete Notification",
+          "name": "Get Unread Count",
           "request": {
-            "method": "DELETE",
+            "method": "GET",
             "header": [],
             "auth": {
               "type": "noauth"
             },
+            "description": "",
             "url": {
-              "raw": "http://localhost:8080/api/notifications/{{notification_id}}",
+              "raw": "http://localhost:8080/api/notifications/unread-count",
               "protocol": "http",
               "host": [
                 "localhost:8080"
@@ -1194,8 +1138,61 @@
               "path": [
                 "api",
                 "notifications",
-                "{{notification_id}}"
-              ]
+                "unread-count"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/notifications/mark-all-read",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "mark-all-read"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Mark as Read",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/notifications/{{notification_id}}/read",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{notification_id}}",
+                "read"
+              ],
+              "query": [],
+              "variable": []
             }
           }
         },
@@ -1207,6 +1204,7 @@
             "auth": {
               "type": "noauth"
             },
+            "description": "",
             "url": {
               "raw": "http://localhost:8080/api/notifications/stream",
               "protocol": "http",
@@ -1217,48 +1215,280 @@
                 "api",
                 "notifications",
                 "stream"
-              ]
+              ],
+              "query": [],
+              "variable": []
             }
           }
         }
       ]
     },
     {
-      "name": "System & Testing",
-      "description": "System health checks and testing endpoints",
+      "name": "Psychological Assessments",
       "item": [
         {
-          "name": "Test Email - Verification",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"test@example.com\",\"code\":\"123456\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
+          "name": "IPIP-120 (Extended Personality)",
+          "item": [
+            {
+              "name": "Start Quiz",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip120/start",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip120",
+                    "start"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "IPIP-50 (Big Five Personality)",
+          "item": [
+            {
+              "name": "Get All Questions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/questions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "questions"
+                  ],
+                  "query": [],
+                  "variable": []
                 }
               }
             },
-            "url": {
-              "raw": "http://localhost:8080/api/test/email/verification",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "test",
-                "email",
-                "verification"
-              ]
+            {
+              "name": "Get Progress",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/progress",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "progress"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Get Saved Responses",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/responses",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "responses"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Reset Quiz",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/reset",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "reset"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Start Quiz",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/start",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "start"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Submit Answer",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/submit-question",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "submit-question"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"questionId\": 1, \"score\": 5}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Submit Quiz",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/ipip50/submit-quiz",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "ipip50",
+                    "submit-quiz"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
             }
-          }
+          ]
         },
+        {
+          "name": "PHQ-9 (Depression Screening)",
+          "item": [
+            {
+              "name": "Start Quiz",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:8080/api/quizzes/phq9/start",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "quizzes",
+                    "phq9",
+                    "start"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "System & Testing",
+      "item": [
         {
           "name": "Test Email - Special Thanks",
           "request": {
@@ -1267,15 +1497,7 @@
             "auth": {
               "type": "noauth"
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"team@example.com\",\"name\":\"Team Member\",\"acknowledgment\":\"Thank you for your dedication\",\"message\":\"System milestone achieved\",\"note\":\"Great work!\"}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
+            "description": "",
             "url": {
               "raw": "http://localhost:8080/api/test/email/special-thanks",
               "protocol": "http",
@@ -1287,7 +1509,53 @@
                 "test",
                 "email",
                 "special-thanks"
-              ]
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"team@example.com\",\"name\":\"Team Member\",\"acknowledgment\":\"Thank you for your dedication\",\"message\":\"System milestone achieved\",\"note\":\"Great work!\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Test Email - Verification",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8080/api/test/email/verification",
+              "protocol": "http",
+              "host": [
+                "localhost:8080"
+              ],
+              "path": [
+                "api",
+                "test",
+                "email",
+                "verification"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"test@example.com\",\"code\":\"123456\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         }
@@ -1296,29 +1564,29 @@
   ],
   "variable": [
     {
-      "key": "session_id",
-      "value": "",
-      "type": "string"
-    },
-    {
       "key": "patient_id",
       "value": "",
-      "type": "string"
+      "type": "default"
     },
     {
-      "key": "engagement_id",
+      "key": "session_id",
       "value": "",
-      "type": "string"
-    },
-    {
-      "key": "notification_id",
-      "value": "",
-      "type": "string"
+      "type": "default"
     },
     {
       "key": "user_email",
       "value": "",
-      "type": "string"
+      "type": "default"
+    },
+    {
+      "key": "engagement_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "notification_id",
+      "value": "",
+      "type": "default"
     }
   ]
 }

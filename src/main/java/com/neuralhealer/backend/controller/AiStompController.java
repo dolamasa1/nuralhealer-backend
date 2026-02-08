@@ -60,9 +60,16 @@ public class AiStompController {
 
         // 1. Get/Create Persistent Chat Session & Save User Message
         UUID chatSessionId = null;
-        if (userId != null) {
-            chatSessionId = chatStorageService.getOrCreateSession(userId);
-            chatStorageService.saveMessage(chatSessionId, "patient", request.question());
+        if (userId != null
+                && authentication.getPrincipal() instanceof com.neuralhealer.backend.model.entity.User user) {
+            UUID patientId = user.getPatientProfile() != null ? user.getPatientProfile().getId() : null;
+
+            if (patientId != null) {
+                chatSessionId = chatStorageService.getOrCreateSession(patientId);
+                chatStorageService.saveMessage(chatSessionId, "patient", request.question());
+            } else {
+                log.warn("User {} has no patient profile - skipping message persistence", userId);
+            }
         }
 
         // 2. Send TYPING_START (as step 2 in original flow, but conceptually step 1 in
@@ -116,9 +123,13 @@ public class AiStompController {
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        // Use convertAndSendToUser to send directly back to the requesting session
+        // Use the authenticated principal name if available, otherwise fallback to
+        // session ID
+        String destinationUser = headerAccessor.getUser() != null ? headerAccessor.getUser().getName()
+                : headerAccessor.getSessionId();
+
         messagingTemplate.convertAndSendToUser(
-                headerAccessor.getSessionId(),
+                destinationUser,
                 "/queue/ai",
                 wsMessage,
                 Map.of(SimpMessageHeaderAccessor.SESSION_ID_HEADER, headerAccessor.getSessionId()));
