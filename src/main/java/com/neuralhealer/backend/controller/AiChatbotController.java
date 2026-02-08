@@ -58,7 +58,7 @@ public class AiChatbotController {
             @Valid @RequestBody AiChatRequest request,
             @AuthenticationPrincipal User user) {
         try {
-            log.info("REST AI request received - creating new session");
+            log.debug("REST AI request received - creating new session");
 
             // 1. Resolve Patient Profile (PatientId)
             UUID patientId = user.getPatientProfile() != null ? user.getPatientProfile().getId() : null;
@@ -106,7 +106,7 @@ public class AiChatbotController {
             @Valid @RequestBody AiChatRequest request,
             @AuthenticationPrincipal User user) {
         try {
-            log.info("REST AI request received for session: {}", sessionId);
+            log.debug("REST AI request received for session: {}", sessionId);
 
             // 1. Save User message
             chatStorageService.saveMessage(sessionId, "PATIENT", request.question());

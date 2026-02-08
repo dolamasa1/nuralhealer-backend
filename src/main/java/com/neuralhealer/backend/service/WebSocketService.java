@@ -71,7 +71,7 @@ public class WebSocketService {
     public void registerSession(String sessionId, String protocol, String userIdentifier) {
         String info = protocol + ":" + userIdentifier;
         sessionRegistry.put(sessionId, info);
-        log.info("Session Registered: {} -> {} (Total: {})", sessionId, info, sessionRegistry.size());
+        log.debug("Session Registered: {} -> {} (Total: {})", sessionId, info, sessionRegistry.size());
     }
 
     /**
@@ -80,7 +80,7 @@ public class WebSocketService {
     public void removeSession(String sessionId) {
         String info = sessionRegistry.remove(sessionId);
         if (info != null) {
-            log.info("Session Removed: {} (Total: {})", info, sessionRegistry.size());
+            log.debug("Session Removed: {} (Total: {})", info, sessionRegistry.size());
         }
     }
 

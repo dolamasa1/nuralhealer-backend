@@ -51,7 +51,7 @@ public class AiStompController {
             userId = ((com.neuralhealer.backend.model.entity.User) authentication.getPrincipal()).getId();
         }
 
-        log.info("STOMP AI request received: session={}, user={}", wsSessionId, userId);
+        log.debug("STOMP AI request received: session={}, user={}", wsSessionId, userId);
 
         if (!aiChatbotService.isAiAvailable()) {
             sendAiMessage(headerAccessor, WebSocketMessageType.AI_ERROR, "الذكاء الاصطناعي غير متاح حالياً");

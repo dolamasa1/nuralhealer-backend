@@ -54,7 +54,7 @@ public class AiChatbotService {
     public AiHealthResponse checkHealth() {
         try {
             String url = baseUrl + healthEndpoint;
-            log.info("Checking AI health at: {}", url);
+            log.debug("Checking AI health at: {}", url);
 
             ResponseEntity<String> response = aiRestTemplate.getForEntity(url, String.class);
 
@@ -63,7 +63,7 @@ public class AiChatbotService {
             lastHealthCheck = LocalDateTime.now();
 
             String message = isHealthy ? "AI connected" : "AI connection issue";
-            log.info("AI health check: {}", message);
+            log.debug("AI health check: {}", message);
 
             return new AiHealthResponse(isHealthy, message, lastHealthCheck);
 
@@ -97,7 +97,7 @@ public class AiChatbotService {
     public AiChatResponse askQuestion(String question) {
         try {
             String url = baseUrl + askEndpoint;
-            log.info("Sending question to AI: {} (length: {} chars)",
+            log.debug("Sending question to AI: {} (length: {} chars)",
                     question.substring(0, Math.min(50, question.length())), question.length());
 
             // Create request with proper headers for Arabic text and API Key
@@ -123,7 +123,7 @@ public class AiChatbotService {
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 AiChatResponse aiResponse = response.getBody();
-                log.info("AI response received: answer length={}",
+                log.debug("AI response received: answer length={}",
                         aiResponse.answer() != null ? aiResponse.answer().length() : 0);
                 return aiResponse;
             } else {

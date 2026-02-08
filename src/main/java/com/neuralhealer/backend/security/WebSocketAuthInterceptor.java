@@ -40,7 +40,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 webSocketService.validateToken(token).ifPresent(auth -> {
                     SecurityContextHolder.getContext().setAuthentication(auth);
                     accessor.setUser(auth);
-                    log.info("WebSocket connection authenticated for user: {}", auth.getName());
+                    log.debug("WebSocket connection authenticated for user: {}", auth.getName());
                 });
             }
 
@@ -50,7 +50,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                         .createGuestAuthentication(accessor.getSessionId());
                 SecurityContextHolder.getContext().setAuthentication(guestAuth);
                 accessor.setUser(guestAuth);
-                log.info("WebSocket connection authenticated as Anonymous Guest: {}", guestAuth.getName());
+                log.debug("WebSocket connection authenticated as Anonymous Guest: {}", guestAuth.getName());
             }
         }
 
