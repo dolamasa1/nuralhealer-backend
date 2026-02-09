@@ -52,8 +52,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 5MB
+      max-file-size: 10MB
+      max-request-size: 10MB
       enabled: true
 
 server:
@@ -122,7 +122,7 @@ file:
   storage:
     base-path: ${FILE_STORAGE_BASE_PATH}
     profile-pictures: ${PROFILE_PICTURES_PATH:doctors/profiles}
-  max-size-mb: ${MAX_FILE_SIZE_MB:5}
+  max-size-mb: ${MAX_FILE_SIZE_MB:10}
   allowed-formats: ${ALLOWED_IMAGE_FORMATS:jpg,jpeg,png,webp}
   image:
     min-dimension: ${PROFILE_IMAGE_MIN_DIMENSION:512}

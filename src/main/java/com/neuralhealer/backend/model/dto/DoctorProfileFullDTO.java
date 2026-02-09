@@ -47,9 +47,6 @@ public class DoctorProfileFullDTO {
     // Contact
     private Map<String, String> socialMedia;
 
-    // Verification details
-    private VerificationDetailsDTO verificationDetails;
-
     // Pricing
     private Double consultationFee;
 
@@ -62,15 +59,5 @@ public class DoctorProfileFullDTO {
         private String country;
         private Double latitude;
         private Double longitude;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class VerificationDetailsDTO {
-        private Boolean identityVerified;
-        private Boolean licenseVerified;
-        private Boolean platformApproved;
     }
 }

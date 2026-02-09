@@ -82,18 +82,19 @@ class DoctorProfileServiceTest {
 
     @Test
     void calculateProfileCompletion_Works() {
-        // Bio(10) + Title(10) + Spec(10) + Exp(10) + Loc(10) + Pic(20) + Fee(10) +
-        // Social(10) + Certs(10)
-        doctorProfile.setBio("Some bio"); // 10
-        doctorProfile.setTitle("Dr."); // 10
-        doctorProfile.setSpecialization("Psychiatrist"); // 10
-        doctorProfile.setYearsOfExperience(5); // 10
+        // Basic Info (5*6=30) + Pic(20) + Certs(10) + Social(10) + Verification(30) =
+        // 100
+        doctorProfile.setBio("Some bio"); // 5
+        doctorProfile.setTitle("Dr."); // 5
+        doctorProfile.setSpecialization("Psychiatrist"); // 5
+        doctorProfile.setYearsOfExperience(5); // 5
         doctorProfile.setLocationCity("Cairo");
-        doctorProfile.setLocationCountry("Egypt"); // 10
+        doctorProfile.setLocationCountry("Egypt"); // 5
+        doctorProfile.setConsultationFee(100.0); // 5
         doctorProfile.setProfilePicturePath("path/to/pic.jpg"); // 20
-        doctorProfile.setConsultationFee(100.0); // 10
-        doctorProfile.setSocialMedia(java.util.Map.of("linkedin", "link")); // 10
         doctorProfile.setCertificates(java.util.List.of(java.util.Map.of("name", "cert"))); // 10
+        doctorProfile.setSocialMedia(java.util.Map.of("linkedin", "link")); // 10
+        doctorProfile.setVerificationStatus("verified"); // 30
 
         when(doctorProfileRepository.findById(doctorId)).thenReturn(Optional.of(doctorProfile));
 

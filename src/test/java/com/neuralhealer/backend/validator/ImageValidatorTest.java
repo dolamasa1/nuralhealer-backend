@@ -1,17 +1,17 @@
 package com.neuralhealer.backend.validator;
 
+import com.neuralhealer.backend.config.FileStorageProperties;
 import com.neuralhealer.backend.exception.FileSizeExceededException;
-import com.neuralhealer.backend.exception.InvalidAspectRatioException;
 import com.neuralhealer.backend.exception.InvalidImageFormatException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,14 +19,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ImageValidatorTest {
 
     private ImageValidator imageValidator;
+    private FileStorageProperties fileProperties;
 
     @BeforeEach
     void setUp() {
-        imageValidator = new ImageValidator();
-        ReflectionTestUtils.setField(imageValidator, "maxSizeMb", 5);
-        ReflectionTestUtils.setField(imageValidator, "allowedFormats", "jpg,jpeg,png,webp");
-        ReflectionTestUtils.setField(imageValidator, "minDimension", 10);
-        ReflectionTestUtils.setField(imageValidator, "maxDimension", 2000);
+        fileProperties = new FileStorageProperties();
+        fileProperties.setMaxSizeMb(5);
+        fileProperties.setAllowedFormats(List.of("jpg", "jpeg", "png", "webp"));
+        fileProperties.getImage().setMinDimension(10);
+        fileProperties.getImage().setMaxDimension(2000);
+
+        imageValidator = new ImageValidator(fileProperties);
     }
 
     @Test
@@ -57,14 +60,6 @@ class ImageValidatorTest {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "hello".getBytes());
 
         assertThrows(InvalidImageFormatException.class, () -> imageValidator.validateImage(file));
-    }
-
-    @Test
-    void validateImage_InvalidAspectRatio() throws IOException {
-        byte[] imageBytes = createMockImage(200, 100, "jpg");
-        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", imageBytes);
-
-        assertThrows(InvalidAspectRatioException.class, () -> imageValidator.validateImage(file));
     }
 
     private byte[] createMockImage(int width, int height, String format) throws IOException {

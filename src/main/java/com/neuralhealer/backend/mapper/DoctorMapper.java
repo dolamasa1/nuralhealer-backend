@@ -43,11 +43,6 @@ public class DoctorMapper {
                 .totalReviews(profile.getTotalReviews())
                 .profileCompletion(profile.getProfileCompletionPercentage())
                 .socialMedia(profile.getSocialMedia())
-                .verificationDetails(DoctorProfileFullDTO.VerificationDetailsDTO.builder()
-                        .identityVerified(profile.getIdentityVerified())
-                        .licenseVerified(profile.getLicenseVerified())
-                        .platformApproved(profile.getPlatformApproved())
-                        .build())
                 .consultationFee(profile.getConsultationFee())
                 .build();
     }
@@ -72,7 +67,7 @@ public class DoctorMapper {
                 .location(location)
                 .availabilityStatus(profile.getAvailabilityStatus())
                 .verificationStatus(profile.getVerificationStatus())
-                .isVerified(profile.getPlatformApproved())
+                .isVerified("verified".equalsIgnoreCase(profile.getVerificationStatus()))
                 .consultationFee(profile.getConsultationFee())
                 .build();
     }

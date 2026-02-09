@@ -176,9 +176,6 @@ CREATE TABLE doctor_profiles (
   total_reviews INTEGER DEFAULT 0,
   profile_completion_percentage INTEGER DEFAULT 0,
   social_media JSONB,                                   -- {linkedin, twitter, ...}
-  identity_verified BOOLEAN DEFAULT false,
-  license_verified BOOLEAN DEFAULT false,
-  platform_approved BOOLEAN DEFAULT false,
   consultation_fee DECIMAL(10,2),
 
   created_at TIMESTAMP DEFAULT now(),
@@ -899,20 +896,29 @@ BEGIN
     SELECT * INTO v_doctor FROM doctor_profiles WHERE id = p_doctor_id;
     IF NOT FOUND THEN RETURN 0; END IF;
 
-    -- Basic info (40)
-    IF v_doctor.title IS NOT NULL AND v_doctor.title != '' THEN v_score := v_score + 10; END IF;
-    IF v_doctor.bio IS NOT NULL AND LENGTH(v_doctor.bio) > 50 THEN v_score := v_score + 15; END IF;
-    IF v_doctor.specialization IS NOT NULL THEN v_score := v_score + 10; END IF;
-    IF v_doctor.years_of_experience IS NOT NULL AND v_doctor.years_of_experience > 0 THEN v_score := v_score + 5; END IF;
+    -- Basic info (Total 30)
+    IF v_doctor.title IS NOT NULL AND v_doctor.title != '' THEN v_score := v_score + 5; END IF;
+    IF v_doctor.bio IS NOT NULL AND v_doctor.bio != '' THEN v_score := v_score + 5; END IF;
+    IF v_doctor.specialization IS NOT NULL AND v_doctor.specialization != '' THEN v_score := v_score + 5; END IF;
+    IF v_doctor.years_of_experience IS NOT NULL THEN v_score := v_score + 5; END IF;
+    IF v_doctor.location_city IS NOT NULL AND v_doctor.location_country IS NOT NULL THEN v_score := v_score + 5; END IF;
+    IF v_doctor.consultation_fee IS NOT NULL THEN v_score := v_score + 5; END IF;
 
-    -- Visual & Professional (30)
+    -- Visual (20)
     IF v_doctor.profile_picture_path IS NOT NULL THEN v_score := v_score + 20; END IF;
+
+    -- Professional (10)
     IF v_doctor.certificates IS NOT NULL AND jsonb_array_length(v_doctor.certificates) > 0 THEN v_score := v_score + 10; END IF;
 
+    -- Contact (10)
+    IF v_doctor.social_media IS NOT NULL THEN v_score := v_score + 10; END IF;
+
     -- Verification (30)
-    IF v_doctor.identity_verified = true THEN v_score := v_score + 10; END IF;
-    IF v_doctor.license_verified = true THEN v_score := v_score + 10; END IF;
-    IF v_doctor.platform_approved = true THEN v_score := v_score + 10; END IF;
+    IF v_doctor.verification_status = 'verified' THEN 
+        v_score := v_score + 30; 
+    ELSIF v_doctor.verification_status = 'pending' THEN 
+        v_score := v_score + 10; 
+    END IF;
 
     RETURN v_score;
 END;
@@ -936,9 +942,9 @@ WHEN (
     OLD.years_of_experience IS DISTINCT FROM NEW.years_of_experience OR
     OLD.profile_picture_path IS DISTINCT FROM NEW.profile_picture_path OR
     OLD.certificates IS DISTINCT FROM NEW.certificates OR
-    OLD.identity_verified IS DISTINCT FROM NEW.identity_verified OR
-    OLD.license_verified IS DISTINCT FROM NEW.license_verified OR
-    OLD.platform_approved IS DISTINCT FROM NEW.platform_approved
+    OLD.social_media IS DISTINCT FROM NEW.social_media OR
+    OLD.verification_status IS DISTINCT FROM NEW.verification_status OR
+    OLD.consultation_fee IS DISTINCT FROM NEW.consultation_fee
 )
 EXECUTE FUNCTION update_profile_completion();
 

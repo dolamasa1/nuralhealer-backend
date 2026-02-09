@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Verification Simulator - NeuralHealer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+        
+        .status-unverified {
+            background: #fee;
+            color: #c33;
+        }
+        
+        .status-pending {
+            background: #fef3cd;
+            color: #856404;
+        }
+        
+        .status-verified {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        .required {
+            color: #c33;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            margin-right: 10px;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .answer-display {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .completion-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        
+        .completion-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+        }
+        
+        .completion-text {
+            text-align: center;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Doctor Verification Portal</h1>
+            <p>NeuralHealer Platform</p>
+            <div class="status-badge" id="statusBadge">Status: Unverified</div>
+            <div class="completion-bar">
+                <div class="completion-fill" id="completionBar" style="width: 20%;"></div>
+            </div>
+            <div class="completion-text" id="completionText">Profile Completion: 20%</div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Step 1: View Questions -->
+        <div class="section" id="questionsSection">
+            <div class="section-title">📋 Verification Questions</div>
+            <div id="questionsList"></div>
+            <button class="btn btn-primary" onclick="showAnswerForm()">Start Verification</button>
+        </div>
+
+        <!-- Step 2: Answer Form -->
+        <div class="section hidden" id="answerSection">
+            <div class="section-title">✍️ Submit Your Answers</div>
+            <form id="verificationForm">
+                <div class="form-group">
+                    <label>Medical License Number <span class="required">*</span></label>
+                    <input type="text" id="license_number" required 
+                           placeholder="e.g., EG-MED-2015-789456">
+                    <div class="help-text">Your official medical practice license number</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Year of Graduation <span class="required">*</span></label>
+                    <input type="number" id="graduation_year" required 
+                           placeholder="e.g., 2015" min="1950" max="2025">
+                    <div class="help-text">Year you completed your medical degree</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Medical School/University <span class="required">*</span></label>
+                    <input type="text" id="medical_school" required 
+                           placeholder="e.g., Cairo University Faculty of Medicine">
+                    <div class="help-text">Name of the institution where you obtained your degree</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Board Certification Number</label>
+                    <input type="text" id="specialty_certification" 
+                           placeholder="e.g., PSY-EG-2020-123">
+                    <div class="help-text">Optional: If you have specialty board certification</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Practice/Clinic</label>
+                    <input type="text" id="current_practice" 
+                           placeholder="e.g., Mind Wellness Center Cairo">
+                    <div class="help-text">Where you currently practice</div>
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="btn btn-secondary" onclick="cancelSubmission()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Verification</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Step 3: View Submitted Answers -->
+        <div class="section hidden" id="answersSection">
+            <div class="section-title">📄 Your Submitted Answers</div>
+            <div id="submittedAnswers"></div>
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="editAnswers()">Edit Answers</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Admin Actions (Simulator Only) -->
+        <div class="section hidden" id="adminSection">
+            <div class="section-title">🔐 Admin Actions (Simulator Only)</div>
+            <div class="alert alert-info">
+                In production, only admins can approve/reject verifications.
+            </div>
+            <div class="actions">
+                <button class="btn btn-success" onclick="approveVerification()">✅ Approve</button>
+                <button class="btn btn-danger" onclick="rejectVerification()">❌ Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let currentStatus = 'unverified'; // unverified | pending | verified | rejected
+        let submittedAnswers = {};
+
+        // Mock questions (matches your DB structure)
+        const questions = [
+            {
+                key: "license_number",
+                label: "Medical License Number",
+                required: true,
+                type: "text",
+                placeholder: "e.g., EG-MED-2015-789456",
+                helpText: "Your official medical practice license number"
+            },
+            {
+                key: "graduation_year",
+                label: "Year of Graduation",
+                required: true,
+                type: "number",
+                placeholder: "e.g., 2015",
+                helpText: "Year you completed your medical degree"
+            },
+            {
+                key: "medical_school",
+                label: "Medical School/University",
+                required: true,
+                type: "text",
+                placeholder: "e.g., Cairo University Faculty of Medicine",
+                helpText: "Name of the institution where you obtained your degree"
+            },
+            {
+                key: "specialty_certification",
+                label: "Board Certification Number",
+                required: false,
+                type: "text",
+                placeholder: "e.g., PSY-EG-2020-123",
+                helpText: "Optional: If you have specialty board certification"
+            },
+            {
+                key: "current_practice",
+                label: "Current Practice/Clinic",
+                required: false,
+                type: "text",
+                placeholder: "e.g., Mind Wellness Center Cairo",
+                helpText: "Where you currently practice"
+            }
+        ];
+
+        // Initialize
+        window.onload = function() {
+            displayQuestions();
+            updateStatus('unverified');
+        };
+
+        function displayQuestions() {
+            const container = document.getElementById('questionsList');
+            container.innerHTML = questions.map((q, i) => `
+                <div class="form-group">
+                    <label>${i + 1}. ${q.label} ${q.required ? '<span class="required">*</span>' : ''}</label>
+                    <div class="help-text">${q.helpText}</div>
+                </div>
+            `).join('');
+        }
+
+        function showAnswerForm() {
+            document.getElementById('questionsSection').classList.add('hidden');
+            document.getElementById('answerSection').classList.remove('hidden');
+        }
+
+        function cancelSubmission() {
+            document.getElementById('answerSection').classList.add('hidden');
+            document.getElementById('questionsSection').classList.remove('hidden');
+        }
+
+        // Handle form submission
+        document.getElementById('verificationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            submittedAnswers = {
+                license_number: document.getElementById('license_number').value,
+                graduation_year: document.getElementById('graduation_year').value,
+                medical_school: document.getElementById('medical_school').value,
+                specialty_certification: document.getElementById('specialty_certification').value,
+                current_practice: document.getElementById('current_practice').value
+            };
+
+            // Simulate API call
+            showAlert('success', '✅ Verification submitted successfully! Status changed to PENDING.');
+            
+            // Update UI
+            updateStatus('pending');
+            displaySubmittedAnswers();
+            
+            // Hide form, show answers
+            document.getElementById('answerSection').classList.add('hidden');
+            document.getElementById('answersSection').classList.remove('hidden');
+            document.getElementById('adminSection').classList.remove('hidden');
+        });
+
+        function displaySubmittedAnswers() {
+            const container = document.getElementById('submittedAnswers');
+            container.innerHTML = Object.entries(submittedAnswers)
+                .filter(([key, value]) => value)
+                .map(([key, value]) => {
+                    const question = questions.find(q => q.key === key);
+                    return `
+                        <div class="form-group">
+                            <label>${question.label}</label>
+                            <div class="answer-display">${value}</div>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        function editAnswers() {
+            // Pre-fill form with existing answers
+            Object.entries(submittedAnswers).forEach(([key, value]) => {
+                const input = document.getElementById(key);
+                if (input) input.value = value;
+            });
+
+            document.getElementById('answersSection').classList.add('hidden');
+            document.getElementById('answerSection').classList.remove('hidden');
+            document.getElementById('adminSection').classList.add('hidden');
+        }
+
+        function approveVerification() {
+            updateStatus('verified');
+            showAlert('success', '🎉 Verification APPROVED! Doctor is now verified on the platform.');
+            document.getElementById('adminSection').classList.add('hidden');
+        }
+
+        function rejectVerification() {
+            updateStatus('rejected');
+            showAlert('error', '❌ Verification REJECTED. Doctor can resubmit with corrections.');
+            document.getElementById('adminSection').classList.add('hidden');
+        }
+
+        function updateStatus(status) {
+            currentStatus = status;
+            const badge = document.getElementById('statusBadge');
+            
+            badge.className = 'status-badge';
+            switch(status) {
+                case 'unverified':
+                    badge.classList.add('status-unverified');
+                    badge.textContent = 'Status: Unverified';
+                    updateCompletion(20);
+                    break;
+                case 'pending':
+                    badge.classList.add('status-pending');
+                    badge.textContent = 'Status: Pending Review';
+                    updateCompletion(50);
+                    break;
+                case 'verified':
+                    badge.classList.add('status-verified');
+                    badge.textContent = 'Status: ✓ Verified';
+                    updateCompletion(90);
+                    break;
+                case 'rejected':
+                    badge.classList.add('status-unverified');
+                    badge.textContent = 'Status: Rejected';
+                    updateCompletion(20);
+                    break;
+            }
+        }
+
+        function updateCompletion(percentage) {
+            document.getElementById('completionBar').style.width = percentage + '%';
+            document.getElementById('completionText').textContent = `Profile Completion: ${percentage}%`;
+        }
+
+        function showAlert(type, message) {
+            const container = document.getElementById('alertContainer');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass}">
+                    ${message}
+                </div>
+            `;
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

@@ -17,7 +17,8 @@ Endpoints for managing doctor profiles, browsing the public lobby, and handling 
 ### Upload Profile Picture
 - **POST** `/api/doctors/me/profile-picture`
 - **Body**: `MultipartFile` (param: `file`)
-- **Note**: Replaces old picture; generates 256x256 thumbnail. Enforces 1-minute cooldown.
+- **Limit**: **10MB**
+- **Note**: Replaces old picture. Image is optimized and square-cropped.
 
 ### Update Availability
 - **PATCH** `/api/doctors/me/availability`
@@ -64,3 +65,13 @@ Endpoints for managing doctor profiles, browsing the public lobby, and handling 
   - `quickSetup`: `true`
   - `title`: String
   - `specialization`: "Psychiatrist" | "Therapist"
+  - `yearsOfExperience`: Integer
+  - `location`: `{city, country}`
+
+---
+
+## 🛡️ Verification Status
+The profile uses a single `verification_status` field:
+- `unverified`: Default state upon registration.
+- `pending`: Verification answers submitted, awaiting review.
+- `verified`: Approved by administration.

@@ -182,27 +182,40 @@ public class DoctorProfileServiceImpl implements DoctorProfileService {
 
         int completion = 0;
 
+        // Basic Info (5 points each, Total 30)
         if (StringUtils.hasText(profile.getBio()))
-            completion += 10;
+            completion += 5;
         if (StringUtils.hasText(profile.getTitle()))
-            completion += 10;
+            completion += 5;
         if (StringUtils.hasText(profile.getSpecialization()))
-            completion += 10;
+            completion += 5;
         if (profile.getYearsOfExperience() != null)
-            completion += 10;
+            completion += 5;
         if (StringUtils.hasText(profile.getLocationCity()) && StringUtils.hasText(profile.getLocationCountry()))
-            completion += 10;
+            completion += 5;
+        if (profile.getConsultationFee() != null)
+            completion += 5;
+
+        // Visual (20)
         if (StringUtils.hasText(profile.getProfilePicturePath()))
             completion += 20;
-        if (profile.getConsultationFee() != null)
-            completion += 10;
 
+        // Professional (10)
+        if (profile.getCertificates() != null && !profile.getCertificates().isEmpty()) {
+            completion += 10;
+        }
+
+        // Contact (10)
         if (profile.getSocialMedia() != null
                 && profile.getSocialMedia().values().stream().anyMatch(StringUtils::hasText)) {
             completion += 10;
         }
 
-        if (profile.getCertificates() != null && !profile.getCertificates().isEmpty()) {
+        // Verification (30)
+        String vStatus = profile.getVerificationStatus();
+        if ("verified".equalsIgnoreCase(vStatus)) {
+            completion += 30;
+        } else if ("pending".equalsIgnoreCase(vStatus)) {
             completion += 10;
         }
 

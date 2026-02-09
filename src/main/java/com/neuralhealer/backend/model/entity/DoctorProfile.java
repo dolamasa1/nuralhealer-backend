@@ -98,19 +98,6 @@ public class DoctorProfile {
     @Column(name = "social_media", columnDefinition = "jsonb")
     private Map<String, String> socialMedia;
 
-    // Verification details
-    @Column(name = "identity_verified")
-    @Builder.Default
-    private Boolean identityVerified = false;
-
-    @Column(name = "license_verified")
-    @Builder.Default
-    private Boolean licenseVerified = false;
-
-    @Column(name = "platform_approved")
-    @Builder.Default
-    private Boolean platformApproved = false;
-
     // Pricing
     @Column(name = "consultation_fee")
     private Double consultationFee;
@@ -133,6 +120,6 @@ public class DoctorProfile {
     }
 
     public Boolean getIsVerified() {
-        return "verified".equalsIgnoreCase(verificationStatus) || Boolean.TRUE.equals(platformApproved);
+        return "verified".equalsIgnoreCase(verificationStatus);
     }
 }

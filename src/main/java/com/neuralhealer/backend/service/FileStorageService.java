@@ -1,10 +1,10 @@
 package com.neuralhealer.backend.service;
 
+import com.neuralhealer.backend.config.FileStorageProperties;
 import com.neuralhealer.backend.validator.ImageValidator;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,31 +24,20 @@ public class FileStorageService {
     private static final Logger logger = LoggerFactory.getLogger(FileStorageService.class);
 
     private final ImageValidator imageValidator;
+    private final FileStorageProperties fileProperties;
     private final Path storageLocation;
 
-    @Value("${file.storage.profile-pictures:doctors/profiles}")
-    private String profilePicturesSubPath;
-
-    @Value("${file.thumbnail.size:256}")
-    private int thumbnailSize;
-
-    @Value("${file.image.compression-quality:85}")
-    private int compressionQuality;
-
-    @Value("${backend.root.url:http://localhost:8080}")
-    private String backendRootUrl;
-
-    public FileStorageService(ImageValidator imageValidator,
-            @Value("${file.storage.base-path}") String storagePath) {
+    public FileStorageService(ImageValidator imageValidator, FileStorageProperties fileProperties) {
         this.imageValidator = imageValidator;
-        this.storageLocation = Paths.get(storagePath).toAbsolutePath().normalize();
+        this.fileProperties = fileProperties;
+        this.storageLocation = Paths.get(fileProperties.getStorage().getBasePath()).toAbsolutePath().normalize();
     }
 
     @PostConstruct
     public void init() {
         try {
             Files.createDirectories(this.storageLocation);
-            Files.createDirectories(this.storageLocation.resolve(profilePicturesSubPath));
+            Files.createDirectories(this.storageLocation.resolve(fileProperties.getStorage().getProfilePictures()));
             logger.info("Storage directories initialized at: {}", this.storageLocation);
         } catch (IOException e) {
             logger.error("Could not initialize storage directory", e);
@@ -61,7 +50,8 @@ public class FileStorageService {
 
         String fileName = "profile.jpg";
         String thumbName = "profile_thumb.jpg";
-        Path doctorProfilePath = this.storageLocation.resolve(profilePicturesSubPath).resolve(doctorId.toString());
+        String subPath = fileProperties.getStorage().getProfilePictures();
+        Path doctorProfilePath = this.storageLocation.resolve(subPath).resolve(doctorId.toString());
 
         try {
             Files.createDirectories(doctorProfilePath);
@@ -74,11 +64,11 @@ public class FileStorageService {
             ImageIO.write(squareImage, "jpg", targetPath.toFile());
 
             // Save thumbnail
-            BufferedImage thumbnail = createThumbnail(squareImage, thumbnailSize);
+            BufferedImage thumbnail = createThumbnail(squareImage, fileProperties.getThumbnail().getSize());
             Path thumbPath = doctorProfilePath.resolve(thumbName);
             ImageIO.write(thumbnail, "jpg", thumbPath.toFile());
 
-            return profilePicturesSubPath + "/" + doctorId + "/" + fileName;
+            return subPath + "/" + doctorId + "/" + fileName;
 
         } catch (IOException e) {
             logger.error("Could not save profile picture for doctor: {}", doctorId, e);
@@ -87,7 +77,8 @@ public class FileStorageService {
     }
 
     public void deleteProfilePicture(UUID doctorId) {
-        Path doctorProfilePath = this.storageLocation.resolve(profilePicturesSubPath).resolve(doctorId.toString());
+        Path doctorProfilePath = this.storageLocation.resolve(fileProperties.getStorage().getProfilePictures())
+                .resolve(doctorId.toString());
         try {
             if (Files.exists(doctorProfilePath)) {
                 // Delete all files in the directory then the directory itself
@@ -116,7 +107,7 @@ public class FileStorageService {
             path = path.replace("profile.jpg", "profile_thumb.jpg");
         }
 
-        return backendRootUrl + "/api/files/" + path;
+        return fileProperties.getBackendRootUrl() + "/api/files/" + path;
     }
 
     private BufferedImage ensureSquareRatio(BufferedImage image) {

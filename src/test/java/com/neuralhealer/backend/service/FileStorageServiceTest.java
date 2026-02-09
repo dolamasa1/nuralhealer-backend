@@ -1,11 +1,11 @@
 package com.neuralhealer.backend.service;
 
+import com.neuralhealer.backend.config.FileStorageProperties;
 import com.neuralhealer.backend.validator.ImageValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 class FileStorageServiceTest {
 
     private FileStorageService fileStorageService;
+    private FileStorageProperties fileProperties;
     private ImageValidator imageValidator;
 
     @TempDir
@@ -29,10 +30,13 @@ class FileStorageServiceTest {
     @BeforeEach
     void setUp() {
         imageValidator = mock(ImageValidator.class);
-        fileStorageService = new FileStorageService(imageValidator, tempDir.toString());
-        ReflectionTestUtils.setField(fileStorageService, "profilePicturesSubPath", "doctors/profiles");
-        ReflectionTestUtils.setField(fileStorageService, "thumbnailSize", 256);
-        ReflectionTestUtils.setField(fileStorageService, "backendRootUrl", "http://localhost:8080");
+        fileProperties = new FileStorageProperties();
+        fileProperties.getStorage().setBasePath(tempDir.toString());
+        fileProperties.getStorage().setProfilePictures("doctors/profiles");
+        fileProperties.getThumbnail().setSize(256);
+        fileProperties.setBackendRootUrl("http://localhost:8080");
+
+        fileStorageService = new FileStorageService(imageValidator, fileProperties);
         fileStorageService.init();
     }
 

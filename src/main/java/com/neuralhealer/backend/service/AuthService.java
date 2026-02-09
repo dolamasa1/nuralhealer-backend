@@ -94,9 +94,6 @@ public class AuthService {
                     .verificationStatus("unverified")
                     .availabilityStatus("offline")
                     .profileCompletionPercentage(initialCompletion)
-                    .platformApproved(false)
-                    .identityVerified(false)
-                    .licenseVerified(false)
                     .rating(0.0)
                     .totalReviews(0)
                     .build();
