@@ -28,7 +28,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
         /**
          * Find active user by email (not soft-deleted).
+         * Eagerly fetches profiles to determine roles during authentication.
          */
+        @org.springframework.data.jpa.repository.EntityGraph(attributePaths = { "doctorProfile", "patientProfile" })
         Optional<User> findByEmailAndDeletedAtIsNull(String email);
 
         /**

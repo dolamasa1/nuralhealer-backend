@@ -35,7 +35,7 @@ public class DoctorProfileController {
     }
 
     @GetMapping("/me/profile")
-    @PreAuthorize("hasRole('DOCTOR')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get my profile", description = "Returns the profile of the currently authenticated doctor")
     public ResponseEntity<DoctorProfileFullDTO> getMyProfile(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(doctorProfileService.getMyProfile(user.getId()));

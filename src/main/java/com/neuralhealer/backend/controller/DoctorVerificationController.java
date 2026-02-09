@@ -33,7 +33,7 @@ public class DoctorVerificationController {
     }
 
     @PostMapping("/me/submit")
-    @PreAuthorize("hasRole('DOCTOR')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Submit verification answers", description = "Submits answers for verification. Sets status to pending.")
     public ResponseEntity<Map<String, String>> submitVerification(
             @AuthenticationPrincipal User user,
@@ -45,7 +45,7 @@ public class DoctorVerificationController {
     }
 
     @GetMapping("/me/answers")
-    @PreAuthorize("hasRole('DOCTOR')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get my verification answers", description = "Returns the answers currently submitted by the authenticated doctor")
     public ResponseEntity<List<DoctorVerificationQuestion>> getMyVerificationAnswers(
             @AuthenticationPrincipal User user) {

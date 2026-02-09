@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -20,32 +21,32 @@
             align-items: center;
             padding: 20px;
         }
-        
+
         .container {
             background: white;
             border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 600px;
             width: 100%;
             padding: 40px;
         }
-        
+
         .header {
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .header h1 {
             color: #667eea;
             font-size: 28px;
             margin-bottom: 8px;
         }
-        
+
         .header p {
             color: #666;
             font-size: 14px;
         }
-        
+
         .status-badge {
             display: inline-block;
             padding: 6px 16px;
@@ -54,26 +55,26 @@
             font-weight: 600;
             margin-top: 12px;
         }
-        
+
         .status-unverified {
             background: #fee;
             color: #c33;
         }
-        
+
         .status-pending {
             background: #fef3cd;
             color: #856404;
         }
-        
+
         .status-verified {
             background: #d4edda;
             color: #155724;
         }
-        
+
         .section {
             margin-bottom: 30px;
         }
-        
+
         .section-title {
             font-size: 18px;
             color: #333;
@@ -81,11 +82,11 @@
             padding-bottom: 8px;
             border-bottom: 2px solid #667eea;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         label {
             display: block;
             font-size: 14px;
@@ -93,11 +94,11 @@
             margin-bottom: 6px;
             font-weight: 500;
         }
-        
+
         .required {
             color: #c33;
         }
-        
+
         input[type="text"],
         input[type="number"] {
             width: 100%;
@@ -107,18 +108,18 @@
             font-size: 14px;
             transition: border-color 0.3s;
         }
-        
+
         input:focus {
             outline: none;
             border-color: #667eea;
         }
-        
+
         .help-text {
             font-size: 12px;
             color: #888;
             margin-top: 4px;
         }
-        
+
         .btn {
             padding: 12px 24px;
             border: none;
@@ -128,66 +129,66 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .btn-primary {
             background: #667eea;
             color: white;
             width: 100%;
         }
-        
+
         .btn-primary:hover {
             background: #5568d3;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
-        
+
         .btn-secondary {
             background: #6c757d;
             color: white;
             margin-right: 10px;
         }
-        
+
         .btn-success {
             background: #28a745;
             color: white;
         }
-        
+
         .btn-danger {
             background: #dc3545;
             color: white;
         }
-        
+
         .actions {
             display: flex;
             gap: 10px;
             margin-top: 20px;
         }
-        
+
         .alert {
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 20px;
             font-size: 14px;
         }
-        
+
         .alert-success {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        
+
         .alert-error {
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        
+
         .alert-info {
             background: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
-        
+
         .answer-display {
             background: #f8f9fa;
             padding: 12px;
@@ -196,7 +197,7 @@
             font-size: 14px;
             color: #333;
         }
-        
+
         .completion-bar {
             height: 8px;
             background: #e9ecef;
@@ -204,25 +205,26 @@
             overflow: hidden;
             margin-top: 12px;
         }
-        
+
         .completion-fill {
             height: 100%;
             background: linear-gradient(90deg, #667eea, #764ba2);
             transition: width 0.5s ease;
         }
-        
+
         .completion-text {
             text-align: center;
             margin-top: 6px;
             font-size: 12px;
             color: #666;
         }
-        
+
         .hidden {
             display: none;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -249,41 +251,6 @@
         <div class="section hidden" id="answerSection">
             <div class="section-title">✍️ Submit Your Answers</div>
             <form id="verificationForm">
-                <div class="form-group">
-                    <label>Medical License Number <span class="required">*</span></label>
-                    <input type="text" id="license_number" required 
-                           placeholder="e.g., EG-MED-2015-789456">
-                    <div class="help-text">Your official medical practice license number</div>
-                </div>
-
-                <div class="form-group">
-                    <label>Year of Graduation <span class="required">*</span></label>
-                    <input type="number" id="graduation_year" required 
-                           placeholder="e.g., 2015" min="1950" max="2025">
-                    <div class="help-text">Year you completed your medical degree</div>
-                </div>
-
-                <div class="form-group">
-                    <label>Medical School/University <span class="required">*</span></label>
-                    <input type="text" id="medical_school" required 
-                           placeholder="e.g., Cairo University Faculty of Medicine">
-                    <div class="help-text">Name of the institution where you obtained your degree</div>
-                </div>
-
-                <div class="form-group">
-                    <label>Board Certification Number</label>
-                    <input type="text" id="specialty_certification" 
-                           placeholder="e.g., PSY-EG-2020-123">
-                    <div class="help-text">Optional: If you have specialty board certification</div>
-                </div>
-
-                <div class="form-group">
-                    <label>Current Practice/Clinic</label>
-                    <input type="text" id="current_practice" 
-                           placeholder="e.g., Mind Wellness Center Cairo">
-                    <div class="help-text">Where you currently practice</div>
-                </div>
-
                 <div class="actions">
                     <button type="button" class="btn btn-secondary" onclick="cancelSubmission()">Cancel</button>
                     <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Verification</button>
@@ -315,58 +282,117 @@
 
     <script>
         // State Management
-        let currentStatus = 'unverified'; // unverified | pending | verified | rejected
+        let currentStatus = 'unverified';
         let submittedAnswers = {};
+        let questions = [];
 
-        // Mock questions (matches your DB structure)
-        const questions = [
-            {
-                key: "license_number",
-                label: "Medical License Number",
-                required: true,
-                type: "text",
-                placeholder: "e.g., EG-MED-2015-789456",
-                helpText: "Your official medical practice license number"
-            },
-            {
-                key: "graduation_year",
-                label: "Year of Graduation",
-                required: true,
-                type: "number",
-                placeholder: "e.g., 2015",
-                helpText: "Year you completed your medical degree"
-            },
-            {
-                key: "medical_school",
-                label: "Medical School/University",
-                required: true,
-                type: "text",
-                placeholder: "e.g., Cairo University Faculty of Medicine",
-                helpText: "Name of the institution where you obtained your degree"
-            },
-            {
-                key: "specialty_certification",
-                label: "Board Certification Number",
-                required: false,
-                type: "text",
-                placeholder: "e.g., PSY-EG-2020-123",
-                helpText: "Optional: If you have specialty board certification"
-            },
-            {
-                key: "current_practice",
-                label: "Current Practice/Clinic",
-                required: false,
-                type: "text",
-                placeholder: "e.g., Mind Wellness Center Cairo",
-                helpText: "Where you currently practice"
-            }
-        ];
+        // Detect API Base
+        const getApiBase = () => {
+            // If running on port 8080 (same as backend), we use the context path
+            if (window.location.port === '8080') return '/api';
+            // If running as a file or different port, point to local backend
+            return 'http://localhost:8080/api';
+        };
+
+        const API_BASE = getApiBase();
+        const AUTH_TOKEN_KEY = 'neuralhealer_token';
 
         // Initialize
-        window.onload = function() {
-            displayQuestions();
-            updateStatus('unverified');
+        window.onload = function () {
+            initializeApp();
         };
+
+        async function initializeApp() {
+            try {
+                // 1. Fetch Questions
+                await fetchQuestions();
+
+                // 2. Fetch Profile to get Status & Completion
+                await fetchProfile();
+
+                // 3. Fetch current answers if pending/verified
+                if (currentStatus !== 'unverified') {
+                    await fetchSubmittedAnswers();
+                }
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showAlert('error', 'Failed to connect to backend. Please check your connection.');
+            }
+        }
+
+        async function fetchQuestions() {
+            const response = await fetch(`${API_BASE}/doctors/verification/questions`, {
+                credentials: 'include'
+            });
+            if (!response.ok) throw new Error('Could not fetch questions');
+
+            const data = await response.json();
+            questions = data.map(q => ({
+                key: q.key,
+                label: q.label,
+                required: q.required,
+                type: q.type || 'text',
+                placeholder: q.placeholder || '',
+                helpText: q.description || ''
+            }));
+
+            displayQuestions();
+            renderAnswerForm();
+        }
+
+        async function fetchProfile() {
+            const token = localStorage.getItem(AUTH_TOKEN_KEY);
+            const headers = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(`${API_BASE}/doctors/me/profile`, {
+                headers: headers,
+                credentials: 'include' // Crucial for HttpOnly cookies
+            });
+
+            if (response.status === 401 || response.status === 403) {
+                // If we get 401/403, it means neither cookie nor token worked
+                showAlert('info', 'Please log in as a doctor to view your full status.');
+                return;
+            }
+
+            if (response.ok) {
+                const profile = await response.json();
+                updateStatus(profile.verificationStatus.toLowerCase());
+                updateCompletion(profile.profileCompletion);
+
+                if (profile.verificationStatus.toLowerCase() === 'pending' ||
+                    profile.verificationStatus.toLowerCase() === 'verified') {
+                    document.getElementById('questionsSection').classList.add('hidden');
+                    document.getElementById('answersSection').classList.remove('hidden');
+                }
+            }
+        }
+
+        async function fetchSubmittedAnswers() {
+            const token = localStorage.getItem(AUTH_TOKEN_KEY);
+            const headers = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(`${API_BASE}/doctors/verification/me/answers`, {
+                headers: headers,
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const answersData = await response.json();
+                // Map API response to our submittedAnswers object
+                submittedAnswers = {};
+                answersData.forEach(ans => {
+                    submittedAnswers[ans.questionKey] = ans.answer;
+                });
+                displaySubmittedAnswers();
+            }
+        }
 
         function displayQuestions() {
             const container = document.getElementById('questionsList');
@@ -378,7 +404,32 @@
             `).join('');
         }
 
+        function renderAnswerForm() {
+            const form = document.getElementById('verificationForm');
+            const actions = form.querySelector('.actions');
+
+            // Generate form fields dynamically based on questions
+            const dynamicFields = questions.map(q => `
+                <div class="form-group">
+                    <label>${q.label} ${q.required ? '<span class="required">*</span>' : ''}</label>
+                    <input type="${q.type}" id="${q.key}" ${q.required ? 'required' : ''} 
+                           placeholder="${q.placeholder}">
+                    <div class="help-text">${q.helpText}</div>
+                </div>
+            `).join('');
+
+            // Insert before actions
+            const content = document.createElement('div');
+            content.innerHTML = dynamicFields;
+            form.insertBefore(content, actions);
+        }
+
         function showAnswerForm() {
+            const token = localStorage.getItem(AUTH_TOKEN_KEY);
+            if (!token) {
+                showAlert('error', 'You must be logged in as a doctor to submit verification.');
+                return;
+            }
             document.getElementById('questionsSection').classList.add('hidden');
             document.getElementById('answerSection').classList.remove('hidden');
         }
@@ -389,39 +440,64 @@
         }
 
         // Handle form submission
-        document.getElementById('verificationForm').addEventListener('submit', function(e) {
+        document.getElementById('verificationForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
-            submittedAnswers = {
-                license_number: document.getElementById('license_number').value,
-                graduation_year: document.getElementById('graduation_year').value,
-                medical_school: document.getElementById('medical_school').value,
-                specialty_certification: document.getElementById('specialty_certification').value,
-                current_practice: document.getElementById('current_practice').value
-            };
 
-            // Simulate API call
-            showAlert('success', '✅ Verification submitted successfully! Status changed to PENDING.');
-            
-            // Update UI
-            updateStatus('pending');
-            displaySubmittedAnswers();
-            
-            // Hide form, show answers
-            document.getElementById('answerSection').classList.add('hidden');
-            document.getElementById('answersSection').classList.remove('hidden');
-            document.getElementById('adminSection').classList.remove('hidden');
+            const token = localStorage.getItem(AUTH_TOKEN_KEY);
+            const answers = {};
+            questions.forEach(q => {
+                const element = document.getElementById(q.key);
+                if (element && element.value) {
+                    answers[q.key] = element.value;
+                }
+            });
+
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/doctors/verification/me/submit`, {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify({ answers })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showAlert('success', `✅ ${data.message}`);
+
+                    submittedAnswers = answers;
+                    updateStatus('pending');
+                    displaySubmittedAnswers();
+
+                    document.getElementById('answerSection').classList.add('hidden');
+                    document.getElementById('answersSection').classList.remove('hidden');
+
+                    // Re-fetch profile to get updated completion
+                    fetchProfile();
+                } else {
+                    const error = await response.json();
+                    showAlert('error', `❌ Submission failed: ${error.message || 'Unknown error'}`);
+                }
+            } catch (err) {
+                showAlert('error', '❌ Network error during submission.');
+            }
         });
 
         function displaySubmittedAnswers() {
             const container = document.getElementById('submittedAnswers');
             container.innerHTML = Object.entries(submittedAnswers)
-                .filter(([key, value]) => value)
                 .map(([key, value]) => {
                     const question = questions.find(q => q.key === key);
+                    const label = question ? question.label : key;
                     return `
                         <div class="form-group">
-                            <label>${question.label}</label>
+                            <label>${label}</label>
                             <div class="answer-display">${value}</div>
                         </div>
                     `;
@@ -430,54 +506,47 @@
 
         function editAnswers() {
             // Pre-fill form with existing answers
-            Object.entries(submittedAnswers).forEach(([key, value]) => {
-                const input = document.getElementById(key);
-                if (input) input.value = value;
+            questions.forEach(q => {
+                const input = document.getElementById(q.key);
+                if (input && submittedAnswers[q.key]) {
+                    input.value = submittedAnswers[q.key];
+                }
             });
 
             document.getElementById('answersSection').classList.add('hidden');
             document.getElementById('answerSection').classList.remove('hidden');
-            document.getElementById('adminSection').classList.add('hidden');
         }
 
-        function approveVerification() {
-            updateStatus('verified');
-            showAlert('success', '🎉 Verification APPROVED! Doctor is now verified on the platform.');
-            document.getElementById('adminSection').classList.add('hidden');
+        // Simulator placeholders for admin actions (would require admin token and different endpoints)
+        async function approveVerification() {
+            showAlert('info', 'Admin approval should be done via Admin Dashboard.');
         }
 
-        function rejectVerification() {
-            updateStatus('rejected');
-            showAlert('error', '❌ Verification REJECTED. Doctor can resubmit with corrections.');
-            document.getElementById('adminSection').classList.add('hidden');
+        async function rejectVerification() {
+            showAlert('info', 'Admin rejection should be done via Admin Dashboard.');
         }
 
         function updateStatus(status) {
             currentStatus = status;
             const badge = document.getElementById('statusBadge');
-            
+
             badge.className = 'status-badge';
-            switch(status) {
+            switch (status) {
                 case 'unverified':
                     badge.classList.add('status-unverified');
                     badge.textContent = 'Status: Unverified';
-                    updateCompletion(20);
                     break;
                 case 'pending':
                     badge.classList.add('status-pending');
                     badge.textContent = 'Status: Pending Review';
-                    updateCompletion(50);
                     break;
                 case 'verified':
                     badge.classList.add('status-verified');
                     badge.textContent = 'Status: ✓ Verified';
-                    updateCompletion(90);
                     break;
-                case 'rejected':
+                default:
                     badge.classList.add('status-unverified');
-                    badge.textContent = 'Status: Rejected';
-                    updateCompletion(20);
-                    break;
+                    badge.textContent = `Status: ${status}`;
             }
         }
 
@@ -489,18 +558,21 @@
         function showAlert(type, message) {
             const container = document.getElementById('alertContainer');
             const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
-            
+            if (type === 'info') alertClass = 'alert-info';
+
             container.innerHTML = `
                 <div class="alert ${alertClass}">
                     ${message}
                 </div>
             `;
 
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                container.innerHTML = '';
-            }, 5000);
+            if (type !== 'error') {
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 5000);
+            }
         }
     </script>
 </body>
+
 </html>
