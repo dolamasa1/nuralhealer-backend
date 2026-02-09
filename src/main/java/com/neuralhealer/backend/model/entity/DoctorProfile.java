@@ -81,7 +81,7 @@ public class DoctorProfile {
     private String availabilityStatus = "offline";
 
     // Metrics
-    @Column(precision = 3, scale = 2)
+    @Column
     @Builder.Default
     private Double rating = 0.00;
 
@@ -112,7 +112,7 @@ public class DoctorProfile {
     private Boolean platformApproved = false;
 
     // Pricing
-    @Column(name = "consultation_fee", precision = 10, scale = 2)
+    @Column(name = "consultation_fee")
     private Double consultationFee;
 
     @CreatedDate
@@ -122,4 +122,17 @@ public class DoctorProfile {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    // Legacy support for older code calling these methods
+    public List<String> getSpecialities() {
+        return specialization != null ? List.of(specialization) : List.of();
+    }
+
+    public Integer getExperienceYears() {
+        return yearsOfExperience;
+    }
+
+    public Boolean getIsVerified() {
+        return "verified".equalsIgnoreCase(verificationStatus) || Boolean.TRUE.equals(platformApproved);
+    }
 }

@@ -628,31 +628,341 @@
       ]
     },
     {
-      "name": "Doctor Directory",
+      "name": "Doctor Profile & Lobby",
       "item": [
         {
-          "name": "Get All Doctors",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
+          "name": "Profile Management",
+          "item": [
+            {
+              "name": "Get My Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/me/profile",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "me",
+                    "profile"
+                  ]
+                }
+              }
             },
-            "description": "",
-            "url": {
-              "raw": "http://localhost:8080/api/doctors",
-              "protocol": "http",
-              "host": [
-                "localhost:8080"
-              ],
-              "path": [
-                "api",
-                "doctors"
-              ],
-              "query": [],
-              "variable": []
+            {
+              "name": "Update Profile",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/me/profile",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "me",
+                    "profile"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Dr.\",\n  \"bio\": \"Experienced psychiatrist specializing in CBT.\",\n  \"specialization\": \"Psychiatrist\",\n  \"yearsOfExperience\": 10,\n  \"locationCity\": \"Cairo\",\n  \"locationCountry\": \"Egypt\",\n  \"consultationFee\": 150.0\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Upload Profile Picture",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/me/profile-picture",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "me",
+                    "profile-picture"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Profile Picture",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/me/profile-picture",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "me",
+                    "profile-picture"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Availability",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/me/availability?status=online",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "me",
+                    "availability"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "online"
+                    }
+                  ]
+                }
+              }
             }
-          }
+          ]
+        },
+        {
+          "name": "Public Lobby",
+          "item": [
+            {
+              "name": "Get Public Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/{{doctor_id}}/profile",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "{{doctor_id}}",
+                    "profile"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Lobby (Filters)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/lobby?specialization=Psychiatrist&sortBy=rating&page=0&size=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "lobby"
+                  ],
+                  "query": [
+                    {
+                      "key": "specialization",
+                      "value": "Psychiatrist"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "rating"
+                    },
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Search Doctors",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/search?q=Sarah&page=0&size=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "search"
+                  ],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "Sarah"
+                    },
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Nearby Doctors",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/nearby?lat=30.0444&lng=31.2357&radius=10",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "nearby"
+                  ],
+                  "query": [
+                    {
+                      "key": "lat",
+                      "value": "30.0444"
+                    },
+                    {
+                      "key": "lng",
+                      "value": "31.2357"
+                    },
+                    {
+                      "key": "radius",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verification Workflow",
+          "item": [
+            {
+              "name": "Get Verification Questions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/verification/questions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "verification",
+                    "questions"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Submit Verification",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"answers\": {\n    \"license_number\": \"MED123456\",\n    \"degree\": \"PhD in Psychiatry\",\n    \"university\": \"Cairo University\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/me/verification/submit",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "me",
+                    "verification",
+                    "submit"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get My Submissions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/api/doctors/me/verification/answers",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:8080"
+                  ],
+                  "path": [
+                    "api",
+                    "doctors",
+                    "me",
+                    "verification",
+                    "answers"
+                  ]
+                }
+              }
+            }
+          ]
         }
       ]
     },
@@ -1585,6 +1895,11 @@
     },
     {
       "key": "notification_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "doctor_id",
       "value": "",
       "type": "default"
     }

@@ -50,6 +50,12 @@ spring:
           timeout: 10000
           writetimeout: 10000
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+      enabled: true
+
 server:
   port: 8080
   servlet:
@@ -124,14 +130,6 @@ file:
     compression-quality: ${IMAGE_COMPRESSION_QUALITY:85}
   thumbnail:
     size: ${THUMBNAIL_SIZE:256}
-
-# Multipart configuration
-spring:
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 5MB
-      enabled: true
 
 # Frontend Configuration
 frontend:
