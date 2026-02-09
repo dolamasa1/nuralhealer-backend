@@ -1,0 +1,133 @@
+package com.neuralhealer.backend.service;
+
+import com.neuralhealer.backend.exception.DoctorNotFoundException;
+
+import com.neuralhealer.backend.mapper.DoctorMapper;
+import com.neuralhealer.backend.model.dto.DoctorProfileFullDTO;
+import com.neuralhealer.backend.model.entity.DoctorProfile;
+
+import com.neuralhealer.backend.model.entity.User;
+import com.neuralhealer.backend.repository.DoctorProfileRepository;
+import com.neuralhealer.backend.service.impl.DoctorProfileServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class DoctorProfileServiceTest {
+
+    @Mock
+    private DoctorProfileRepository doctorProfileRepository;
+
+    @Mock
+    private FileStorageService fileStorageService;
+
+    @Mock
+    private DoctorMapper doctorMapper;
+
+    @InjectMocks
+    private DoctorProfileServiceImpl doctorProfileService;
+
+    private UUID doctorId;
+    private UUID userId;
+    private DoctorProfile doctorProfile;
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        doctorId = UUID.randomUUID();
+        userId = UUID.randomUUID();
+        user = User.builder().id(userId).email("test@example.com").build();
+        doctorProfile = DoctorProfile.builder()
+                .id(doctorId)
+                .user(user)
+                .title("Dr.")
+                .specialization("Psychiatrist")
+                .build();
+    }
+
+    @Test
+    void getDoctorProfile_Success() {
+        when(doctorProfileRepository.findById(doctorId)).thenReturn(Optional.of(doctorProfile));
+        when(fileStorageService.getPublicUrl(any(), eq(false))).thenReturn("http://full.url");
+        when(fileStorageService.getPublicUrl(any(), eq(true))).thenReturn("http://thumb.url");
+
+        DoctorProfileFullDTO expectedDTO = DoctorProfileFullDTO.builder().id(doctorId.toString()).build();
+        when(doctorMapper.toFullDTO(any(), any(), anyString(), anyString())).thenReturn(expectedDTO);
+
+        DoctorProfileFullDTO result = doctorProfileService.getDoctorProfile(doctorId);
+
+        assertNotNull(result);
+        assertEquals(doctorId.toString(), result.getId());
+        verify(doctorProfileRepository).findById(doctorId);
+    }
+
+    @Test
+    void getDoctorProfile_NotFound() {
+        when(doctorProfileRepository.findById(doctorId)).thenReturn(Optional.empty());
+
+        assertThrows(DoctorNotFoundException.class, () -> doctorProfileService.getDoctorProfile(doctorId));
+    }
+
+    @Test
+    void calculateProfileCompletion_Works() {
+        // Bio(10) + Title(10) + Spec(10) + Exp(10) + Loc(10) + Pic(20) + Fee(10) +
+        // Social(10) + Certs(10)
+        doctorProfile.setBio("Some bio"); // 10
+        doctorProfile.setTitle("Dr."); // 10
+        doctorProfile.setSpecialization("Psychiatrist"); // 10
+        doctorProfile.setYearsOfExperience(5); // 10
+        doctorProfile.setLocationCity("Cairo");
+        doctorProfile.setLocationCountry("Egypt"); // 10
+        doctorProfile.setProfilePicturePath("path/to/pic.jpg"); // 20
+        doctorProfile.setConsultationFee(100.0); // 10
+        doctorProfile.setSocialMedia(java.util.Map.of("linkedin", "link")); // 10
+        doctorProfile.setCertificates(java.util.List.of(java.util.Map.of("name", "cert"))); // 10
+
+        when(doctorProfileRepository.findById(doctorId)).thenReturn(Optional.of(doctorProfile));
+
+        int completion = doctorProfileService.calculateProfileCompletion(doctorId);
+
+        assertEquals(100, completion);
+    }
+
+    @Test
+    void uploadProfilePicture_EnforcesRateLimit() {
+        when(doctorProfileRepository.findByUserId(userId)).thenReturn(Optional.of(doctorProfile));
+
+        // First upload succeeds (conceptually, we don't mock the internal timestamp map
+        // easily but we can test the behavior)
+        // We'll just call it and then call it again.
+
+        // Since we can't easily reset/inspect the private lastUploadTimes map without
+        // reflection,
+        // we'll just test that it works on first call and we'll trust the logic for the
+        // second.
+
+        // Mocking MultipartFile
+        org.springframework.web.multipart.MultipartFile file = mock(
+                org.springframework.web.multipart.MultipartFile.class);
+        when(fileStorageService.saveProfilePicture(any(), any())).thenReturn("new/path.jpg");
+        when(fileStorageService.getPublicUrl(any(), eq(false))).thenReturn("http://new.url");
+
+        String url = doctorProfileService.uploadProfilePicture(userId, file);
+
+        assertNotNull(url);
+        assertEquals("http://new.url", url);
+        verify(doctorProfileRepository).save(any());
+
+        // Second upload within 1 minute should fail
+        assertThrows(IllegalStateException.class, () -> doctorProfileService.uploadProfilePicture(userId, file));
+    }
+}

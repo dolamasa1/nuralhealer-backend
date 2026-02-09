@@ -25,6 +25,14 @@ COMMENT ON DATABASE neuralhealer IS 'NeuralHealer - AI-Powered Healthcare Platfo
 -- ENUMS
 -- ================================================================
 
+CREATE TYPE engagement_status AS ENUM ('pending', 'active', 'ended', 'archived', 'cancelled');
+CREATE TYPE verification_type AS ENUM ('start', 'end');
+CREATE TYPE token_status AS ENUM ('pending', 'verified', 'expired', 'cancelled');
+CREATE TYPE subscription_status AS ENUM ('active', 'expired', 'cancelled', 'pending');
+CREATE TYPE chat_sender_type AS ENUM ('patient', 'ai');
+CREATE TYPE job_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'retry');
+CREATE TYPE notification_source AS ENUM ('engagement', 'message', 'system', 'ai', 'reminder', 'admin');
+
 CREATE TYPE engagement_status AS ENUM (
   'pending',
   'active',
@@ -81,6 +89,23 @@ CREATE TYPE notification_source AS ENUM (
 CREATE TABLE engagement_access_rules (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   rule_name VARCHAR(255) UNIQUE NOT NULL,
+  can_view_all_history BOOLEAN DEFAULT false,
+  can_view_current_only BOOLEAN DEFAULT true,
+  can_view_patient_profile BOOLEAN DEFAULT true,
+  can_modify_notes BOOLEAN DEFAULT true,
+  can_message_patient BOOLEAN DEFAULT true,
+  retains_period_access BOOLEAN DEFAULT false,
+  retains_history_access BOOLEAN DEFAULT false,
+  retains_no_access BOOLEAN DEFAULT true,
+  description TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT now(),
+  updated_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE engagement_access_rules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  rule_name VARCHAR(255) UNIQUE NOT NULL,
   
   -- View permissions
   can_view_all_history BOOLEAN DEFAULT false,
@@ -131,19 +156,34 @@ CREATE TABLE users (
 CREATE TABLE doctor_profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
   title VARCHAR(100),
   bio TEXT,
-  specialities JSONB,
-  experience_years INTEGER,
+  specialization VARCHAR(100),                    -- e.g. 'Psychiatrist', 'Therapist'
+  years_of_experience INTEGER,
   certificates JSONB,
+
   location_city VARCHAR(100),
   location_country VARCHAR(100),
-  is_verified BOOLEAN DEFAULT false,
-  verification_data JSONB,
-  
+  latitude DECIMAL(10,8),
+  longitude DECIMAL(11,8),
+
+  -- Enhanced fields from your update
+  profile_picture_path VARCHAR(500),
+  verification_status VARCHAR(50) DEFAULT 'unverified', -- unverified, pending, verified
+  availability_status VARCHAR(50) DEFAULT 'offline',    -- online, offline, busy
+  rating DECIMAL(3,2) DEFAULT 0.00,
+  total_reviews INTEGER DEFAULT 0,
+  profile_completion_percentage INTEGER DEFAULT 0,
+  social_media JSONB,                                   -- {linkedin, twitter, ...}
+  identity_verified BOOLEAN DEFAULT false,
+  license_verified BOOLEAN DEFAULT false,
+  platform_approved BOOLEAN DEFAULT false,
+  consultation_fee DECIMAL(10,2),
+
   created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now(),
-  
+
   CONSTRAINT fk_doctor_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -161,6 +201,30 @@ CREATE TABLE patient_profiles (
   updated_at TIMESTAMP DEFAULT now(),
   
   CONSTRAINT fk_patient_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- ================================================================
+-- 4. NEW: DOCTOR REVIEWS & VERIFICATION
+-- ================================================================
+
+CREATE TABLE doctor_reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  doctor_id UUID NOT NULL REFERENCES doctor_profiles(id) ON DELETE CASCADE,
+  patient_id UUID NOT NULL REFERENCES patient_profiles(id) ON DELETE CASCADE,
+  rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+  comment TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE doctor_verification_questions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  doctor_id UUID NOT NULL REFERENCES doctor_profiles(id) ON DELETE CASCADE,
+  question_key VARCHAR(100) NOT NULL,
+  answer TEXT,
+  verified_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  CONSTRAINT unique_doctor_question UNIQUE (doctor_id, question_key)
 );
 
 -- ================================================================
@@ -500,6 +564,18 @@ CREATE TABLE notifications (
 -- INDEXES FOR PERFORMANCE
 -- ================================================================
 
+CREATE INDEX idx_doctor_profiles_user_id ON doctor_profiles(user_id);
+CREATE INDEX idx_doctor_verification_status ON doctor_profiles(verification_status);
+CREATE INDEX idx_doctor_availability ON doctor_profiles(availability_status);
+CREATE INDEX idx_doctor_specialization ON doctor_profiles(specialization);
+CREATE INDEX idx_doctor_rating ON doctor_profiles(rating DESC);
+CREATE INDEX idx_doctor_location ON doctor_profiles(location_city, location_country);
+CREATE INDEX idx_doctor_coordinates ON doctor_profiles(latitude, longitude)
+    WHERE latitude IS NOT NULL AND longitude IS NOT NULL;
+
+CREATE INDEX idx_verification_questions_doctor ON doctor_verification_questions(doctor_id);
+CREATE INDEX idx_verification_questions_verified ON doctor_verification_questions(verified_at);
+
 -- Fast lookup for pending email jobs
 CREATE INDEX IF NOT EXISTS idx_queue_pending 
 ON message_queues(job_type, status, created_at) 
@@ -751,6 +827,22 @@ ON CONFLICT (template_key, language_code, recipient_context) DO UPDATE SET
     updated_at = NOW();
 
 -- 15. SYSTEM SETTINGS FOR NOTIFICATIONS
+
+INSERT INTO system_settings (setting_key, setting_value, description, is_public) VALUES
+('doctor_verification_questions',
+ '[
+   {"key": "license_number", "label": "Medical License Number", "required": true, "type": "text"},
+   {"key": "graduation_year", "label": "Year of Graduation", "required": true, "type": "number"},
+   {"key": "medical_school", "label": "Medical School / University", "required": false, "type": "text"},
+   {"key": "specialty_certification", "label": "Board Certification Number", "required": false, "type": "text"},
+   {"key": "current_practice", "label": "Current Practice/Clinic Name", "required": false, "type": "text"}
+ ]'::jsonb,
+ 'List of verification questions for doctors',
+ false)
+ON CONFLICT (setting_key) DO UPDATE SET
+  setting_value = EXCLUDED.setting_value,
+  updated_at = NOW();
+
 INSERT INTO system_settings (setting_key, setting_value, description, is_public) VALUES
 ('notification_active_user_threshold_days', '3', 'Days of inactivity before re-engagement notification for active users', false),
 ('notification_inactive_warning_days', '14', 'Days of inactivity before warning notification', false),
@@ -763,8 +855,92 @@ CREATE INDEX idx_users_activity_status ON users(activity_status, last_login_at);
 COMMENT ON COLUMN users.activity_status IS 'User activity life-cycle status (active, dormant, inactive)';
 
 -- ================================================================
--- TRIGGERS
+-- FUNCTIONS & TRIGGERS
 -- ================================================================
+-- 1. Auto-update doctor rating
+CREATE OR REPLACE FUNCTION update_doctor_rating()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_avg_rating DECIMAL(3,2);
+    v_total_reviews INTEGER;
+BEGIN
+    IF (TG_OP = 'DELETE') THEN
+        SELECT COALESCE(ROUND(AVG(rating)::numeric, 2), 0.00), COUNT(*)
+        INTO v_avg_rating, v_total_reviews
+        FROM doctor_reviews WHERE doctor_id = OLD.doctor_id;
+        
+        UPDATE doctor_profiles 
+        SET rating = v_avg_rating, total_reviews = v_total_reviews, updated_at = NOW()
+        WHERE id = OLD.doctor_id;
+    ELSE
+        SELECT COALESCE(ROUND(AVG(rating)::numeric, 2), 0.00), COUNT(*)
+        INTO v_avg_rating, v_total_reviews
+        FROM doctor_reviews WHERE doctor_id = NEW.doctor_id;
+        
+        UPDATE doctor_profiles 
+        SET rating = v_avg_rating, total_reviews = v_total_reviews, updated_at = NOW()
+        WHERE id = NEW.doctor_id;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_doctor_rating
+AFTER INSERT OR UPDATE OR DELETE ON doctor_reviews
+FOR EACH ROW EXECUTE FUNCTION update_doctor_rating();
+
+-- 2. Profile completion percentage
+CREATE OR REPLACE FUNCTION calculate_profile_completion(p_doctor_id UUID)
+RETURNS INTEGER AS $$
+DECLARE
+    v_score INTEGER := 0;
+    v_doctor RECORD;
+BEGIN
+    SELECT * INTO v_doctor FROM doctor_profiles WHERE id = p_doctor_id;
+    IF NOT FOUND THEN RETURN 0; END IF;
+
+    -- Basic info (40)
+    IF v_doctor.title IS NOT NULL AND v_doctor.title != '' THEN v_score := v_score + 10; END IF;
+    IF v_doctor.bio IS NOT NULL AND LENGTH(v_doctor.bio) > 50 THEN v_score := v_score + 15; END IF;
+    IF v_doctor.specialization IS NOT NULL THEN v_score := v_score + 10; END IF;
+    IF v_doctor.years_of_experience IS NOT NULL AND v_doctor.years_of_experience > 0 THEN v_score := v_score + 5; END IF;
+
+    -- Visual & Professional (30)
+    IF v_doctor.profile_picture_path IS NOT NULL THEN v_score := v_score + 20; END IF;
+    IF v_doctor.certificates IS NOT NULL AND jsonb_array_length(v_doctor.certificates) > 0 THEN v_score := v_score + 10; END IF;
+
+    -- Verification (30)
+    IF v_doctor.identity_verified = true THEN v_score := v_score + 10; END IF;
+    IF v_doctor.license_verified = true THEN v_score := v_score + 10; END IF;
+    IF v_doctor.platform_approved = true THEN v_score := v_score + 10; END IF;
+
+    RETURN v_score;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_profile_completion()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.profile_completion_percentage := calculate_profile_completion(NEW.id);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_profile_completion
+BEFORE UPDATE ON doctor_profiles
+FOR EACH ROW
+WHEN (
+    OLD.title IS DISTINCT FROM NEW.title OR
+    OLD.bio IS DISTINCT FROM NEW.bio OR
+    OLD.specialization IS DISTINCT FROM NEW.specialization OR
+    OLD.years_of_experience IS DISTINCT FROM NEW.years_of_experience OR
+    OLD.profile_picture_path IS DISTINCT FROM NEW.profile_picture_path OR
+    OLD.certificates IS DISTINCT FROM NEW.certificates OR
+    OLD.identity_verified IS DISTINCT FROM NEW.identity_verified OR
+    OLD.license_verified IS DISTINCT FROM NEW.license_verified OR
+    OLD.platform_approved IS DISTINCT FROM NEW.platform_approved
+)
+EXECUTE FUNCTION update_profile_completion();
 
 -- Auto-update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()

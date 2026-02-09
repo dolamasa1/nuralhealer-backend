@@ -97,7 +97,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"question\": \"How can I manage stress?\"}",
+                  "raw": "{\"question\": \"I feel sad\", \"country\": \"egypt\"}",
                   "options": {
                     "raw": {
                       "language": "json"

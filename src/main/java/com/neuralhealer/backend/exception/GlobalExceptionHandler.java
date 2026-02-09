@@ -9,9 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -231,6 +232,81 @@ public class GlobalExceptionHandler {
                                 .status(HttpStatus.FORBIDDEN)
                                 .body(ErrorResponse.of(
                                                 HttpStatus.FORBIDDEN.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
+
+        /**
+         * Handle file size exceeded exceptions.
+         */
+        @ExceptionHandler(FileSizeExceededException.class)
+        public ResponseEntity<ErrorResponse> handleFileSizeExceeded(
+                        FileSizeExceededException ex,
+                        HttpServletRequest request) {
+                return ResponseEntity
+                                .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.PAYLOAD_TOO_LARGE.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
+
+        /**
+         * Handle Spring's default max upload size exceeded exception.
+         */
+        @ExceptionHandler(MaxUploadSizeExceededException.class)
+        public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceeded(
+                        MaxUploadSizeExceededException ex,
+                        HttpServletRequest request) {
+                return ResponseEntity
+                                .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.PAYLOAD_TOO_LARGE.value(),
+                                                "File size exceeds the maximum allowed limit",
+                                                request.getRequestURI()));
+        }
+
+        /**
+         * Handle invalid image format exceptions.
+         */
+        @ExceptionHandler(InvalidImageFormatException.class)
+        public ResponseEntity<ErrorResponse> handleInvalidImageFormat(
+                        InvalidImageFormatException ex,
+                        HttpServletRequest request) {
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.BAD_REQUEST.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
+
+        /**
+         * Handle invalid aspect ratio exceptions.
+         */
+        @ExceptionHandler(InvalidAspectRatioException.class)
+        public ResponseEntity<ErrorResponse> handleInvalidAspectRatio(
+                        InvalidAspectRatioException ex,
+                        HttpServletRequest request) {
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.BAD_REQUEST.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
+
+        /**
+         * Handle profile picture not found exceptions.
+         */
+        @ExceptionHandler(ProfilePictureNotFoundException.class)
+        public ResponseEntity<ErrorResponse> handleProfilePictureNotFound(
+                        ProfilePictureNotFoundException ex,
+                        HttpServletRequest request) {
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.NOT_FOUND.value(),
                                                 ex.getMessage(),
                                                 request.getRequestURI()));
         }

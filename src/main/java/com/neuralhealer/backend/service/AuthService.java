@@ -79,14 +79,34 @@ public class AuthService {
 
         // Create role-specific profile
         if (request.role() == UserRole.DOCTOR) {
+            int initialCompletion = 0;
+            if (Boolean.TRUE.equals(request.quickSetup())) {
+                if (org.springframework.util.StringUtils.hasText(request.title()))
+                    initialCompletion += 10;
+                if (org.springframework.util.StringUtils.hasText(request.specialization()))
+                    initialCompletion += 10;
+            }
+
             DoctorProfile doctorProfile = DoctorProfile.builder()
                     .user(user)
-                    .isVerified(false)
+                    .title(Boolean.TRUE.equals(request.quickSetup()) ? request.title() : null)
+                    .specialization(Boolean.TRUE.equals(request.quickSetup()) ? request.specialization() : null)
+                    .verificationStatus("unverified")
+                    .availabilityStatus("offline")
+                    .profileCompletionPercentage(initialCompletion)
+                    .platformApproved(false)
+                    .identityVerified(false)
+                    .licenseVerified(false)
+                    .rating(0.0)
+                    .totalReviews(0)
                     .build();
+
             doctorProfileRepository.save(doctorProfile);
             user.setDoctorProfile(doctorProfile);
-            log.info("Created doctor profile for user: {}", user.getId());
+            log.info("Created enhanced doctor profile for user: {} (QuickSetup: {})", user.getId(),
+                    request.quickSetup());
         } else if (request.role() == UserRole.PATIENT) {
+
             PatientProfile patientProfile = PatientProfile.builder()
                     .user(user)
                     .build();

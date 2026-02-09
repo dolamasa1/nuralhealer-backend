@@ -1,7 +1,8 @@
 spring:
   cache:
     type: simple
-    cache-names: aiHealthCache
+    cache-names: aiHealthCache, doctorLobbyCache
+
   application:
     name: neuralhealer-backend
   
@@ -110,7 +111,30 @@ ai:
     ask-endpoint: /query
     timeout-seconds: ${AI_SERVICE_TIMEOUT_SECONDS:90}
 
+# File Storage Configuration
+file:
+  storage:
+    base-path: ${FILE_STORAGE_BASE_PATH}
+    profile-pictures: ${PROFILE_PICTURES_PATH:doctors/profiles}
+  max-size-mb: ${MAX_FILE_SIZE_MB:5}
+  allowed-formats: ${ALLOWED_IMAGE_FORMATS:jpg,jpeg,png,webp}
+  image:
+    min-dimension: ${PROFILE_IMAGE_MIN_DIMENSION:512}
+    max-dimension: ${PROFILE_IMAGE_MAX_DIMENSION:2048}
+    compression-quality: ${IMAGE_COMPRESSION_QUALITY:85}
+  thumbnail:
+    size: ${THUMBNAIL_SIZE:256}
+
+# Multipart configuration
+spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+      enabled: true
+
 # Frontend Configuration
 frontend:
   url: ${FRONTEND_URL:http://localhost:3000}
+
 

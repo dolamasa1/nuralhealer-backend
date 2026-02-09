@@ -44,13 +44,11 @@ public class DoctorProfile {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
-    // JSONB column for specialities array
-    @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private List<String> specialities;
+    @Column(length = 100)
+    private String specialization;
 
-    @Column(name = "experience_years")
-    private Integer experienceYears;
+    @Column(name = "years_of_experience")
+    private Integer yearsOfExperience;
 
     // JSONB column for certificates array
     @Type(JsonType.class)
@@ -63,14 +61,59 @@ public class DoctorProfile {
     @Column(name = "location_country", length = 100)
     private String locationCountry;
 
-    @Column(name = "is_verified")
-    @Builder.Default
-    private Boolean isVerified = false;
+    @Column
+    private Double latitude;
 
-    // JSONB column for verification data
+    @Column
+    private Double longitude;
+
+    // Profile picture
+    @Column(name = "profile_picture_path", length = 500)
+    private String profilePicturePath;
+
+    // Verification and status
+    @Column(name = "verification_status", length = 50)
+    @Builder.Default
+    private String verificationStatus = "unverified";
+
+    @Column(name = "availability_status", length = 50)
+    @Builder.Default
+    private String availabilityStatus = "offline";
+
+    // Metrics
+    @Column(precision = 3, scale = 2)
+    @Builder.Default
+    private Double rating = 0.00;
+
+    @Column(name = "total_reviews")
+    @Builder.Default
+    private Integer totalReviews = 0;
+
+    @Column(name = "profile_completion_percentage")
+    @Builder.Default
+    private Integer profileCompletionPercentage = 0;
+
+    // Social media (JSONB)
     @Type(JsonType.class)
-    @Column(name = "verification_data", columnDefinition = "jsonb")
-    private Map<String, Object> verificationData;
+    @Column(name = "social_media", columnDefinition = "jsonb")
+    private Map<String, String> socialMedia;
+
+    // Verification details
+    @Column(name = "identity_verified")
+    @Builder.Default
+    private Boolean identityVerified = false;
+
+    @Column(name = "license_verified")
+    @Builder.Default
+    private Boolean licenseVerified = false;
+
+    @Column(name = "platform_approved")
+    @Builder.Default
+    private Boolean platformApproved = false;
+
+    // Pricing
+    @Column(name = "consultation_fee", precision = 10, scale = 2)
+    private Double consultationFee;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)

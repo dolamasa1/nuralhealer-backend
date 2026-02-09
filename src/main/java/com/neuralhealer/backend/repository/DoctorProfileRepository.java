@@ -11,7 +11,8 @@ import java.util.UUID;
  * Repository for DoctorProfile entity operations.
  */
 @Repository
-public interface DoctorProfileRepository extends JpaRepository<DoctorProfile, UUID> {
+public interface DoctorProfileRepository extends JpaRepository<DoctorProfile, UUID>,
+        org.springframework.data.jpa.repository.JpaSpecificationExecutor<DoctorProfile> {
 
     /**
      * Find doctor profile by user ID.
