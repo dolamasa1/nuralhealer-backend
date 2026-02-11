@@ -46,16 +46,22 @@ Endpoints for managing doctor profiles, browsing the public lobby, and handling 
 ---
 
 ## 🛡️ Verification
-*Authenticated (ROLE_DOCTOR / Public for questions)*
+*Authenticated (Any User)* for testing purposes; logically `ROLE_DOCTOR`.
 
 ### Get Verification Questions
 - **GET** `/api/doctors/verification/questions`
 - **Response**: List of objects `[{key, label, type, required}]`
 
 ### Submit Verification
-- **POST** `/api/doctors/me/submit`
-- **Body**: `VerificationSubmissionRequest` (Map of answers)
+- **POST** `/api/doctors/verification/me/submit`
+- **Body**: `VerificationSubmissionRequest`
+- **Fields**: `answers` (Map<String, String>)
 - **Status**: Sets profile to `pending` review.
+
+### Get My Verification Answers
+- **GET** `/api/doctors/verification/me/answers`
+- **Response**: List of `DoctorVerificationQuestion`
+- **Note**: Allows doctors to view their previously submitted answers.
 
 ---
 
