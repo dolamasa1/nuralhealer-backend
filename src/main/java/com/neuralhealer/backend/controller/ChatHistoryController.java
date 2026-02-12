@@ -62,7 +62,8 @@ public class ChatHistoryController {
         // For efficiency, we could check this in the repository, but for now we'll
         // filter or rely on ID match
         // A robust check:
-        List<AiChatSession> sessions = chatStorageService.getUserSessions(user.getId());
+        UUID id = user.getPatientProfile() != null ? user.getPatientProfile().getId() : user.getId();
+        List<AiChatSession> sessions = chatStorageService.getUserSessions(id);
         boolean isOwner = sessions.stream().anyMatch(s -> s.getId().equals(sessionId));
 
         if (!isOwner) {
@@ -81,7 +82,8 @@ public class ChatHistoryController {
         // Verify ownership
         // Optimization: Create specific existsBy method in repo later if needed.
         // For now, reusing the list check is acceptable for N < 100 sessions
-        List<AiChatSession> sessions = chatStorageService.getUserSessions(user.getId());
+        UUID id = user.getPatientProfile() != null ? user.getPatientProfile().getId() : user.getId();
+        List<AiChatSession> sessions = chatStorageService.getUserSessions(id);
         boolean isOwner = sessions.stream().anyMatch(s -> s.getId().equals(sessionId));
 
         if (!isOwner) {
