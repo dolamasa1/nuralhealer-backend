@@ -150,6 +150,26 @@ public class DirectEmailService {
     }
 
     /**
+     * Send an engagement refreshed token notification.
+     */
+    public void sendEngagementRefreshedToken(String email, String recipientName, String initiatorName, String token,
+            int expiryMinutes) {
+        try {
+            String subject = "New Verification Code - Engagement Refreshed";
+            String verificationUrl = frontendBaseUrl + "/verify-engagement?token=" + token;
+            String htmlBody = renderEngagementRefreshedTemplate(recipientName, initiatorName, token, expiryMinutes,
+                    verificationUrl);
+
+            gmailSmtpService.sendEmail(email, subject, htmlBody);
+            log.info("Engagement refreshed token email sent to: {}", email);
+
+        } catch (Exception e) {
+            log.error("Error sending engagement refreshed token email to {}: {}", email, e.getMessage());
+            throw new EmailSendException(e.getMessage(), e);
+        }
+    }
+
+    /**
      * Build the password reset link.
      */
     private String buildResetLink(String resetToken) {
@@ -218,12 +238,25 @@ public class DirectEmailService {
     }
 
     private String renderEngagementVerificationTemplate(String recipientName, String initiatorName, String token) {
-        String template = loadTemplate("engagment-verification.html");
+        String template = loadTemplate("engagement-started.html"); // Use existing matching structure or
+                                                                   // engagment-verification.html
+
+        return template
+                .replace("{USER_NAME}", recipientName)
+                .replace("{DOCTOR_NAME}", initiatorName)
+                .replace("{TOKEN}", token);
+    }
+
+    private String renderEngagementRefreshedTemplate(String recipientName, String initiatorName, String token,
+            int expiryMinutes, String verificationUrl) {
+        String template = loadTemplate("engagement-refreshed.html");
 
         return template
                 .replace("{RECIPIENT_NAME}", recipientName)
                 .replace("{INITIATOR_NAME}", initiatorName)
-                .replace("{TOKEN}", token);
+                .replace("{NEW_TOKEN}", token)
+                .replace("{EXPIRY_MINUTES}", String.valueOf(expiryMinutes))
+                .replace("{VERIFICATION_URL}", verificationUrl);
     }
 
     /**

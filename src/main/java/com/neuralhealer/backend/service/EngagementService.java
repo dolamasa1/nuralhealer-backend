@@ -552,6 +552,24 @@ public class EngagementService {
         });
 
         EngagementVerificationToken newToken = verificationService.generateStartToken(engagement);
+
+        // Send Email Notification to the counter-party (the one who needs to verify)
+        User recipient = engagement.getInitiatedBy().equals("doctor")
+                ? engagement.getPatient().getUser()
+                : engagement.getDoctor().getUser();
+
+        User initiator = engagement.getInitiatedBy().equals("doctor")
+                ? engagement.getDoctor().getUser()
+                : engagement.getPatient().getUser();
+
+        directEmailService.sendEngagementRefreshedToken(
+                recipient.getEmail(),
+                recipient.getFirstName(),
+                initiator.getFirstName(),
+                newToken.getToken(),
+                3 // Assuming 3 minutes based on VerificationService constant
+        );
+
         return mapTokenToResponse(newToken, true);
     }
 
