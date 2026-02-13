@@ -27,7 +27,7 @@ public class EngagementController {
     private final EngagementMessageService messageService;
 
     @PostMapping("/initiate")
-    @Operation(summary = "Initiate a new engagement (Doctor only)")
+    @Operation(summary = "Initiate a new engagement (Doctor or Patient)")
     public ResponseEntity<StartEngagementResponse> initiate(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody StartEngagementRequest request) {
@@ -35,7 +35,7 @@ public class EngagementController {
     }
 
     @PostMapping("/verify-start")
-    @Operation(summary = "Verify engagement start with token (Patient)")
+    @Operation(summary = "Verify engagement start with token (Doctor or Patient)")
     public ResponseEntity<EngagementResponse> verifyStart(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody VerifyEngagementRequest request) {
@@ -57,7 +57,7 @@ public class EngagementController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Hard delete a PENDING engagement (Doctor only)")
+    @Operation(summary = "Hard delete a PENDING engagement (Involved parties only)")
     public ResponseEntity<Void> deleteEngagement(
             @AuthenticationPrincipal User user,
             @PathVariable UUID id) {
@@ -75,7 +75,7 @@ public class EngagementController {
     }
 
     @PostMapping("/{id}/refresh-token")
-    @Operation(summary = "Refresh START token for a pending engagement (Doctor only)")
+    @Operation(summary = "Refresh START token for a pending engagement (Initiator only)")
     public ResponseEntity<TokenResponse> refreshToken(
             @AuthenticationPrincipal User user,
             @PathVariable UUID id) {
@@ -83,7 +83,7 @@ public class EngagementController {
     }
 
     @GetMapping("/{id}/token")
-    @Operation(summary = "Get current valid START token (Doctor only)")
+    @Operation(summary = "Get current valid START token (Initiator only)")
     public ResponseEntity<TokenResponse> getCurrentToken(
             @AuthenticationPrincipal User user,
             @PathVariable UUID id) {

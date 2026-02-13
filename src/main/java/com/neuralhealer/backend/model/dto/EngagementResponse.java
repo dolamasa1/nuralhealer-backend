@@ -7,6 +7,7 @@ public record EngagementResponse(
                 UUID id,
                 String engagementId,
                 String status,
+                String initiatedBy,
                 UserSummary doctor,
                 UserSummary patient,
                 String accessRule,

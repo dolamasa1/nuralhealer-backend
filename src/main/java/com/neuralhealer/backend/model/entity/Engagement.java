@@ -55,6 +55,11 @@ public class Engagement {
     @JoinColumn(name = "access_rule_name", referencedColumnName = "rule_name")
     private EngagementAccessRule accessRule;
 
+    // Track who initiated the engagement: "doctor" or "patient"
+    @Column(name = "initiated_by", nullable = false, length = 10)
+    @Builder.Default
+    private String initiatedBy = "doctor";
+
     @Column(name = "engagement_type", length = 50)
     private String engagementType;
 
@@ -91,7 +96,7 @@ public class Engagement {
     // --- Lifecycle Helpers ---
 
     /**
-     * Activates the engagement when patient verifies the token.
+     * Activates the engagement when the counter-party verifies the token.
      */
     public void activate() {
         this.status = EngagementStatus.active;

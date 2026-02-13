@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Engagement Request</title>
+</head>
+
+<body
+    style="margin: 0; padding: 0; background-color: #1A1625; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+        style="background-color: #1A1625; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" border="0"
+                    style="max-width: 600px; width: 100%; background-color: #1C1A2B; border: 1px solid #3F3651; border-radius: 16px;">
+                    <!-- Header Section -->
+                    <tr>
+                        <td style="padding: 48px 48px 24px 48px; text-align: center;">
+                            <h1
+                                style="margin: 0 0 8px 0; color: #ECE8F5; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
+                                New Engagement Request</h1>
+                        </td>
+                    </tr>
+
+                    <!-- Subtitle -->
+                    <tr>
+                        <td style="padding: 0 48px 32px 48px; text-align: center;">
+                            <p style="margin: 0; color: #C5B8D9; font-size: 18px; line-height: 1.6;">Dear Dr.
+                                {DOCTOR_NAME},</p>
+                        </td>
+                    </tr>
+
+                    <!-- Info Box -->
+                    <tr>
+                        <td style="padding: 0 48px 32px 48px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                style="background-color: #241D30; border: 1px solid #3F3651; border-radius: 12px;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <p
+                                            style="margin: 0 0 16px 0; color: #D8CFE8; font-size: 16px; line-height: 1.7;">
+                                            <strong style="color: #ECE8F5;">{PATIENT_NAME}</strong> has requested to
+                                            start an engagement with you.
+                                        </p>
+
+                                        <div style="border-top: 1px solid #3F3651; padding-top: 16px;">
+                                            <p
+                                                style="margin: 0 0 8px 0; color: #A89EC0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                                Requested Access Level</p>
+                                            <p style="margin: 0 0 16px 0; color: #ECE8F5; font-size: 16px;">
+                                                {ACCESS_RULE}</p>
+
+                                            <p
+                                                style="margin: 0 0 8px 0; color: #A89EC0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                                Patient's Message</p>
+                                            <p
+                                                style="margin: 0; color: #D8CFE8; font-size: 15px; line-height: 1.6; font-style: italic;">
+                                                "{PATIENT_MESSAGE}"</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Verification Token Section -->
+                    <tr>
+                        <td style="padding: 0 48px 40px 48px; text-align: center;">
+                            <p style="margin: 0 0 16px 0; color: #C5B8D9; font-size: 16px;">To accept this request,
+                                please use the following verification token:</p>
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                style="background-color: #161421; border: 2px dashed #667eea; border-radius: 12px;">
+                                <tr>
+                                    <td style="padding: 20px; text-align: center;">
+                                        <span
+                                            style="font-family: 'Courier New', monospace; font-size: 32px; font-weight: 700; color: #667eea; letter-spacing: 4px;">{TOKEN}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="margin: 12px 0 0 0; color: #A89EC0; font-size: 13px;">This token expires in 24
+                                hours.</p>
+                        </td>
+                    </tr>
+
+                    <!-- CTA Button -->
+                    <tr>
+                        <td style="padding: 0 48px 48px 48px; text-align: center;">
+                            <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td align="center"
+                                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px;">
+                                        <a href="{VERIFICATION_LINK}"
+                                            style="display: inline-block; padding: 14px 32px; color: #ECE8F5; font-size: 16px; font-weight: 600; text-decoration: none;">Verify
+                                            and Accept Request</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 24px 48px; text-align: center; border-top: 1px solid #3F3651;">
+                            <p style="margin: 0; color: #A89EC0; font-size: 14px; line-height: 1.6;">If you didn't
+                                expect this request, you can simply ignore this email or cancel the request from your
+                                dashboard.</p>
+                            <p style="margin: 8px 0 0 0; color: #A89EC0; font-size: 12px;">© 2026 Neural Healer. All
+                                rights reserved.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

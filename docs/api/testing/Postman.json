@@ -1113,7 +1113,7 @@
             "auth": {
               "type": "noauth"
             },
-            "description": "",
+            "description": "Get current valid START token for a pending engagement. Restricted to the original initiator.",
             "url": {
               "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/token",
               "protocol": "http",
@@ -1139,7 +1139,7 @@
             "auth": {
               "type": "noauth"
             },
-            "description": "",
+            "description": "Initiate a new engagement. Can be called by a doctor (providing patientId) or a patient (providing doctorId). Patients can optionally provide a message.",
             "url": {
               "raw": "http://localhost:8080/api/engagements/initiate",
               "protocol": "http",
@@ -1156,7 +1156,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\"patientId\": \"{{patient_id}}\", \"accessRuleName\": \"FULL_ACCESS\"}",
+              "raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"doctorId\": \"{{doctor_id}}\",\n  \"message\": \"I would like to engage with you regarding my treatment plan.\",\n  \"accessRuleName\": \"FULL_ACCESS\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1173,7 +1173,7 @@
             "auth": {
               "type": "noauth"
             },
-            "description": "",
+            "description": "Refresh the START token. Restricted to the original initiator.",
             "url": {
               "raw": "http://localhost:8080/api/engagements/{{engagement_id}}/refresh-token",
               "protocol": "http",
@@ -1297,14 +1297,14 @@
           }
         },
         {
-          "name": "Verify Start (Patient)",
+          "name": "Verify Start",
           "request": {
             "method": "POST",
             "header": [],
             "auth": {
               "type": "noauth"
             },
-            "description": "",
+            "description": "Verify and activate the engagement using the 2FA token. The verifier must be the party NOT who initiated the engagement.",
             "url": {
               "raw": "http://localhost:8080/api/engagements/verify-start",
               "protocol": "http",

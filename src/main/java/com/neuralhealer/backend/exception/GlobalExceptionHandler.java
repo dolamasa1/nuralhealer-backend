@@ -162,6 +162,25 @@ public class GlobalExceptionHandler {
         }
 
         /**
+         * Handle bad request exceptions (invalid client requests).
+         * Returns HTTP 400 Bad Request.
+         */
+        @ExceptionHandler(BadRequestException.class)
+        public ResponseEntity<ErrorResponse> handleBadRequest(
+                        BadRequestException ex,
+                        HttpServletRequest request) {
+
+                log.debug("Bad request: {}", ex.getMessage());
+
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(ErrorResponse.of(
+                                                HttpStatus.BAD_REQUEST.value(),
+                                                ex.getMessage(),
+                                                request.getRequestURI()));
+        }
+
+        /**
          * Handle conflict exceptions (business rule violations).
          * Returns HTTP 409 Conflict.
          */

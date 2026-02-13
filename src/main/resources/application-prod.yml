@@ -3,10 +3,20 @@ spring:
     url: ${GLOBAL_DB_URL}
     username: ${GLOBAL_DB_USERNAME}
     password: ${GLOBAL_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 4 # Limited for Supabase Session Mode
+      minimum-idle: 2 # Keep 2 warm connections ready
+      connection-timeout: 5000 # Fail fast (5 seconds)
+      idle-timeout: 600000 # 10 minutes - prevents constant recycling
+      max-lifetime: 1800000 # 30 minutes
+      # No connection-test-query - Hikari's built-in checks are sufficient
   jpa:
     hibernate:
       ddl-auto: none # Never auto-migrate in prod
     show-sql: false
+  sql:
+    init:
+      mode: never # Ensure SQL init doesn't run in production
 
 neuralhealer:
   security:

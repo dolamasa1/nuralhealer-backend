@@ -93,6 +93,63 @@ public class DirectEmailService {
     }
 
     /**
+     * Send an engagement request email from a patient to a doctor.
+     */
+    public void sendEngagementRequestFromPatient(String email, String doctorName, String patientName, String token,
+            String accessRule, String message, String engagementCode) {
+        try {
+            String subject = "New Engagement Request from " + patientName;
+            String verificationLink = frontendBaseUrl + "/verify-engagement?token=" + token;
+            String htmlBody = renderEngagementRequestTemplate(doctorName, patientName, token, accessRule, message,
+                    verificationLink);
+
+            gmailSmtpService.sendEmail(email, subject, htmlBody);
+            log.info("Engagement request email sent to doctor: {}", email);
+
+        } catch (Exception e) {
+            log.error("Error sending engagement request email to {}: {}", email, e.getMessage());
+            throw new EmailSendException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Send an engagement activation confirmation to a patient.
+     */
+    public void sendEngagementActivatedToPatient(String email, String patientName, String doctorName,
+            String engagementCode, String accessRule, String activationDate) {
+        try {
+            String subject = "✅ Engagement Request Accepted - Dr. " + doctorName;
+            String dashboardLink = frontendBaseUrl + "/dashboard";
+            String htmlBody = renderEngagementActivatedTemplate(patientName, doctorName, engagementCode, accessRule,
+                    activationDate, dashboardLink);
+
+            gmailSmtpService.sendEmail(email, subject, htmlBody);
+            log.info("Engagement activation email sent to patient: {}", email);
+
+        } catch (Exception e) {
+            log.error("Error sending engagement activation email to {}: {}", email, e.getMessage());
+            throw new EmailSendException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Send a general engagement verification token.
+     */
+    public void sendEngagementToken(String email, String recipientName, String initiatorName, String token) {
+        try {
+            String subject = "Engagement Verification Code - NeuralHealer";
+            String htmlBody = renderEngagementVerificationTemplate(recipientName, initiatorName, token);
+
+            gmailSmtpService.sendEmail(email, subject, htmlBody);
+            log.info("Engagement token email sent to: {}", email);
+
+        } catch (Exception e) {
+            log.error("Error sending engagement token email to {}: {}", email, e.getMessage());
+            throw new EmailSendException(e.getMessage(), e);
+        }
+    }
+
+    /**
      * Build the password reset link.
      */
     private String buildResetLink(String resetToken) {
@@ -132,6 +189,41 @@ public class DirectEmailService {
                 .replace("{PERSONAL_ACKNOWLEDGMENT}", acknowledgment)
                 .replace("{MILESTONE_MESSAGE}", milestone)
                 .replace("{EXCLUSIVE_NOTE}", note);
+    }
+
+    private String renderEngagementRequestTemplate(String doctorName, String patientName, String token,
+            String accessRule, String message, String verificationLink) {
+        String template = loadTemplate("engagement-request-from-patient.html");
+
+        return template
+                .replace("{DOCTOR_NAME}", doctorName)
+                .replace("{PATIENT_NAME}", patientName)
+                .replace("{TOKEN}", token)
+                .replace("{ACCESS_RULE}", accessRule)
+                .replace("{PATIENT_MESSAGE}", message != null ? message : "No message provided.")
+                .replace("{VERIFICATION_LINK}", verificationLink);
+    }
+
+    private String renderEngagementActivatedTemplate(String patientName, String doctorName, String engagementCode,
+            String accessRule, String activationDate, String dashboardLink) {
+        String template = loadTemplate("engagement-activated-by-doctor.html");
+
+        return template
+                .replace("{PATIENT_NAME}", patientName)
+                .replace("{DOCTOR_NAME}", doctorName)
+                .replace("{ENGAGEMENT_CODE}", engagementCode)
+                .replace("{ACCESS_RULE}", accessRule)
+                .replace("{ACTIVATION_DATE}", activationDate)
+                .replace("{DASHBOARD_LINK}", dashboardLink);
+    }
+
+    private String renderEngagementVerificationTemplate(String recipientName, String initiatorName, String token) {
+        String template = loadTemplate("engagment-verification.html");
+
+        return template
+                .replace("{RECIPIENT_NAME}", recipientName)
+                .replace("{INITIATOR_NAME}", initiatorName)
+                .replace("{TOKEN}", token);
     }
 
     /**

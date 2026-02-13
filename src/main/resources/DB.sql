@@ -235,6 +235,9 @@ CREATE TABLE engagements (
   patient_id UUID NOT NULL REFERENCES patient_profiles(id) ON DELETE CASCADE,
   access_rule_name VARCHAR(255) NOT NULL REFERENCES engagement_access_rules(rule_name),
   
+  -- Track who initiated the engagement (doctor or patient)
+  initiated_by VARCHAR(10) NOT NULL DEFAULT 'doctor',
+  
   status engagement_status DEFAULT 'pending',
   engagement_type VARCHAR(50),
   start_at TIMESTAMP,
@@ -249,8 +252,12 @@ CREATE TABLE engagements (
   notes TEXT,
   
   created_at TIMESTAMP DEFAULT now(),
-  updated_at TIMESTAMP DEFAULT now()
+  updated_at TIMESTAMP DEFAULT now(),
+  
+  -- Constraint to ensure initiated_by is valid
+  CONSTRAINT check_initiated_by CHECK (initiated_by IN ('doctor', 'patient'))
 );
+
 
 -- ================================================================
 -- 5. DOCTOR-PATIENT RELATIONSHIPS
@@ -593,6 +600,7 @@ CREATE INDEX idx_engagements_doctor_id ON engagements(doctor_id);
 CREATE INDEX idx_engagements_patient_id ON engagements(patient_id);
 CREATE INDEX idx_engagements_status ON engagements(status);
 CREATE INDEX idx_engagements_dates ON engagements(start_at, end_at);
+CREATE INDEX idx_engagements_initiated_by ON engagements(initiated_by);
 
 -- Doctor-patient relationship indexes
 CREATE INDEX idx_doctor_patients_doctor_id ON doctor_patients(doctor_id);

@@ -36,33 +36,48 @@ public class EngagementService {
     private final SimpMessagingTemplate messagingTemplate;
     private final NotificationService notificationService;
     private final EngagementMessageService messageService;
+    private final com.neuralhealer.backend.integration.gmail.DirectEmailService directEmailService;
 
     @Transactional
-    public StartEngagementResponse initiateEngagement(User doctor, StartEngagementRequest request) {
-        if (doctor.getRole() != UserRole.DOCTOR) {
-            throw new UnauthorizedException("Only doctors can initiate engagements");
+    public StartEngagementResponse initiateEngagement(User initiator, StartEngagementRequest request) {
+        UUID doctorUserId, patientUserId;
+        String initiatedBy;
+
+        if (initiator.getRole() == UserRole.DOCTOR) {
+            doctorUserId = initiator.getId();
+            patientUserId = request.patientId();
+            if (patientUserId == null) {
+                throw new BadRequestException("Patient ID is required for doctor-initiated engagements");
+            }
+            initiatedBy = "doctor";
+        } else if (initiator.getRole() == UserRole.PATIENT) {
+            patientUserId = initiator.getId();
+            doctorUserId = request.doctorId();
+            if (doctorUserId == null) {
+                throw new BadRequestException("Doctor ID is required for patient-initiated engagements");
+            }
+            initiatedBy = "patient";
+        } else {
+            throw new UnauthorizedException("Only doctors and patients can initiate engagements");
         }
 
-        User patient = userRepository.findById(request.patientId())
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
-
-        if (patient.getRole() != UserRole.PATIENT) {
-            throw new InvalidVerificationException("Selected user is not a patient");
-        }
+        User targetUser = userRepository.findById(initiator.getRole() == UserRole.DOCTOR ? patientUserId : doctorUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Target user not found"));
 
         // Check for existing active engagement
-        if (engagementRepository.findActiveEngagement(doctor.getId(), patient.getId(),
+        if (engagementRepository.findActiveEngagement(doctorUserId, patientUserId,
                 List.of(EngagementStatus.pending, EngagementStatus.active)).isPresent()) {
-            throw new InvalidVerificationException("An active or pending engagement already exists for this patient");
+            throw new InvalidVerificationException(
+                    "An active or pending engagement already exists between these users");
         }
 
         EngagementAccessRule rule = accessRuleRepository.findByRuleName(request.accessRuleName())
                 .orElseThrow(() -> new ResourceNotFoundException("Access rule not found"));
 
-        DoctorProfile doctorProfile = doctorProfileRepository.findByUserId(doctor.getId())
+        DoctorProfile doctorProfile = doctorProfileRepository.findByUserId(doctorUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor profile not found"));
 
-        PatientProfile patientProfile = patientProfileRepository.findByUserId(patient.getId())
+        PatientProfile patientProfile = patientProfileRepository.findByUserId(patientUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient profile not found"));
 
         Engagement engagement = Engagement.builder()
@@ -70,6 +85,8 @@ public class EngagementService {
                 .patient(patientProfile)
                 .accessRule(rule)
                 .status(EngagementStatus.pending)
+                .initiatedBy(initiatedBy)
+                .notes(request.message())
                 .build();
 
         engagement = engagementRepository.save(engagement);
@@ -82,7 +99,7 @@ public class EngagementService {
                             .doctorId(doctorProfile.getId())
                             .patientId(patientProfile.getId())
                             .addedAt(LocalDateTime.now())
-                            .relationshipStatus("INITIAL_PENDING")
+                            .relationshipStatus(null) // NULL until engagement is activated
                             .isActive(false)
                             .build();
                     return doctorPatientRepository.save(newDp);
@@ -92,15 +109,34 @@ public class EngagementService {
         doctorPatientRepository.save(dp);
 
         // Record event
-        saveEvent(engagement.getId(), "INITIATED", doctor.getId(),
-                "{\"doctorName\":\"" + doctor.getLastName() + "\",\"patientName\":\"" + patient.getLastName() + "\"}");
+        saveEvent(engagement.getId(), "INITIATED", initiator.getId(),
+                "{\"initiatorRole\":\"" + initiator.getRole() + "\", \"initiatedBy\":\"" + initiatedBy + "\"}");
 
         // Generate 2FA Token
         EngagementVerificationToken token = verificationService.generateStartToken(engagement);
 
+        // Send Email Notification
+        if (initiatedBy.equals("doctor")) {
+            // Token to patient
+            directEmailService.sendEngagementToken(targetUser.getEmail(), targetUser.getFirstName(),
+                    initiator.getFirstName(), token.getToken());
+        } else {
+            // Token to doctor (request from patient)
+            directEmailService.sendEngagementRequestFromPatient(
+                    targetUser.getEmail(),
+                    targetUser.getFirstName(),
+                    initiator.getFirstName(),
+                    token.getToken(),
+                    rule.getRuleName(),
+                    request.message(),
+                    engagement.getEngagementId());
+        }
+
         return new StartEngagementResponse(
                 engagement.getId(),
                 engagement.getStatus().name(),
+                initiatedBy,
+                new StartEngagementResponse.RecipientInfo(targetUser.getRole().name(), targetUser.getEmail()),
                 new StartEngagementResponse.VerificationInfo(
                         token.getToken(),
                         token.getQrCodeData(),
@@ -108,19 +144,33 @@ public class EngagementService {
     }
 
     @Transactional
-    public EngagementResponse verifyStart(User user, String tokenString) {
-        EngagementVerificationToken token = verificationService.verifyToken(tokenString, user);
+    public EngagementResponse verifyStart(User verifier, String tokenString) {
+        EngagementVerificationToken token = verificationService.verifyToken(tokenString, verifier);
 
         if (token.getVerificationType() != VerificationType.start) {
             throw new InvalidVerificationException("Invalid token type for start verification");
         }
 
         Engagement engagement = token.getEngagement();
+
+        // Directional validation: who should verify?
+        if (engagement.getInitiatedBy().equals("doctor")) {
+            // Doctor initiated, patient must verify
+            if (verifier.getRole() != UserRole.PATIENT) {
+                throw new UnauthorizedException("Only patients can verify doctor-initiated engagements");
+            }
+        } else {
+            // Patient initiated, doctor must verify
+            if (verifier.getRole() != UserRole.DOCTOR) {
+                throw new UnauthorizedException("Only doctors can verify patient-initiated engagements");
+            }
+        }
+
         engagement.activate();
         engagementRepository.save(engagement);
 
         // Record event
-        saveEvent(engagement.getId(), "VERIFIED", user.getId(), "{\"role\":\"PATIENT\"}");
+        saveEvent(engagement.getId(), "VERIFIED", verifier.getId(), "{\"role\":\"" + verifier.getRole() + "\"}");
 
         // Explicitly update relationship to ensure started_at immutability
         DoctorPatient dp = doctorPatientRepository
@@ -142,13 +192,28 @@ public class EngagementService {
 
         broadcastEngagementStatus(engagement.getId(), "active", "Engagement has been activated");
 
-        // Notify Doctor that Patient has verified/started
+        // Notify Initiator that Verifier has verified/started
+        User initiator = engagement.getInitiatedBy().equals("doctor")
+                ? engagement.getDoctor().getUser()
+                : engagement.getPatient().getUser();
+
         notificationService.notifyUser(
-                engagement.getDoctor().getUser().getId(),
+                initiator.getId(),
                 NotificationType.ENGAGEMENT_STARTED,
                 "Engagement Activated",
-                "Patient " + engagement.getPatient().getUser().getFirstName()
-                        + " has verified and started the engagement.");
+                verifier.getFirstName() + " has verified and started the engagement.");
+
+        // Send Email Confirmation to Initiator
+        if (engagement.getInitiatedBy().equals("patient")) {
+            // Patient initiated -> send to patient that doctor accepted
+            directEmailService.sendEngagementActivatedToPatient(
+                    engagement.getPatient().getUser().getEmail(),
+                    engagement.getPatient().getUser().getFirstName(),
+                    engagement.getDoctor().getUser().getFirstName(),
+                    engagement.getEngagementId(),
+                    engagement.getAccessRule().getRuleName(),
+                    LocalDateTime.now().toString());
+        }
 
         return mapToResponse(engagement);
     }
@@ -166,6 +231,12 @@ public class EngagementService {
         StartEngagementResponse response = new StartEngagementResponse(
                 engagement.getId(),
                 engagement.getStatus().name(),
+                engagement.getInitiatedBy(),
+                new StartEngagementResponse.RecipientInfo(
+                        user.getId().equals(engagement.getDoctor().getUser().getId()) ? "PATIENT" : "DOCTOR",
+                        user.getId().equals(engagement.getDoctor().getUser().getId())
+                                ? engagement.getPatient().getUser().getEmail()
+                                : engagement.getDoctor().getUser().getEmail()),
                 new StartEngagementResponse.VerificationInfo(
                         token.getToken(),
                         token.getQrCodeData(),
@@ -249,6 +320,9 @@ public class EngagementService {
     }
 
     private Engagement getEngagementIfAuthorized(UUID engagementId, User user) {
+        if (engagementId == null) {
+            throw new BadRequestException("Engagement ID is required");
+        }
         Engagement engagement = engagementRepository.findById(engagementId)
                 .orElseThrow(() -> new EngagementNotFoundException("Engagement not found"));
 
@@ -267,6 +341,7 @@ public class EngagementService {
                 e.getId(),
                 e.getEngagementId(),
                 e.getStatus().name(),
+                e.getInitiatedBy(),
                 new EngagementResponse.UserSummary(docUser.getId(), docUser.getFirstName(),
                         docUser.getLastName(), docUser.getEmail()),
                 new EngagementResponse.UserSummary(patUser.getId(), patUser.getFirstName(),
@@ -447,8 +522,14 @@ public class EngagementService {
     public TokenResponse refreshToken(User user, UUID engagementId) {
         Engagement engagement = getEngagementIfAuthorized(engagementId, user);
 
-        if (!engagement.getDoctor().getUser().getId().equals(user.getId())) {
-            throw new ForbiddenException("Only the creator doctor can refresh tokens");
+        // Check if caller is the initiator
+        boolean isInitiator = (engagement.getInitiatedBy().equals("doctor")
+                && engagement.getDoctor().getUser().getId().equals(user.getId()))
+                || (engagement.getInitiatedBy().equals("patient")
+                        && engagement.getPatient().getUser().getId().equals(user.getId()));
+
+        if (!isInitiator) {
+            throw new ForbiddenException("Only the initiator can refresh tokens");
         }
 
         if (engagement.getStatus() != EngagementStatus.pending) {
@@ -478,8 +559,15 @@ public class EngagementService {
     public TokenResponse getCurrentToken(User user, UUID engagementId) {
         Engagement engagement = getEngagementIfAuthorized(engagementId, user);
 
-        if (!engagement.getDoctor().getUser().getId().equals(user.getId())) {
-            throw new ForbiddenException("Only the doctor can retrieve engagement tokens");
+        // Only initiator should be able to see the token to share it (if not already
+        // sent via email)
+        boolean isInitiator = (engagement.getInitiatedBy().equals("doctor")
+                && engagement.getDoctor().getUser().getId().equals(user.getId()))
+                || (engagement.getInitiatedBy().equals("patient")
+                        && engagement.getPatient().getUser().getId().equals(user.getId()));
+
+        if (!isInitiator) {
+            throw new ForbiddenException("Only the initiator can retrieve engagement tokens");
         }
 
         EngagementVerificationToken token = tokenRepository
