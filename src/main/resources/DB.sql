@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS email_verification_otps (
     verified_at TIMESTAMP,
     attempts INTEGER DEFAULT 0,
     is_used BOOLEAN DEFAULT false,
-    ip_address INET,
+    ip_address VARCHAR(45),
     user_agent TEXT,
     CONSTRAINT fk_otp_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );;
