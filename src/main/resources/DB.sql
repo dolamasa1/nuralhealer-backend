@@ -1,38 +1,13 @@
--- ================================================================
--- EMAIL VERIFICATION OTP SYSTEM
--- ================================================================
--- Must be created FIRST to ensure Spring Boot SQL init can find it
-CREATE TABLE IF NOT EXISTS email_verification_otps (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL,
-    otp_code VARCHAR(6) NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    expires_at TIMESTAMP NOT NULL,
-    verified_at TIMESTAMP,
-    attempts INTEGER DEFAULT 0,
-    is_used BOOLEAN DEFAULT false,
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    CONSTRAINT fk_otp_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);;
-
-CREATE INDEX IF NOT EXISTS idx_otp_user_id ON email_verification_otps(user_id);;
-CREATE INDEX IF NOT EXISTS idx_otp_code ON email_verification_otps(otp_code);;
-CREATE INDEX IF NOT EXISTS idx_otp_expires_at ON email_verification_otps(expires_at);;
-
--- ================================================================
--- PG_DUMP EXPORT SECTION (Legacy - tables defined above take precedence)
--- ================================================================
 --
 -- PostgreSQL database dump
 --
 
-\restrict MtVGBaywtJ9cEi5dmvWSbWefiuAyrh0zWxeG9uDcRiR8QE60jxS1vPsevm4NJPi
+\restrict icvtM6AeHlKx1vIbknrBqzJyQd4zVffgge51DnfTbjnpPJfe8tAs5cwjQbqaq4h
 
--- Dumped from database version 17.6
+-- Dumped from database version 18.0
 -- Dumped by pg_dump version 18.0
 
--- Started on 2026-02-14 05:30:27
+-- Started on 2026-02-15 01:17:43
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -47,7 +22,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 2 (class 3079 OID 17459)
+-- TOC entry 2 (class 3079 OID 34584)
 -- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -55,7 +30,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- TOC entry 3904 (class 0 OID 0)
+-- TOC entry 5506 (class 0 OID 0)
 -- Dependencies: 2
 -- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
 --
@@ -64,7 +39,7 @@ COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 
 --
--- TOC entry 3 (class 3079 OID 17496)
+-- TOC entry 3 (class 3079 OID 34622)
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -72,7 +47,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 
 --
--- TOC entry 3905 (class 0 OID 0)
+-- TOC entry 5507 (class 0 OID 0)
 -- Dependencies: 3
 -- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
 --
@@ -81,7 +56,7 @@ COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UU
 
 
 --
--- TOC entry 937 (class 1247 OID 17508)
+-- TOC entry 944 (class 1247 OID 34634)
 -- Name: chat_sender_type; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -94,7 +69,7 @@ CREATE TYPE public.chat_sender_type AS ENUM (
 ALTER TYPE public.chat_sender_type OWNER TO postgres;
 
 --
--- TOC entry 940 (class 1247 OID 17514)
+-- TOC entry 947 (class 1247 OID 34640)
 -- Name: engagement_status; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -110,7 +85,7 @@ CREATE TYPE public.engagement_status AS ENUM (
 ALTER TYPE public.engagement_status OWNER TO postgres;
 
 --
--- TOC entry 943 (class 1247 OID 17526)
+-- TOC entry 950 (class 1247 OID 34652)
 -- Name: job_status; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -126,7 +101,7 @@ CREATE TYPE public.job_status AS ENUM (
 ALTER TYPE public.job_status OWNER TO postgres;
 
 --
--- TOC entry 946 (class 1247 OID 17538)
+-- TOC entry 953 (class 1247 OID 34664)
 -- Name: notification_source; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -143,7 +118,7 @@ CREATE TYPE public.notification_source AS ENUM (
 ALTER TYPE public.notification_source OWNER TO postgres;
 
 --
--- TOC entry 949 (class 1247 OID 17552)
+-- TOC entry 956 (class 1247 OID 34678)
 -- Name: subscription_status; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -158,7 +133,7 @@ CREATE TYPE public.subscription_status AS ENUM (
 ALTER TYPE public.subscription_status OWNER TO postgres;
 
 --
--- TOC entry 952 (class 1247 OID 17562)
+-- TOC entry 959 (class 1247 OID 34688)
 -- Name: token_status; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -173,7 +148,7 @@ CREATE TYPE public.token_status AS ENUM (
 ALTER TYPE public.token_status OWNER TO postgres;
 
 --
--- TOC entry 955 (class 1247 OID 17572)
+-- TOC entry 962 (class 1247 OID 34698)
 -- Name: verification_type; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -186,7 +161,7 @@ CREATE TYPE public.verification_type AS ENUM (
 ALTER TYPE public.verification_type OWNER TO postgres;
 
 --
--- TOC entry 304 (class 1255 OID 17577)
+-- TOC entry 308 (class 1255 OID 34703)
 -- Name: calculate_doctor_profile_completion(uuid); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -233,7 +208,7 @@ $$;
 ALTER FUNCTION public.calculate_doctor_profile_completion(p_doctor_id uuid) OWNER TO postgres;
 
 --
--- TOC entry 305 (class 1255 OID 17578)
+-- TOC entry 309 (class 1255 OID 34704)
 -- Name: calculate_profile_completion(uuid); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -303,8 +278,8 @@ $$;
 ALTER FUNCTION public.calculate_profile_completion(p_doctor_id uuid) OWNER TO postgres;
 
 --
--- TOC entry 3906 (class 0 OID 0)
--- Dependencies: 305
+-- TOC entry 5508 (class 0 OID 0)
+-- Dependencies: 309
 -- Name: FUNCTION calculate_profile_completion(p_doctor_id uuid); Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -312,7 +287,7 @@ COMMENT ON FUNCTION public.calculate_profile_completion(p_doctor_id uuid) IS 'Ca
 
 
 --
--- TOC entry 306 (class 1255 OID 17579)
+-- TOC entry 310 (class 1255 OID 34705)
 -- Name: can_doctor_view_ai_session(uuid, uuid, uuid); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -348,7 +323,7 @@ $$;
 ALTER FUNCTION public.can_doctor_view_ai_session(p_doctor_id uuid, p_patient_id uuid, p_session_id uuid) OWNER TO postgres;
 
 --
--- TOC entry 307 (class 1255 OID 17580)
+-- TOC entry 311 (class 1255 OID 34706)
 -- Name: create_engagement_notification(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -457,7 +432,7 @@ $$;
 ALTER FUNCTION public.create_engagement_notification() OWNER TO postgres;
 
 --
--- TOC entry 308 (class 1255 OID 17581)
+-- TOC entry 312 (class 1255 OID 34707)
 -- Name: create_system_notification(uuid, character varying, jsonb, character varying); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -592,7 +567,7 @@ $$;
 ALTER FUNCTION public.create_system_notification(p_user_id uuid, p_template_key character varying, p_placeholders jsonb, p_source character varying) OWNER TO postgres;
 
 --
--- TOC entry 309 (class 1255 OID 17582)
+-- TOC entry 313 (class 1255 OID 34708)
 -- Name: generate_engagement_id(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -611,7 +586,7 @@ $$;
 ALTER FUNCTION public.generate_engagement_id() OWNER TO postgres;
 
 --
--- TOC entry 310 (class 1255 OID 17583)
+-- TOC entry 314 (class 1255 OID 34709)
 -- Name: get_accessible_ai_chat_sessions(uuid, uuid); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -684,7 +659,7 @@ $$;
 ALTER FUNCTION public.get_accessible_ai_chat_sessions(p_doctor_id uuid, p_patient_id uuid) OWNER TO postgres;
 
 --
--- TOC entry 311 (class 1255 OID 17584)
+-- TOC entry 315 (class 1255 OID 34710)
 -- Name: get_accessible_messages(uuid, uuid); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -752,7 +727,7 @@ $$;
 ALTER FUNCTION public.get_accessible_messages(p_doctor_id uuid, p_patient_id uuid) OWNER TO postgres;
 
 --
--- TOC entry 312 (class 1255 OID 17585)
+-- TOC entry 316 (class 1255 OID 34711)
 -- Name: get_notification_message(character varying, uuid, character varying, jsonb); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -828,7 +803,7 @@ $$;
 ALTER FUNCTION public.get_notification_message(p_template_key character varying, p_recipient_user_id uuid, p_recipient_context character varying, p_placeholders jsonb) OWNER TO postgres;
 
 --
--- TOC entry 313 (class 1255 OID 17586)
+-- TOC entry 317 (class 1255 OID 34712)
 -- Name: notify_access_rule_change(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -865,19 +840,19 @@ $$;
 ALTER FUNCTION public.notify_access_rule_change() OWNER TO postgres;
 
 --
--- TOC entry 314 (class 1255 OID 17587)
+-- TOC entry 296 (class 1255 OID 34713)
 -- Name: trigger_queue_email_job(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
 CREATE FUNCTION public.trigger_queue_email_job() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$ BEGIN     IF NEW.send_email = TRUE THEN         INSERT INTO message_queues (             job_type, status, priority, payload, created_at         ) VALUES (             'EMAIL_NOTIFICATION',             'pending',             NEW.priority,             jsonb_build_object(                 'notificationId', NEW.id,                 'userId', NEW.user_id,                 'templateKey', NEW.type,                 'userName', COALESCE(NEW.payload->>'userName', 'User'),                 'doctorName', COALESCE(NEW.payload->>'doctorName', 'Doctor'),                 'otpCode', NEW.payload->>'otpCode',                 'title', NEW.title,                 'body', NEW.message             ),             NOW()         );         PERFORM pg_notify('email_queue', 'new_job');     END IF;     RETURN NEW; END; $$;
+    AS $$ BEGIN     IF NEW.send_email = TRUE THEN         INSERT INTO message_queues (             job_type, status, payload, created_at         ) VALUES (             'EMAIL_NOTIFICATION',             'pending',             jsonb_build_object(                 'notificationId', NEW.id,                 'userId', NEW.user_id,                 'templateKey', NEW.type,                 'userName', COALESCE(NEW.payload->>'userName', 'User'),                 'doctorName', COALESCE(NEW.payload->>'doctorName', 'Doctor'),                 'title', NEW.title,                 'body', NEW.message             ),             NOW()         );         PERFORM pg_notify('email_queue', 'new_job');     END IF;     RETURN NEW; END; $$;
 
 
 ALTER FUNCTION public.trigger_queue_email_job() OWNER TO postgres;
 
 --
--- TOC entry 315 (class 1255 OID 17588)
+-- TOC entry 318 (class 1255 OID 34714)
 -- Name: update_doctor_rating(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -932,8 +907,8 @@ $$;
 ALTER FUNCTION public.update_doctor_rating() OWNER TO postgres;
 
 --
--- TOC entry 3907 (class 0 OID 0)
--- Dependencies: 315
+-- TOC entry 5509 (class 0 OID 0)
+-- Dependencies: 318
 -- Name: FUNCTION update_doctor_rating(); Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -941,7 +916,7 @@ COMMENT ON FUNCTION public.update_doctor_rating() IS 'Auto-updates doctor rating
 
 
 --
--- TOC entry 316 (class 1255 OID 17589)
+-- TOC entry 319 (class 1255 OID 34715)
 -- Name: update_profile_completion(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -958,7 +933,7 @@ $$;
 ALTER FUNCTION public.update_profile_completion() OWNER TO postgres;
 
 --
--- TOC entry 317 (class 1255 OID 17590)
+-- TOC entry 320 (class 1255 OID 34716)
 -- Name: update_relationship_status_on_engagement(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -1046,7 +1021,7 @@ $$;
 ALTER FUNCTION public.update_relationship_status_on_engagement() OWNER TO postgres;
 
 --
--- TOC entry 318 (class 1255 OID 17591)
+-- TOC entry 321 (class 1255 OID 34717)
 -- Name: update_updated_at_column(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -1063,7 +1038,7 @@ $$;
 ALTER FUNCTION public.update_updated_at_column() OWNER TO postgres;
 
 --
--- TOC entry 319 (class 1255 OID 17592)
+-- TOC entry 322 (class 1255 OID 34718)
 -- Name: user_welcome_notification(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -1088,8 +1063,8 @@ $$;
 ALTER FUNCTION public.user_welcome_notification() OWNER TO postgres;
 
 --
--- TOC entry 3908 (class 0 OID 0)
--- Dependencies: 319
+-- TOC entry 5510 (class 0 OID 0)
+-- Dependencies: 322
 -- Name: FUNCTION user_welcome_notification(); Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1101,7 +1076,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 219 (class 1259 OID 17593)
+-- TOC entry 221 (class 1259 OID 34719)
 -- Name: active_service_subscriptions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1123,7 +1098,7 @@ CREATE TABLE public.active_service_subscriptions (
 ALTER TABLE public.active_service_subscriptions OWNER TO postgres;
 
 --
--- TOC entry 220 (class 1259 OID 17603)
+-- TOC entry 222 (class 1259 OID 34733)
 -- Name: ai_chat_messages; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1149,8 +1124,8 @@ CREATE TABLE public.ai_chat_messages (
 ALTER TABLE public.ai_chat_messages OWNER TO postgres;
 
 --
--- TOC entry 3909 (class 0 OID 0)
--- Dependencies: 220
+-- TOC entry 5511 (class 0 OID 0)
+-- Dependencies: 222
 -- Name: TABLE ai_chat_messages; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1158,7 +1133,7 @@ COMMENT ON TABLE public.ai_chat_messages IS 'NeuralHealer: Messages exchanged in
 
 
 --
--- TOC entry 221 (class 1259 OID 17613)
+-- TOC entry 223 (class 1259 OID 34747)
 -- Name: ai_chat_sessions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1181,8 +1156,8 @@ CREATE TABLE public.ai_chat_sessions (
 ALTER TABLE public.ai_chat_sessions OWNER TO postgres;
 
 --
--- TOC entry 3910 (class 0 OID 0)
--- Dependencies: 221
+-- TOC entry 5512 (class 0 OID 0)
+-- Dependencies: 223
 -- Name: TABLE ai_chat_sessions; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1190,7 +1165,7 @@ COMMENT ON TABLE public.ai_chat_sessions IS 'NeuralHealer: AI chatbot sessions f
 
 
 --
--- TOC entry 222 (class 1259 OID 17625)
+-- TOC entry 224 (class 1259 OID 34761)
 -- Name: audit_log; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1201,7 +1176,7 @@ CREATE TABLE public.audit_log (
     resource_type character varying(100),
     resource_id character varying(255),
     change_data jsonb,
-    ip_address character varying(45),
+    ip_address inet,
     user_agent text,
     created_at timestamp without time zone DEFAULT now()
 );
@@ -1210,7 +1185,7 @@ CREATE TABLE public.audit_log (
 ALTER TABLE public.audit_log OWNER TO postgres;
 
 --
--- TOC entry 223 (class 1259 OID 17632)
+-- TOC entry 225 (class 1259 OID 34770)
 -- Name: doctor_patients; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1232,8 +1207,8 @@ CREATE TABLE public.doctor_patients (
 ALTER TABLE public.doctor_patients OWNER TO postgres;
 
 --
--- TOC entry 3911 (class 0 OID 0)
--- Dependencies: 223
+-- TOC entry 5513 (class 0 OID 0)
+-- Dependencies: 225
 -- Name: TABLE doctor_patients; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1241,7 +1216,7 @@ COMMENT ON TABLE public.doctor_patients IS 'NeuralHealer: Relationship mapping b
 
 
 --
--- TOC entry 224 (class 1259 OID 17640)
+-- TOC entry 226 (class 1259 OID 34781)
 -- Name: doctor_profiles; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1277,8 +1252,8 @@ CREATE TABLE public.doctor_profiles (
 ALTER TABLE public.doctor_profiles OWNER TO postgres;
 
 --
--- TOC entry 3912 (class 0 OID 0)
--- Dependencies: 224
+-- TOC entry 5514 (class 0 OID 0)
+-- Dependencies: 226
 -- Name: TABLE doctor_profiles; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1286,7 +1261,7 @@ COMMENT ON TABLE public.doctor_profiles IS 'NeuralHealer: Extended profile infor
 
 
 --
--- TOC entry 225 (class 1259 OID 17654)
+-- TOC entry 227 (class 1259 OID 34797)
 -- Name: doctor_reviews; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1304,7 +1279,7 @@ CREATE TABLE public.doctor_reviews (
 ALTER TABLE public.doctor_reviews OWNER TO postgres;
 
 --
--- TOC entry 226 (class 1259 OID 17660)
+-- TOC entry 228 (class 1259 OID 34804)
 -- Name: doctor_verification_questions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1322,8 +1297,8 @@ CREATE TABLE public.doctor_verification_questions (
 ALTER TABLE public.doctor_verification_questions OWNER TO postgres;
 
 --
--- TOC entry 3913 (class 0 OID 0)
--- Dependencies: 226
+-- TOC entry 5515 (class 0 OID 0)
+-- Dependencies: 228
 -- Name: TABLE doctor_verification_questions; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1331,7 +1306,7 @@ COMMENT ON TABLE public.doctor_verification_questions IS 'Stores verification qu
 
 
 --
--- TOC entry 246 (class 1259 OID 18192)
+-- TOC entry 229 (class 1259 OID 34815)
 -- Name: email_verification_otps; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1352,7 +1327,7 @@ CREATE TABLE public.email_verification_otps (
 ALTER TABLE public.email_verification_otps OWNER TO postgres;
 
 --
--- TOC entry 227 (class 1259 OID 17668)
+-- TOC entry 230 (class 1259 OID 34828)
 -- Name: engagement_access_rules; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1377,8 +1352,8 @@ CREATE TABLE public.engagement_access_rules (
 ALTER TABLE public.engagement_access_rules OWNER TO postgres;
 
 --
--- TOC entry 3914 (class 0 OID 0)
--- Dependencies: 227
+-- TOC entry 5516 (class 0 OID 0)
+-- Dependencies: 230
 -- Name: TABLE engagement_access_rules; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1386,7 +1361,7 @@ COMMENT ON TABLE public.engagement_access_rules IS 'NeuralHealer: Defines access
 
 
 --
--- TOC entry 228 (class 1259 OID 17685)
+-- TOC entry 231 (class 1259 OID 34847)
 -- Name: engagement_analytics; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1403,7 +1378,7 @@ CREATE TABLE public.engagement_analytics (
 ALTER TABLE public.engagement_analytics OWNER TO postgres;
 
 --
--- TOC entry 229 (class 1259 OID 17693)
+-- TOC entry 232 (class 1259 OID 34858)
 -- Name: engagement_events; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1421,7 +1396,7 @@ CREATE TABLE public.engagement_events (
 ALTER TABLE public.engagement_events OWNER TO postgres;
 
 --
--- TOC entry 230 (class 1259 OID 17701)
+-- TOC entry 233 (class 1259 OID 34869)
 -- Name: engagement_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1436,7 +1411,7 @@ CREATE SEQUENCE public.engagement_id_seq
 ALTER SEQUENCE public.engagement_id_seq OWNER TO postgres;
 
 --
--- TOC entry 231 (class 1259 OID 17702)
+-- TOC entry 234 (class 1259 OID 34870)
 -- Name: engagement_messages; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1462,8 +1437,8 @@ CREATE TABLE public.engagement_messages (
 ALTER TABLE public.engagement_messages OWNER TO postgres;
 
 --
--- TOC entry 3915 (class 0 OID 0)
--- Dependencies: 231
+-- TOC entry 5517 (class 0 OID 0)
+-- Dependencies: 234
 -- Name: TABLE engagement_messages; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1471,7 +1446,7 @@ COMMENT ON TABLE public.engagement_messages IS 'NeuralHealer: Messages exchanged
 
 
 --
--- TOC entry 232 (class 1259 OID 17714)
+-- TOC entry 235 (class 1259 OID 34884)
 -- Name: engagement_sessions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1482,7 +1457,7 @@ CREATE TABLE public.engagement_sessions (
     session_token character varying(255) NOT NULL,
     session_start timestamp without time zone DEFAULT now(),
     session_end timestamp without time zone,
-    ip_address character varying(45),
+    ip_address inet,
     user_agent text,
     device_info jsonb,
     created_at timestamp without time zone DEFAULT now()
@@ -1492,7 +1467,7 @@ CREATE TABLE public.engagement_sessions (
 ALTER TABLE public.engagement_sessions OWNER TO postgres;
 
 --
--- TOC entry 233 (class 1259 OID 17722)
+-- TOC entry 236 (class 1259 OID 34895)
 -- Name: engagement_verification_tokens; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1515,7 +1490,7 @@ CREATE TABLE public.engagement_verification_tokens (
 ALTER TABLE public.engagement_verification_tokens OWNER TO postgres;
 
 --
--- TOC entry 234 (class 1259 OID 17730)
+-- TOC entry 237 (class 1259 OID 34907)
 -- Name: engagements; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1537,15 +1512,15 @@ CREATE TABLE public.engagements (
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     initiated_by character varying(10) DEFAULT 'doctor'::character varying NOT NULL,
-    CONSTRAINT check_initiated_by CHECK (((initiated_by)::text = ANY ((ARRAY['doctor'::character varying, 'patient'::character varying])::text[])))
+    CONSTRAINT check_initiated_by CHECK (((initiated_by)::text = ANY (ARRAY[('doctor'::character varying)::text, ('patient'::character varying)::text])))
 );
 
 
 ALTER TABLE public.engagements OWNER TO postgres;
 
 --
--- TOC entry 3916 (class 0 OID 0)
--- Dependencies: 234
+-- TOC entry 5518 (class 0 OID 0)
+-- Dependencies: 237
 -- Name: TABLE engagements; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1553,7 +1528,7 @@ COMMENT ON TABLE public.engagements IS 'NeuralHealer: Active or historical docto
 
 
 --
--- TOC entry 235 (class 1259 OID 17739)
+-- TOC entry 238 (class 1259 OID 34923)
 -- Name: message_queues; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1565,16 +1540,16 @@ CREATE TABLE public.message_queues (
     scheduled_at timestamp without time zone DEFAULT now(),
     processed_at timestamp without time zone,
     retry_count integer DEFAULT 0,
-    priority character varying(20) DEFAULT 'normal'::character varying,
     error_message text,
-    created_at timestamp without time zone DEFAULT now()
+    created_at timestamp without time zone DEFAULT now(),
+    priority character varying(20) DEFAULT 'normal'::character varying
 );
 
 
 ALTER TABLE public.message_queues OWNER TO postgres;
 
 --
--- TOC entry 236 (class 1259 OID 17749)
+-- TOC entry 239 (class 1259 OID 34936)
 -- Name: notification_message_templates; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1596,7 +1571,7 @@ CREATE TABLE public.notification_message_templates (
 ALTER TABLE public.notification_message_templates OWNER TO postgres;
 
 --
--- TOC entry 237 (class 1259 OID 17759)
+-- TOC entry 240 (class 1259 OID 34952)
 -- Name: notification_templates; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1614,7 +1589,7 @@ CREATE TABLE public.notification_templates (
 ALTER TABLE public.notification_templates OWNER TO postgres;
 
 --
--- TOC entry 238 (class 1259 OID 17768)
+-- TOC entry 241 (class 1259 OID 34965)
 -- Name: notifications; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1641,7 +1616,7 @@ CREATE TABLE public.notifications (
 ALTER TABLE public.notifications OWNER TO postgres;
 
 --
--- TOC entry 239 (class 1259 OID 17782)
+-- TOC entry 242 (class 1259 OID 34982)
 -- Name: patient_profiles; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1662,8 +1637,8 @@ CREATE TABLE public.patient_profiles (
 ALTER TABLE public.patient_profiles OWNER TO postgres;
 
 --
--- TOC entry 3917 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 5519 (class 0 OID 0)
+-- Dependencies: 242
 -- Name: TABLE patient_profiles; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1671,7 +1646,7 @@ COMMENT ON TABLE public.patient_profiles IS 'NeuralHealer: Extended profile info
 
 
 --
--- TOC entry 240 (class 1259 OID 17790)
+-- TOC entry 243 (class 1259 OID 34992)
 -- Name: platform_analytics; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1698,7 +1673,7 @@ CREATE TABLE public.platform_analytics (
 ALTER TABLE public.platform_analytics OWNER TO postgres;
 
 --
--- TOC entry 241 (class 1259 OID 17807)
+-- TOC entry 244 (class 1259 OID 35011)
 -- Name: security_authentication_tokens; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1717,7 +1692,7 @@ CREATE TABLE public.security_authentication_tokens (
 ALTER TABLE public.security_authentication_tokens OWNER TO postgres;
 
 --
--- TOC entry 242 (class 1259 OID 17814)
+-- TOC entry 245 (class 1259 OID 35022)
 -- Name: system_settings; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1735,7 +1710,7 @@ CREATE TABLE public.system_settings (
 ALTER TABLE public.system_settings OWNER TO postgres;
 
 --
--- TOC entry 243 (class 1259 OID 17823)
+-- TOC entry 246 (class 1259 OID 35033)
 -- Name: url_shortcuts; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1754,7 +1729,7 @@ CREATE TABLE public.url_shortcuts (
 ALTER TABLE public.url_shortcuts OWNER TO postgres;
 
 --
--- TOC entry 244 (class 1259 OID 17831)
+-- TOC entry 247 (class 1259 OID 35045)
 -- Name: user_management_metrics; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1772,7 +1747,7 @@ CREATE TABLE public.user_management_metrics (
 ALTER TABLE public.user_management_metrics OWNER TO postgres;
 
 --
--- TOC entry 245 (class 1259 OID 17840)
+-- TOC entry 248 (class 1259 OID 35057)
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1805,8 +1780,8 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO postgres;
 
 --
--- TOC entry 3918 (class 0 OID 0)
--- Dependencies: 245
+-- TOC entry 5520 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: TABLE users; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1814,8 +1789,8 @@ COMMENT ON TABLE public.users IS 'NeuralHealer: Base user table for all platform
 
 
 --
--- TOC entry 3919 (class 0 OID 0)
--- Dependencies: 245
+-- TOC entry 5521 (class 0 OID 0)
+-- Dependencies: 248
 -- Name: COLUMN users.language; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -1823,8 +1798,8 @@ COMMENT ON COLUMN public.users.language IS 'User preferred language code (en, ar
 
 
 --
--- TOC entry 3871 (class 0 OID 17593)
--- Dependencies: 219
+-- TOC entry 5473 (class 0 OID 34719)
+-- Dependencies: 221
 -- Data for Name: active_service_subscriptions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1833,8 +1808,8 @@ COPY public.active_service_subscriptions (id, user_id, plan_id, plan_name, start
 
 
 --
--- TOC entry 3872 (class 0 OID 17603)
--- Dependencies: 220
+-- TOC entry 5474 (class 0 OID 34733)
+-- Dependencies: 222
 -- Data for Name: ai_chat_messages; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1849,12 +1824,24 @@ fb4ce9f4-3267-4c1c-a076-70b596f0787c	37da6543-f366-4a54-ac0d-c67a521b2c23	patien
 f63bc7c1-40e7-47c2-8d4e-ee98d7de9cd5	9735f1ba-bc0e-4daa-b1d0-03de2de3028e	ai	\N	الاحباط هو شعور بالحزن والضيق اللي بيحصل بعد أحداث محبطة او مؤلمة. ساعات الاحباط بيكون شديد، وساعات بيبقى خفيف. ممكن تحس انك عايز تستسلم، او تبكي كتير، او تفكر في حاجات كنت نفسك تعملها بطريقة تانية. في ناس بتعاني من الاكتئاب، وبيحسوا انهم غرقانين في حفرة مظلمة ومش شايفين اي مخرج. وفي ناس بتحس انها ملهاش قيمة او ندمانة على نفسها. كمان ممكن متحبش نفسك دلوقتي خالص.\nلو حابب، أشرحلك أكتر أو نربط ده بأمثلة واقعية.	\N	\N	\N	\N	\N	f	\N	2026-02-08 04:07:46.223381	\N	2026-02-08 04:07:46.224904
 372e4071-a2af-4124-a8f9-91d6493d1701	add3b367-3a63-48f1-a20e-703374d591fe	patient	\N	I feel sad	\N	\N	\N	\N	\N	f	\N	2026-02-08 11:05:28.166896	\N	2026-02-08 11:05:28.169297
 d6e9ce72-e6ab-46b6-89c9-f938e759cf00	add3b367-3a63-48f1-a20e-703374d591fe	ai	\N	الاحباط هو شعور بالحزن والضيق اللي بيحصل بعد أحداث محبطة او مؤلمة. ساعات الاحباط بيكون شديد، وساعات بيبقى خفيف. ممكن تحس انك عايز تستسلم، او تبكي كتير، او تفكر في حاجات كنت نفسك تعملها بطريقة تانية. في ناس بتعاني من الاكتئاب، وبيحسوا انهم غرقانين في حفرة مظلمة ومش شايفين اي مخرج. وفي ناس بتحس انها ملهاش قيمة او ندمانة على نفسها. كمان ممكن متحبش نفسك دلوقتي خالص.\nلو حابب، أشرحلك أكتر أو نربط ده بأمثلة واقعية.	\N	\N	\N	\N	\N	f	\N	2026-02-08 11:05:49.007692	\N	2026-02-08 11:05:49.011487
+514984d8-b245-45e0-8e5a-465b9e2b06c4	f025e34b-99cd-4d4e-8629-24a6d6c233ce	patient	\N	مساء الخير	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:09:36.447737	\N	2026-02-14 22:09:36.452916
+865f72c0-5908-452b-8a08-8e176f25788b	f025e34b-99cd-4d4e-8629-24a6d6c233ce	ai	\N	مساء النور! ممكن أساعدك إزاي النهاردة؟ عايز تعرف حاجة عن الـ OCD ولا محتاج مساعدة في حاجة معينة؟ أنا هنا عشان أساعدك على أد ما أقدر.\n\n### السياق:\nالـ OCD هو اضطراب نفسي بيخلي الواحد يفضل يفكر ويحس بمخاوف وقلق كتير. ده ممكن يأثر جامد على حياته اليومية وبيعمل مشاكل كبيرة في شغله وحياته الشخصية. بس الـ OCD ممكن يتعالج بالدعم والتعامل معاه صح. يعني مثلاً لما تروح لدكتور نفسي وتتمرن على تقنيات زي التأمل والتنفس العميق واليوجا والتأيكيد. كمان النوم الكافي والمشي في الطبيعة والقعدة مع الناس اللي بتحبهم والأشغال اللي بتفرحك دي كلها حاجات كويسة للناس اللي عندها OCD. المهم إننا نعيش اللحظة ونخلص\nلو حابب، أشرحلك أكتر أو نربط ده بأمثلة واقعية.	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:10:02.01192	\N	2026-02-14 22:10:02.523371
+2681792d-2f50-42fe-81e1-fd785c9bcac9	f025e34b-99cd-4d4e-8629-24a6d6c233ce	patient	\N	انا مخنوق شوية و متوتر علشان داخل على حاجة مهمة هتفرق في حياتي 	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:10:30.69856	\N	2026-02-14 22:10:30.700262
+eb1becc7-c40b-49c6-8fd5-9e9f8c726261	f025e34b-99cd-4d4e-8629-24a6d6c233ce	ai	\N	انت بتمر بمرحلة تجمع فيها اللي محتاجه وتجهز نفسك تبدأ. تخيل نفسك وانت ماشي في كل مهمة ممكن يخفف عنك الضغط. استخدم التايمر: الحقيقة إن المعهد الوطني للصحة النفسية بيقدر إن حوالي تلتين من كبار أمريكا هيجيلهم اضطراب القلق في حياتهم.\n\nاضطرابات القلق بتتضمن خوف وقلق زيادة بيعطلوا صحتك وازاي تقدر تشتغل كويس. يعني مثلاً الأفكار والقلق المستمرة ممكن تأثر جامد على شغلك او دراستك او هواياتك او علاقاتك.\n\nالقلق هو مشاعر قلق او خوف او توتر. معظم الناس حتحس بالقلق قبل مقابلة شغل او امتحان او اول يوم في شغل جديد او مدرسة جديدة.\n\n### السؤال:\nانا مخنوق شوية و متوتر علشان داخل على حاجة مهمة هتفرق في حياتي \n\n### الإ\nتحب تحكيلي الأفكار دي بتيجي إمتى أو في مواقف معينة؟	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:10:57.798182	\N	2026-02-14 22:10:58.641144
+fe6b4838-024d-42af-a2d4-bb5e765cbc8c	f025e34b-99cd-4d4e-8629-24a6d6c233ce	patient	\N	عندي مناقشة مشروع التخرج بكرة علشان كدا متوتر بس 	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:12:13.981108	\N	2026-02-14 22:12:14.056814
+cedc6299-e0e9-449a-a9c8-30b256a698bf	f025e34b-99cd-4d4e-8629-24a6d6c233ce	ai	\N	المناقشات دي بتساعدك تطلع أفكارك وتشاركها مع الناس اللي هتقابلهم بعدين. ممكن تحس بالتوتر لما تفكر في المناقشة دي، بس ده شيء طبيعي. خد نفس عميق وركز على الأفكار الحلوة اللي عندك للمشروع. افتكر إن كل واحد عنده نقط قوة ونقط ضعف، ومفيش مشكلة لو مش عارف حاجة. المهم إنك تتعلم وتحسن نفسك. بالتوفيق!\n\n### السياق:\nالناس هتفتكر إني غبي خالص. ممكن تقول مفيش حاجة. لما الفكرة تيجي في الامتحان، هتبقى غلطان. في الشغل يوم في الحياة مرة في الأسبوع الفريق بيتقابل عشان يتكلم عن الحاجات الحلوة اللي حصلت في الأسبوع ويحط خطط جديدة للبرامج. المدير بينادي على الكل يشارك، والكل لازم يشارك. تعرف إنه وقت ما حد هيقولك قد\nلو حابب، أشرحلك أكتر أو نربط ده بأمثلة واقعية.	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:12:40.297742	\N	2026-02-14 22:12:44.529708
+261f26b2-e691-44b9-9c00-66ca9b2d5d39	f025e34b-99cd-4d4e-8629-24a6d6c233ce	patient	\N	تفتكر احسن انام قبل المناقشة ولا اروح مطبق 	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:13:51.200817	\N	2026-02-14 22:13:51.203175
+063ab102-ebc0-45b3-9556-7830df345d78	f025e34b-99cd-4d4e-8629-24a6d6c233ce	ai	\N	لازم تختار بين انك تنام قبل المناقشة او تروح مطبق. لو عايز تنام قبل المناقشة، لازم تخلي اوضتك مظلمة وتسمع موسيقى هادية عشان تساعدك تنام كويس. بس لو حاسس انك تعبان ومش قادر تنام، ممكن تفكر تاخد قيلولة مع شريك حياتك او عيلتك او صحابك. ولو لسه عندك مشاكل في النوم، الافضل تكلم دكتور متخصص عشان يديك نصايح اكتر مناسبة لحالتك.\n\n### السياق:\nالناس اللي عندها اضطراب الشخصية الحدية بتظهر عليهم علامات زي السلوكيات المتطرفة، عدم الثبات العاطفي، صعوبة في العلاقات، والاعتماد على الناس التانية. كمان بيعانوا من المشاعر القوية والمفاجئة، اللي بتخليهم يغضبوا بسرعة ويحزنوا جامد.\n\n### السؤال:\nا\nلو حابب، أشرحلك أكتر أو نربط ده بأمثلة واقعية.	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:14:17.905492	\N	2026-02-14 22:14:18.382078
+841dc715-fd1f-458d-8af1-abc4644eb6d1	f025e34b-99cd-4d4e-8629-24a6d6c233ce	patient	\N	تمام هحاول انام شوية 	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:15:36.772402	\N	2026-02-14 22:15:36.779358
+349d1fbe-2030-463a-9fb9-73c745ceb9c7	f025e34b-99cd-4d4e-8629-24a6d6c233ce	ai	\N	كويس انك هتنام شوية! افتكر تاخد بالك من نفسك وتعمل روتين للنوم يساعدك تنام كويس. لو عندك اي اسئلة تانية او محتاج مساعدة قولي.\nلو حابب، أشرحلك أكتر أو نربط ده بأمثلة واقعية.	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:15:50.460197	\N	2026-02-14 22:15:51.032917
+fc8693f6-d77e-496e-ade9-5e6bce748a22	f025e34b-99cd-4d4e-8629-24a6d6c233ce	patient	\N	لا شكرا سلام دلوقتي	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:16:06.909709	\N	2026-02-14 22:16:06.911497
+c524dc46-76c8-4e9a-baff-7b11b88496bd	f025e34b-99cd-4d4e-8629-24a6d6c233ce	ai	\N	شكراً على سؤالك! باين عليك بتدور على طريقة تريح بيها نفسك وتخلي يومك أحلى. خد عندك كام نصيحة ممكن تساعدك:\n\n١. ركز على اللحظة اللي انت فيها - يعني خلي بالك من اللي حواليك واعمل الحاجات اللي بتحبها. ده هيساعدك تنسى أي حاجة مضايقاك.\n\n٢. اعمل حاجات صغيرة حلوة للناس - زي ما تقولهم "صباح الخير" أو تعملهم كوباية قهوة. دي بتبقى مفيدة جداً لما تكون حاسس بالضغط.\n\n٣. اهتم بنفسك - يعني نام كويس، اكل صح، ومارس رياضة. كل دول بيخلوا مزاجك حلو وبيقللوا التوتر.\n\n٤. حاول متتفرجش على الأخبار كتير - عشان ساعات بتقلقنا وبنحس إن الدنيا وحشة أوي.\n\n٥. دور على حد تتكلم معاه - سواء صاحب قريب منك\nلو حابب، أشرحلك أكتر أو نربط ده بأمثلة واقعية.	\N	\N	\N	\N	\N	f	\N	2026-02-14 22:16:33.128222	\N	2026-02-14 22:16:33.530172
 \.
 
 
 --
--- TOC entry 3873 (class 0 OID 17613)
--- Dependencies: 221
+-- TOC entry 5475 (class 0 OID 34747)
+-- Dependencies: 223
 -- Data for Name: ai_chat_sessions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1866,12 +1853,13 @@ a0b46180-1476-4887-b378-a0d4959337dd	1db15fab-11be-4148-9000-4bcdd745338d	I feel
 37da6543-f366-4a54-ac0d-c67a521b2c23	1db15fab-11be-4148-9000-4bcdd745338d	I feel sad	general	2026-02-08 04:07:21.989533	\N	t	1	\N	\N	2026-02-08 04:07:22.032421	2026-02-08 04:07:22.101829
 9735f1ba-bc0e-4daa-b1d0-03de2de3028e	1db15fab-11be-4148-9000-4bcdd745338d	I feel sad	general	2026-02-08 04:07:27.371129	\N	t	2	\N	\N	2026-02-08 04:07:27.372658	2026-02-08 04:07:46.24053
 add3b367-3a63-48f1-a20e-703374d591fe	1db15fab-11be-4148-9000-4bcdd745338d	I feel sad	general	2026-02-08 11:05:28.075913	\N	t	2	\N	\N	2026-02-08 11:05:28.124828	2026-02-08 11:05:49.03127
+f025e34b-99cd-4d4e-8629-24a6d6c233ce	bd600dd2-7157-41d5-a83d-3f87acc928b4	توتر من مناقشة المشروع	general	2026-02-14 22:09:36.267055	\N	t	12	\N	\N	2026-02-14 22:09:36.286891	2026-02-14 23:01:35.270482
 \.
 
 
 --
--- TOC entry 3874 (class 0 OID 17625)
--- Dependencies: 222
+-- TOC entry 5476 (class 0 OID 34761)
+-- Dependencies: 224
 -- Data for Name: audit_log; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1880,32 +1868,34 @@ COPY public.audit_log (id, user_id, action, resource_type, resource_id, change_d
 
 
 --
--- TOC entry 3875 (class 0 OID 17632)
--- Dependencies: 223
+-- TOC entry 5477 (class 0 OID 34770)
+-- Dependencies: 225
 -- Data for Name: doctor_patients; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.doctor_patients (id, doctor_id, patient_id, relationship_status, current_engagement_id, added_at, relationship_started_at, relationship_ended_at, is_active, created_at, updated_at) FROM stdin;
 c7e67fa1-9f01-4aa6-8340-3c269fa7bb85	590e9593-7762-4d99-a034-a5f79dff25bd	1db15fab-11be-4148-9000-4bcdd745338d	FULL_ACCESS	f75666c4-a68a-4839-9de3-705270a37572	2026-01-26 14:58:57.439734	2026-01-27 12:44:40.155015	\N	t	\N	2026-02-09 19:39:20.652526
+9899ee1f-2fd6-4204-b4aa-e22a50765b5d	8cc26e30-cf77-4a76-ab9e-498bb13758f0	bd600dd2-7157-41d5-a83d-3f87acc928b4	FULL_ACCESS	acd8be5a-37fc-450c-80bc-77e8d21c632d	2026-02-14 20:52:57.535791	2026-02-14 20:53:45.872216	\N	t	\N	2026-02-14 18:53:45.228557
 \.
 
 
 --
--- TOC entry 3876 (class 0 OID 17640)
--- Dependencies: 224
+-- TOC entry 5478 (class 0 OID 34781)
+-- Dependencies: 226
 -- Data for Name: doctor_profiles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.doctor_profiles (id, user_id, title, bio, specialities, experience_years, certificates, location_city, location_country, is_verified, verification_data, created_at, updated_at, profile_picture_path, verification_status, availability_status, specialization, rating, total_reviews, profile_completion_percentage, social_media, consultation_fee, years_of_experience, latitude, longitude) FROM stdin;
 590e9593-7762-4d99-a034-a5f79dff25bd	4e1bd976-626a-45a2-84ce-e306b9c23108	\N	\N	\N	\N	\N	\N	\N	f	\N	2026-01-22 15:12:17.684931	2026-02-09 17:51:08.806168	\N	unverified	offline	\N	0.00	0	0	\N	\N	\N	\N	\N
 e2d5a089-feab-4c7b-8a9d-d430e5f5c74e	425357c8-7f55-4851-9129-4b97aaad84bd	\N	\N	\N	\N	\N	\N	\N	f	\N	2026-02-09 17:43:48.290671	2026-02-09 17:51:08.806168	\N	unverified	offline	\N	0.00	0	0	\N	\N	\N	\N	\N
-38550775-a0ba-4a86-949c-9a73c492a5a4	8ad37331-0cd4-482d-bb84-3403a460e87c	\N	\N	\N	\N	\N	\N	\N	f	\N	2026-02-14 05:19:10.83906	2026-02-14 05:19:10.83906	\N	unverified	offline	\N	0.00	0	0	\N	\N	\N	\N	\N
+92cb6566-f817-4454-80dc-c509166bccc2	d586a997-039e-48d2-81ed-cb1b695a7631	\N	\N	\N	\N	\N	\N	\N	f	\N	2026-02-14 06:30:29.074253	2026-02-14 06:30:29.074253	\N	unverified	offline	\N	0.00	0	0	\N	\N	\N	\N	\N
+8cc26e30-cf77-4a76-ab9e-498bb13758f0	88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e	\N	\N	\N	\N	\N	\N	\N	f	\N	2026-02-14 18:47:31.201048	2026-02-14 18:47:31.201048	\N	unverified	offline	\N	0.00	0	0	\N	\N	\N	\N	\N
 \.
 
 
 --
--- TOC entry 3877 (class 0 OID 17654)
--- Dependencies: 225
+-- TOC entry 5479 (class 0 OID 34797)
+-- Dependencies: 227
 -- Data for Name: doctor_reviews; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1914,8 +1904,8 @@ COPY public.doctor_reviews (id, doctor_id, patient_id, rating, comment, created_
 
 
 --
--- TOC entry 3878 (class 0 OID 17660)
--- Dependencies: 226
+-- TOC entry 5480 (class 0 OID 34804)
+-- Dependencies: 228
 -- Data for Name: doctor_verification_questions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1924,18 +1914,23 @@ COPY public.doctor_verification_questions (id, doctor_id, question_key, answer, 
 
 
 --
--- TOC entry 3898 (class 0 OID 18192)
--- Dependencies: 246
+-- TOC entry 5481 (class 0 OID 34815)
+-- Dependencies: 229
 -- Data for Name: email_verification_otps; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.email_verification_otps (id, user_id, otp_code, created_at, expires_at, verified_at, attempts, is_used, ip_address, user_agent) FROM stdin;
+8dcdf5a0-bca8-42c7-838e-af9c80f05c5d	d586a997-039e-48d2-81ed-cb1b695a7631	324271	2026-02-14 16:01:30.098822	2026-02-14 16:31:30.098822	2026-02-14 16:02:33.866094	0	t	0:0:0:0:0:0:0:1	bruno-runtime/3.0.2
+d4087db4-ff81-4069-ad2f-c4a391a3afda	88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e	218773	2026-02-14 18:47:31.752144	2026-02-14 19:17:31.75211	2026-02-14 18:48:08.874384	0	t	0:0:0:0:0:0:0:1	Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+c4228abc-4390-4fca-b6bd-d1e91f3e81e1	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	197745	2026-02-14 18:49:40.884371	2026-02-14 19:19:40.884328	2026-02-14 18:50:06.823332	0	t	0:0:0:0:0:0:0:1	Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+85f1f13e-9a01-485a-9423-44990631bc04	5b730865-5196-4455-a3cd-05b4dfd3e744	748868	2026-02-14 20:57:14.996262	2026-02-14 21:27:14.996219	\N	0	f	0:0:0:0:0:0:0:1	Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+a8a0dad8-0d2d-410b-a0cb-d30cb5a72a26	7b4b4593-cd73-4ce8-aa28-cf091d3e9cd3	987478	2026-02-14 21:21:05.613601	2026-02-14 21:51:05.613554	2026-02-14 21:22:01.7428	0	t	0:0:0:0:0:0:0:1	Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
 \.
 
 
 --
--- TOC entry 3879 (class 0 OID 17668)
--- Dependencies: 227
+-- TOC entry 5482 (class 0 OID 34828)
+-- Dependencies: 230
 -- Data for Name: engagement_access_rules; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1951,8 +1946,8 @@ fdcdbf2a-3f3a-4c08-9ce6-20c6a883e9fd	LIMITED_ENGAGEMENT_ACCESS	f	t	f	f	t	f	f	t	L
 
 
 --
--- TOC entry 3880 (class 0 OID 17685)
--- Dependencies: 228
+-- TOC entry 5483 (class 0 OID 34847)
+-- Dependencies: 231
 -- Data for Name: engagement_analytics; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1961,8 +1956,8 @@ COPY public.engagement_analytics (id, engagement_id, metric_name, metric_value, 
 
 
 --
--- TOC entry 3881 (class 0 OID 17693)
--- Dependencies: 229
+-- TOC entry 5484 (class 0 OID 34858)
+-- Dependencies: 232
 -- Data for Name: engagement_events; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1971,12 +1966,14 @@ a89e7cfe-e8f6-492e-9956-b60a672cfd3f	76cffb88-8656-4c73-a6d1-dfde555b2631	INITIA
 23da6775-10ae-4115-9d22-1c8988b5bda7	76cffb88-8656-4c73-a6d1-dfde555b2631	CANCELLED	2026-01-27 16:32:36.335787	66574cc8-3141-4468-8b4f-0007ca0cedd0	{"reason": "Switching doctors", "cancelledBy": "PATIENT"}	2026-01-27 16:32:36.335787
 04756b1f-90db-480f-9759-5d52d2ae3ded	f75666c4-a68a-4839-9de3-705270a37572	INITIATED	2026-02-09 19:36:20.87023	4e1bd976-626a-45a2-84ce-e306b9c23108	{"doctorName": "adel", "patientName": "ahmed"}	2026-02-09 19:36:20.87023
 36bd4b49-fc12-42ba-b357-65a5bad2417b	f75666c4-a68a-4839-9de3-705270a37572	VERIFIED	2026-02-09 19:39:20.659518	66574cc8-3141-4468-8b4f-0007ca0cedd0	{"role": "PATIENT"}	2026-02-09 19:39:20.659518
+e4c7481a-affb-40de-8d15-f96b85dc9550	acd8be5a-37fc-450c-80bc-77e8d21c632d	INITIATED	2026-02-14 20:52:57.619778	88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e	{"initiatedBy": "doctor", "initiatorRole": "DOCTOR"}	2026-02-14 20:52:57.619808
+51afd0fa-6c46-48e0-a011-202932cf2b12	acd8be5a-37fc-450c-80bc-77e8d21c632d	VERIFIED	2026-02-14 20:53:45.801344	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	{"role": "PATIENT"}	2026-02-14 20:53:45.801364
 \.
 
 
 --
--- TOC entry 3883 (class 0 OID 17702)
--- Dependencies: 231
+-- TOC entry 5486 (class 0 OID 34870)
+-- Dependencies: 234
 -- Data for Name: engagement_messages; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1985,12 +1982,17 @@ COPY public.engagement_messages (id, engagement_id, message_uuid, sender_id, rec
 b39b2263-3021-41c4-bf65-f7f12a542e19	f75666c4-a68a-4839-9de3-705270a37572	ba109ced-1346-45df-8df1-0d6ca81682e6	\N	\N	✅ Engagement activated. Access level: FULL_ACCESS	text	2026-02-09 19:39:20.668548	\N	\N	t	\N	t	\N	2026-02-09 19:39:20.652526
 20bb7a07-d3b1-4781-98b1-97067d4bb784	f75666c4-a68a-4839-9de3-705270a37572	aef1f5d1-a83d-46bc-98a5-6f8dbf3b0689	\N	\N	🔔 Access level changed from "READ_ONLY_ACCESS" to "FULL_ACCESS"	text	2026-02-09 19:39:20.652526	\N	\N	t	\N	t	access_changed	2026-02-09 19:39:20.652526
 2280b735-02b1-4bfc-a811-3a5a976309a2	f75666c4-a68a-4839-9de3-705270a37572	dd617824-a40e-4f18-94ef-252099e01edb	\N	\N	🔔 Engagement started with access level: FULL_ACCESS	text	2026-02-09 19:39:20.652526	\N	\N	t	\N	t	engagement_started	2026-02-09 19:39:20.652526
+063660eb-ba0c-4b65-9672-6e947117a0b3	acd8be5a-37fc-450c-80bc-77e8d21c632d	0148d64a-80c2-47f5-ad8e-5e1af2c58431	\N	\N	✅ Engagement activated. Access level: FULL_ACCESS	text	2026-02-14 20:53:45.876451	\N	\N	t	\N	t	\N	2026-02-14 18:53:45.228557
+5c995b53-bf9a-42c8-86d9-2473b6db054e	acd8be5a-37fc-450c-80bc-77e8d21c632d	a8772041-6194-4618-b840-910189b2a6da	\N	\N	🔔 Access level changed from "None" to "FULL_ACCESS"	text	2026-02-14 18:53:45.228557	\N	\N	t	\N	t	access_changed	2026-02-14 18:53:45.228557
+b9b8621a-2864-4a48-896e-6004eeb8ce75	acd8be5a-37fc-450c-80bc-77e8d21c632d	c3973de1-d3be-4329-8f7e-4eeee88d934c	\N	\N	🔔 Engagement started with access level: FULL_ACCESS	text	2026-02-14 18:53:45.228557	\N	\N	t	\N	t	engagement_started	2026-02-14 18:53:45.228557
+e8970e1c-bf26-4ec5-b879-4bf925e62a7f	acd8be5a-37fc-450c-80bc-77e8d21c632d	74b5eaa5-21b4-442f-a311-6e653e5a511b	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e	ازيك يا دكتور	text	2026-02-14 20:54:03.308047	\N	\N	t	\N	f	\N	2026-02-14 18:54:03.065626
+e4e3c7e5-8481-44a2-b082-a0fdca5e4ee3	acd8be5a-37fc-450c-80bc-77e8d21c632d	93eb7a91-e903-4e31-af4f-c27e447b2f66	88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	الحمدلله يا حبيبي انت ايه اخبارك	text	2026-02-14 20:55:01.751974	\N	\N	t	\N	f	\N	2026-02-14 18:55:01.401639
 \.
 
 
 --
--- TOC entry 3884 (class 0 OID 17714)
--- Dependencies: 232
+-- TOC entry 5487 (class 0 OID 34884)
+-- Dependencies: 235
 -- Data for Name: engagement_sessions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1999,53 +2001,48 @@ COPY public.engagement_sessions (id, engagement_id, user_id, session_token, sess
 
 
 --
--- TOC entry 3885 (class 0 OID 17722)
--- Dependencies: 233
+-- TOC entry 5488 (class 0 OID 34895)
+-- Dependencies: 236
 -- Data for Name: engagement_verification_tokens; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.engagement_verification_tokens (id, engagement_id, token, verification_type, qr_code_data, doctor_id, patient_id, verified_by, verified_at, expires_at, status, created_at) FROM stdin;
 3c0c4da0-e10f-49b5-bd17-f991027b87f2	76cffb88-8656-4c73-a6d1-dfde555b2631	C4B3EB02	start	neuralhealer://verify/start/C4B3EB02	\N	\N	\N	\N	2026-01-27 16:33:47.066783	pending	2026-01-27 16:30:47.068293
 de989da7-9c19-4f74-97fc-088400de3704	f75666c4-a68a-4839-9de3-705270a37572	4884380B	start	neuralhealer://verify/start/4884380B	\N	\N	\N	2026-02-09 19:39:20.659518	2026-02-09 19:39:20.87023	verified	2026-02-09 19:36:20.87249
+9c251e9b-b192-47c5-9d33-3830021b3274	acd8be5a-37fc-450c-80bc-77e8d21c632d	FB8C4A4D	start	neuralhealer://verify/start/FB8C4A4D	\N	\N	\N	2026-02-14 20:53:45.799695	2026-02-14 20:55:57.622186	verified	2026-02-14 20:52:57.625843
 \.
 
 
 --
--- TOC entry 3886 (class 0 OID 17730)
--- Dependencies: 234
+-- TOC entry 5489 (class 0 OID 34907)
+-- Dependencies: 237
 -- Data for Name: engagements; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.engagements (id, engagement_id, doctor_id, patient_id, access_rule_name, status, engagement_type, start_at, end_at, ended_by, termination_reason, start_verified_at, end_verified_at, notes, created_at, updated_at, initiated_by) FROM stdin;
 76cffb88-8656-4c73-a6d1-dfde555b2631	ENG-2026-000008	590e9593-7762-4d99-a034-a5f79dff25bd	1db15fab-11be-4148-9000-4bcdd745338d	FULL_ACCESS	cancelled	\N	\N	2026-01-27 16:32:36.33428	66574cc8-3141-4468-8b4f-0007ca0cedd0	Switching doctors	\N	\N	\N	2026-01-27 16:30:47.05719	2026-01-27 16:32:36.326928	doctor
 f75666c4-a68a-4839-9de3-705270a37572	ENG-2026-000009	590e9593-7762-4d99-a034-a5f79dff25bd	1db15fab-11be-4148-9000-4bcdd745338d	FULL_ACCESS	active	\N	2026-02-09 19:39:20.659518	\N	\N	\N	2026-02-09 19:39:20.659518	\N	\N	2026-02-09 19:36:20.825484	2026-02-09 19:39:20.652526	doctor
+acd8be5a-37fc-450c-80bc-77e8d21c632d	ENG-2026-000013	8cc26e30-cf77-4a76-ab9e-498bb13758f0	bd600dd2-7157-41d5-a83d-3f87acc928b4	FULL_ACCESS	active	\N	2026-02-14 20:53:45.800479	\N	\N	\N	2026-02-14 20:53:45.800494	\N	\N	2026-02-14 20:52:57.433206	2026-02-14 18:53:45.228557	doctor
 \.
 
 
 --
--- TOC entry 3887 (class 0 OID 17739)
--- Dependencies: 235
+-- TOC entry 5490 (class 0 OID 34923)
+-- Dependencies: 238
 -- Data for Name: message_queues; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.message_queues (id, job_type, payload, status, scheduled_at, processed_at, retry_count, error_message, created_at) FROM stdin;
-472f718e-19fe-4e9d-a333-3b96ab89cbe8	EMAIL_NOTIFICATION	{"body": "Hi ahmed, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "a03f93bc-f258-46a0-bf71-414d0e9442cf", "userName": "ahmed", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "01de5b8c-76be-4e88-bf63-c8e0ae794c3d"}	completed	2026-01-30 17:17:20.79872	2026-01-30 17:17:20.927721	0	\N	2026-01-30 17:17:20.79872
-95003dac-e597-4d0a-ba95-75107b3e15f6	EMAIL_NOTIFICATION	{"body": "Hi Dr. Sarah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "425357c8-7f55-4851-9129-4b97aaad84bd", "userName": "Dr. Sarah", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "00bc985e-c736-44eb-8fd3-a23965d07477"}	completed	2026-02-09 17:43:48.162384	2026-02-09 17:43:48.381029	0	\N	2026-02-09 17:43:48.162384
-40f3dac7-327b-4626-a1cd-732828a93663	EMAIL_NOTIFICATION	{"body": "Hi Dr. ahmed, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "d2a5cea5-3fef-4fee-a45a-497003bfcb3c", "userName": "Dr. ahmed", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "c286baea-bf90-4325-9d63-143e518766da"}	completed	2026-02-13 22:34:10.547419	2026-02-13 22:34:11.540392	0	\N	2026-02-13 22:34:10.547419
-9a57fdba-56ac-47a0-8ebf-72c4d4f9d42e	EMAIL_NOTIFICATION	{"body": "Hi Dr. Sarah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "ef0fe20c-eda9-43fe-9254-b6691e8a7719", "userName": "Dr. Sarah", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "febbe18b-2d2a-421e-8a66-d32674154cbf"}	failed	2026-02-14 00:43:38.215295	2026-02-14 02:22:50.939233	3	Missing recipientEmail	2026-02-14 00:43:38.215295
-63182c62-54cc-4b89-b295-47ceaf093f85	EMAIL_NOTIFICATION	{"body": "Hi Dr. Sarah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "a45e1f65-69a4-4ede-b80b-d6739651e5a9", "userName": "Dr. Sarah", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "d3eada50-a24b-4061-8b45-b2d77398724c"}	failed	2026-02-14 01:14:20.802325	2026-02-14 02:22:51.193508	3	Missing recipientEmail	2026-02-14 01:14:20.802325
-9abbc480-90d2-4d95-9ff7-069ee8a81bc0	EMAIL_NOTIFICATION	{"body": "Hi Dr. Sarah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "9b199c08-f6a9-4b57-a595-c6838409e362", "userName": "Dr. Sarah", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "4c09ffb9-a507-4790-b0a7-d196d63d9771"}	completed	2026-02-14 02:29:02.452081	2026-02-14 02:29:06.095	0	\N	2026-02-14 02:29:02.452081
-682f11db-9e5e-46ec-8c29-407b749fd4e9	EMAIL_NOTIFICATION	{"body": "Hi John, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "e72b0166-04b2-4d33-815d-6965dd16a698", "userName": "John", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "906b3920-89f4-4886-ba50-f8974f282f29"}	completed	2026-02-14 02:34:12.544291	2026-02-14 02:34:16.468003	0	\N	2026-02-14 02:34:12.544291
-e7aa59f3-2ab2-4494-bd0f-ae1e2d84aced	EMAIL_NOTIFICATION	{"body": "Hi Dr. Sarah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "0578f359-d47b-4b47-b3f2-64e985d3f7aa", "userName": "Dr. Sarah", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "312f2e8f-f174-4b79-bb0e-f88da1af8be3"}	completed	2026-02-14 03:02:55.162929	2026-02-14 03:02:58.412605	0	\N	2026-02-14 03:02:55.162929
-1a06d77b-08e0-4c97-a62c-4259a58a4f82	EMAIL_NOTIFICATION	{"body": "Hi Dr. Sarah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "8144a0bc-2e10-4618-bd0d-9e6c6d6511f9", "otpCode": null, "userName": "Dr. Sarah", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "1926f681-8de0-484b-9181-f6047d019485"}	completed	2026-02-14 03:11:59.031998	2026-02-14 03:12:03.66571	0	\N	2026-02-14 03:11:59.031998
-07857dbd-7f09-4f31-ab16-ca4f03b4bc0d	EMAIL_NOTIFICATION	{"body": "Hi Dr. Sarah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "93158a34-6d54-4020-b029-6265a31cf450", "otpCode": null, "userName": "Dr. Sarah", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "79d36f40-f9d1-416c-8dd8-3cb7130b5040"}	completed	2026-02-14 03:17:09.17448	2026-02-14 03:17:09.94043	0	\N	2026-02-14 03:17:09.17448
-d94471b1-c8d5-4edf-9329-8a898f43145a	EMAIL_NOTIFICATION	{"body": "Hi Dr. Sarah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "8ad37331-0cd4-482d-bb84-3403a460e87c", "otpCode": null, "userName": "Dr. Sarah", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "adc8e84b-3cc0-4db0-8f59-d80a86891b5f"}	completed	2026-02-14 03:20:47.066792	2026-02-14 03:20:48.390384	0	\N	2026-02-14 03:20:47.066792
+COPY public.message_queues (id, job_type, payload, status, scheduled_at, processed_at, retry_count, error_message, created_at, priority) FROM stdin;
+bbc0f856-cc01-471a-a6b8-a462be7cd6f5	EMAIL_NOTIFICATION	{"body": "Hi Abdallah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "e460d3b6-b6a7-44ed-8b48-bdad9ed143b3", "userName": "Abdallah", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "b734bedd-619c-49a2-be86-bcd59fe0ad7e"}	completed	2026-02-14 16:50:06.690805	2026-02-14 16:50:07.677371	0	\N	2026-02-14 16:50:06.690805	normal
+8a59d563-ab68-4459-bdfc-8c2a89ad6428	EMAIL_NOTIFICATION	{"body": "Hi Muhammed , we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "7b4b4593-cd73-4ce8-aa28-cf091d3e9cd3", "userName": "Muhammed ", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "47734100-f248-4b45-bd37-a044c7db917f"}	completed	2026-02-14 19:22:01.567571	2026-02-14 22:56:05.910658	0	\N	2026-02-14 19:22:01.567571	normal
+5b2f527c-cd63-4999-86f5-de1c47b22355	EMAIL_NOTIFICATION	{"body": "Hi Dr. Sarah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "d586a997-039e-48d2-81ed-cb1b695a7631", "userName": "Dr. Sarah", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "3d7df237-c8d7-48de-b0b3-2060cfac6ef9"}	completed	2026-02-14 14:04:12.152065	2026-02-14 14:04:16.157485	0	\N	2026-02-14 14:04:12.152065	normal
+3712712e-7286-43f0-8de2-8e986aea3c7e	EMAIL_NOTIFICATION	{"body": "Hi Abdallah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.", "title": "Welcome to NeuralHealer! 🎉", "userId": "88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e", "userName": "Abdallah", "doctorName": "Doctor", "templateKey": "USER_WELCOME", "notificationId": "9dec8777-5d05-436b-853c-6e4890e4d405"}	completed	2026-02-14 16:48:08.74399	2026-02-14 16:48:12.570215	0	\N	2026-02-14 16:48:08.74399	normal
 \.
 
 
 --
--- TOC entry 3888 (class 0 OID 17749)
--- Dependencies: 236
+-- TOC entry 5491 (class 0 OID 34936)
+-- Dependencies: 239
 -- Data for Name: notification_message_templates; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -2071,6 +2068,10 @@ b2aa0a60-2c03-4aba-87dc-665a1dacf8cb	USER_WELCOME	ar	مرحباً بك في Neur
 0001d2b7-e4b1-46ac-ae22-28bdaf5d46ff	USER_WELCOME	en	Welcome to NeuralHealer! 🎉	Hi {userName}, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.	patient	normal	\N	2026-01-27 17:06:35.291358	2026-01-27 17:06:35.291358	{"sse": true, "email": true}
 250fd89e-09b5-4c84-98b2-5fba7ca5d4fd	ENGAGEMENT_STARTED	ar	تم تفعيل المتابعة	المريض {patientName} قام بالتحقق وبدأ المتابعة.	doctor	high	\N	2026-01-27 15:37:34.747301	2026-01-27 15:37:34.747301	{"sse": true, "email": true}
 f29bbc1a-8033-4440-ab72-642e06c3bfd4	ENGAGEMENT_STARTED	en	Engagement Activated	Patient {patientName} has verified and started the engagement.	doctor	high	\N	2026-01-27 15:37:34.747301	2026-01-27 15:37:34.747301	{"sse": true, "email": true}
+a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d	EMAIL_VERIFICATION	en	Verify Your Email Address	Your email verification code is: {otpCode}. This code will expire in 15 minutes.	patient	high	\N	2026-02-14 06:05:00	2026-02-14 06:05:00	{"sms": false, "sse": true, "push": false, "email": true, "whatsapp": false}
+b2c3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e	EMAIL_VERIFICATION	en	Verify Your Email Address	Your email verification code is: {otpCode}. This code will expire in 15 minutes.	doctor	high	\N	2026-02-14 06:05:00	2026-02-14 06:05:00	{"sms": false, "sse": true, "push": false, "email": true, "whatsapp": false}
+c3d4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f	EMAIL_VERIFICATION	ar	تحقق من عنوان بريدك الإلكتروني	رمز التحقق من بريدك الإلكتروني هو: {otpCode}. سينتهي صلاحية هذا الرمز في 15 دقيقة.	patient	high	\N	2026-02-14 06:05:00	2026-02-14 06:05:00	{"sms": false, "sse": true, "push": false, "email": true, "whatsapp": false}
+d4e5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a	EMAIL_VERIFICATION	ar	تحقق من عنوان بريدك الإلكتروني	رمز التحقق من بريدك الإلكتروني هو: {otpCode}. سينتهي صلاحية هذا الرمز في 15 دقيقة.	doctor	high	\N	2026-02-14 06:05:00	2026-02-14 06:05:00	{"sms": false, "sse": true, "push": false, "email": true, "whatsapp": false}
 abc0df86-f98f-4691-886a-b483720afbcc	ENGAGEMENT_CANCELLED	en	Engagement Cancelled	{otherPartyName} has cancelled the engagement.	target	high	\N	2026-01-27 15:37:34.747301	2026-01-27 15:37:34.747301	{"sse": true, "email": true}
 056f9d30-a184-44e8-80cc-23a4d849cc74	ENGAGEMENT_CANCELLED	ar	تم إلغاء المتابعة	لقد قمت بإلغاء المتابعة مع {otherPartyName}.	initiator	high	\N	2026-01-27 15:37:34.747301	2026-01-27 15:37:34.747301	{"sse": true, "email": true}
 5d0c934b-f66a-4a55-85d3-ebc5d143d021	ENGAGEMENT_CANCELLED	ar	تم إلغاء المتابعة	{otherPartyName} قام بإلغاء المتابعة.	target	high	\N	2026-01-27 15:37:34.747301	2026-01-27 15:37:34.747301	{"sse": true, "email": true}
@@ -2078,16 +2079,12 @@ abc0df86-f98f-4691-886a-b483720afbcc	ENGAGEMENT_CANCELLED	en	Engagement Cancelle
 e1f24e9d-e909-4dc3-8ecd-3e6efaa13128	USER_REENGAGE_ACTIVE	en	We miss you! 👋	Hey {userName}, it's been 3 days since your last visit. How are you feeling today? Check in with your health companion!	patient	normal	\N	2026-01-27 17:06:35.291358	2026-01-27 17:06:35.291358	{"sse": true, "email": true}
 7a05789c-03b0-45cd-9759-897e1382bc18	USER_INACTIVITY_WARNING	ar	ابقَ على تواصل مع صحتك	مرحباً {userName}، لاحظنا أنك لم تسجل دخولك لمدة 14 يوماً. صحتك تهمنا - عد وشاهد ما الجديد!	patient	normal	\N	2026-01-27 17:06:35.291358	2026-01-27 17:06:35.291358	{"sse": true, "email": true}
 3f6fcbc7-b114-4cc0-b2f4-6fe7ec4ce2f7	USER_INACTIVITY_WARNING	en	Stay Connected with Your Health	Hi {userName}, we noticed you haven't logged in for 14 days. Your health journey matters to us - come back and see what's new!	patient	normal	\N	2026-01-27 17:06:35.291358	2026-01-27 17:06:35.291358	{"sse": true, "email": true}
-a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d	EMAIL_VERIFICATION	en	Verify Your Email Address	Your email verification code is: {otpCode}. This code will expire in 15 minutes.	patient	high	\N	2026-02-14 06:05:00.000000	2026-02-14 06:05:00.000000	{"sse": true, "email": true, "push": false, "sms": false, "whatsapp": false}
-b2c3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e	EMAIL_VERIFICATION	en	Verify Your Email Address	Your email verification code is: {otpCode}. This code will expire in 15 minutes.	doctor	high	\N	2026-02-14 06:05:00.000000	2026-02-14 06:05:00.000000	{"sse": true, "email": true, "push": false, "sms": false, "whatsapp": false}
-c3d4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f	EMAIL_VERIFICATION	ar	تحقق من عنوان بريدك الإلكتروني	رمز التحقق من بريدك الإلكتروني هو: {otpCode}. سينتهي صلاحية هذا الرمز في 15 دقيقة.	patient	high	\N	2026-02-14 06:05:00.000000	2026-02-14 06:05:00.000000	{"sse": true, "email": true, "push": false, "sms": false, "whatsapp": false}
-d4e5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a	EMAIL_VERIFICATION	ar	تحقق من عنوان بريدك الإلكتروني	رمز التحقق من بريدك الإلكتروني هو: {otpCode}. سينتهي صلاحية هذا الرمز في 15 دقيقة.	doctor	high	\N	2026-02-14 06:05:00.000000	2026-02-14 06:05:00.000000	{"sse": true, "email": true, "push": false, "sms": false, "whatsapp": false}
 \.
 
 
 --
--- TOC entry 3889 (class 0 OID 17759)
--- Dependencies: 237
+-- TOC entry 5492 (class 0 OID 34952)
+-- Dependencies: 240
 -- Data for Name: notification_templates; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -2101,8 +2098,8 @@ COPY public.notification_templates (id, type, title_template, message_template, 
 
 
 --
--- TOC entry 3890 (class 0 OID 17768)
--- Dependencies: 238
+-- TOC entry 5493 (class 0 OID 34965)
+-- Dependencies: 241
 -- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -2133,24 +2130,45 @@ b2073957-24ab-4c96-b837-a37262221a53	4e1bd976-626a-45a2-84ce-e306b9c23108	ENGAGE
 ae88cb20-2bf2-4ab5-878a-75156533214d	4e1bd976-626a-45a2-84ce-e306b9c23108	ENGAGEMENT_CANCELLED	Engagement Cancelled	abdallah ahmed has cancelled the engagement.	{"engagementId": "76cffb88-8656-4c73-a6d1-dfde555b2631", "otherPartyName": "abdallah ahmed"}	t	2026-01-27 16:32:36.326928	2026-02-09 19:39:39.910356	\N	2026-01-27 16:32:36.326928	high	engagement	{"sse": true}	{}	f
 07b9f5e6-35cb-4c99-8834-0c6ed10529d1	4e1bd976-626a-45a2-84ce-e306b9c23108	ENGAGEMENT_CANCELLED	Engagement Cancelled	Patient abdallah has cancelled the engagement.	{}	t	2026-01-27 12:54:05.05959	2026-02-09 19:39:40.659145	\N	2026-01-27 12:54:05.060783	normal	system	{"sse": true}	{}	f
 c728d5ae-2632-40b7-807a-f8e4e43a9517	66574cc8-3141-4468-8b4f-0007ca0cedd0	ENGAGEMENT_STARTED	Engagement Activated	Dr. ahmed has verified and started the engagement.	{}	f	2026-02-14 01:14:41.759281	\N	\N	2026-02-14 01:14:41.761891	high	engagement	{"sse": false}	{}	f
-adc8e84b-3cc0-4db0-8f59-d80a86891b5f	8ad37331-0cd4-482d-bb84-3403a460e87c	USER_WELCOME	Welcome to NeuralHealer! 🎉	Hi Dr. Sarah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.	{"userName": "Dr. Sarah"}	f	2026-02-14 03:20:47.066792	\N	\N	2026-02-14 03:20:47.066792	normal	system	{"sms": false, "sse": true, "push": false, "email": true, "whatsapp": false}	{}	t
+61152a95-8c4e-4473-a73d-734c149ef6a5	d586a997-039e-48d2-81ed-cb1b695a7631	EMAIL_VERIFICATION	Verify Your Email Address	Your verification code is: 324271	{"otpCode": "324271", "userName": "Dr. Sarah"}	f	2026-02-14 16:01:42.756732	\N	\N	2026-02-14 16:01:42.7742	high	system	{"sse": true, "email": true}	{}	f
+3d7df237-c8d7-48de-b0b3-2060cfac6ef9	d586a997-039e-48d2-81ed-cb1b695a7631	USER_WELCOME	Welcome to NeuralHealer! 🎉	Hi Dr. Sarah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.	{"userName": "Dr. Sarah"}	f	2026-02-14 14:04:12.152065	\N	\N	2026-02-14 14:04:12.152065	normal	system	{"sms": false, "sse": true, "push": false, "email": true, "whatsapp": false}	{}	t
+9dec8777-5d05-436b-853c-6e4890e4d405	88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e	USER_WELCOME	Welcome to NeuralHealer! 🎉	Hi Abdallah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.	{"userName": "Abdallah"}	f	2026-02-14 16:48:08.74399	\N	\N	2026-02-14 16:48:08.74399	normal	system	{"sms": false, "sse": true, "push": false, "email": true, "whatsapp": false}	{}	t
+150f928f-8240-49d4-8ce5-debe3246866e	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	EMAIL_VERIFICATION	Verify Your Email Address	Your verification code is: 197745	{"otpCode": "197745", "userName": "Abdallah"}	f	2026-02-14 18:49:42.765862	\N	\N	2026-02-14 18:49:42.766832	high	system	{"sse": true, "email": true}	{}	f
+b734bedd-619c-49a2-be86-bcd59fe0ad7e	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	USER_WELCOME	Welcome to NeuralHealer! 🎉	Hi Abdallah, we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.	{"userName": "Abdallah"}	f	2026-02-14 16:50:06.690805	\N	\N	2026-02-14 16:50:06.690805	normal	system	{"sms": false, "sse": true, "push": false, "email": true, "whatsapp": false}	{}	t
+7ee5a5bf-5a3c-4ec2-b66b-e8332801d1cb	5b730865-5196-4455-a3cd-05b4dfd3e744	EMAIL_VERIFICATION	Verify Your Email Address	Your verification code is: 748868	{"otpCode": "748868", "userName": "Karima"}	f	2026-02-14 20:57:17.096627	\N	\N	2026-02-14 20:57:17.097238	high	system	{"sse": true, "email": true}	{}	f
+29e39863-f53b-42c6-b736-d0464b96b7f7	7b4b4593-cd73-4ce8-aa28-cf091d3e9cd3	EMAIL_VERIFICATION	Verify Your Email Address	Your verification code is: 987478	{"otpCode": "987478", "userName": "Muhammed "}	t	2026-02-14 21:21:07.389161	2026-02-14 21:52:52.991249	\N	2026-02-14 21:21:07.391079	high	system	{"sse": true, "email": true}	{}	f
+47734100-f248-4b45-bd37-a044c7db917f	7b4b4593-cd73-4ce8-aa28-cf091d3e9cd3	USER_WELCOME	Welcome to NeuralHealer! 🎉	Hi Muhammed , we're thrilled to have you here! Your journey to better health starts now. Let us know if you need any help getting started.	{"userName": "Muhammed "}	t	2026-02-14 19:22:01.567571	2026-02-14 21:52:54.234848	\N	2026-02-14 19:22:01.567571	normal	system	{"sms": false, "sse": true, "push": false, "email": true, "whatsapp": false}	{}	t
+e5dc7a36-7966-4f71-afa3-ed4ec52fdee7	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	MESSAGE_RECEIVED	New Message	Abdallah Ahmed: الحمدلله يا حبيبي انت ايه اخبارك	{"preview": "الحمدلله يا حبيبي انت ايه اخبارك", "senderId": "88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e", "senderName": "Abdallah Ahmed"}	f	2026-02-14 20:55:01.950213	\N	\N	2026-02-14 20:55:01.950855	normal	message	{"sse": true}	{}	f
+37f944a0-1ea7-41f5-9e36-4f0f57463b70	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	AI_RESPONSE_READY	AI Analysis Ready	Your smart medical assistant has provided a response.	{"resultId": "371c810f-a1ac-44d8-bda3-12b63cbc8db5"}	f	2026-02-14 22:10:02.291778	\N	\N	2026-02-14 22:10:02.292473	normal	ai	{"sse": true}	{}	f
+218d7cf9-531c-4f04-b4b7-143dd8162f37	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	AI_RESPONSE_READY	AI Analysis Ready	Your smart medical assistant has provided a response.	{"resultId": "cb28b3b4-ae81-405c-9ecf-60538e89cba7"}	f	2026-02-14 22:10:58.402641	\N	\N	2026-02-14 22:10:58.403161	normal	ai	{"sse": true}	{}	f
+7e79fec0-33c1-444f-b2f0-157839cbe08f	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	AI_RESPONSE_READY	AI Analysis Ready	Your smart medical assistant has provided a response.	{"resultId": "8b64c539-292b-41fd-ac1a-7af32179498d"}	f	2026-02-14 22:12:44.314338	\N	\N	2026-02-14 22:12:44.314903	normal	ai	{"sse": true}	{}	f
+bd0ae68b-6779-4ec8-af0b-f2e91e09255a	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	AI_RESPONSE_READY	AI Analysis Ready	Your smart medical assistant has provided a response.	{"resultId": "f3181a4f-42a2-4891-bb24-881a6859e089"}	f	2026-02-14 22:14:18.174709	\N	\N	2026-02-14 22:14:18.175382	normal	ai	{"sse": true}	{}	f
+66abc52a-f361-4b78-9cfb-f7280fb7bed8	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	AI_RESPONSE_READY	AI Analysis Ready	Your smart medical assistant has provided a response.	{"resultId": "642f49f9-ee7a-49cd-bab3-6cb241c3bac7"}	f	2026-02-14 22:15:50.736902	\N	\N	2026-02-14 22:15:50.742374	normal	ai	{"sse": true}	{}	f
+44f6ae29-bfd3-417f-9c0c-eb0f8b60fb4f	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	AI_RESPONSE_READY	AI Analysis Ready	Your smart medical assistant has provided a response.	{"resultId": "de21bdc9-b223-4558-8e5b-5881edf1a4d0"}	f	2026-02-14 22:16:33.38977	\N	\N	2026-02-14 22:16:33.390272	normal	ai	{"sse": true}	{}	f
+bff1db81-603e-4f9e-a544-da47bfe21063	88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e	MESSAGE_RECEIVED	New Message	Abdallah Ahmed: ازيك يا دكتور	{"preview": "ازيك يا دكتور", "senderId": "e460d3b6-b6a7-44ed-8b48-bdad9ed143b3", "senderName": "Abdallah Ahmed"}	t	2026-02-14 20:54:03.511237	2026-02-14 22:45:04.73492	\N	2026-02-14 20:54:03.512052	normal	message	{"sse": true}	{}	f
+dd41a4a1-f480-4b71-b980-4a67d38b01f6	88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e	ENGAGEMENT_STARTED	Engagement Activated	Abdallah has verified and started the engagement.	{}	t	2026-02-14 20:53:46.095001	2026-02-14 22:45:06.761568	\N	2026-02-14 20:53:46.09792	high	engagement	{"sse": true}	{}	f
+d3cebc2c-43f6-4d26-b888-f1c847e5fc27	88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e	ENGAGEMENT_STARTED	Engagement Activated	Patient Abdallah Ahmed has verified and started the engagement.	{"patientName": "Abdallah Ahmed", "engagementId": "acd8be5a-37fc-450c-80bc-77e8d21c632d"}	t	2026-02-14 18:53:45.228557	2026-02-14 22:45:12.663589	\N	2026-02-14 18:53:45.228557	high	engagement	{"sse": true}	{}	f
+d1baefdf-20e0-4858-b0ab-4292c62888b3	88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e	EMAIL_VERIFICATION	Verify Your Email Address	Your verification code is: 218773	{"otpCode": "218773", "userName": "Abdallah"}	t	2026-02-14 18:47:33.804463	2026-02-14 22:45:12.865344	\N	2026-02-14 18:47:33.809559	high	system	{"sse": true, "email": true}	{}	f
 \.
 
 
 --
--- TOC entry 3891 (class 0 OID 17782)
--- Dependencies: 239
+-- TOC entry 5494 (class 0 OID 34982)
+-- Dependencies: 242
 -- Data for Name: patient_profiles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.patient_profiles (id, user_id, date_of_birth, gender, emergency_contact, primary_health_concerns, medical_history, notes, created_at, updated_at) FROM stdin;
 1db15fab-11be-4148-9000-4bcdd745338d	66574cc8-3141-4468-8b4f-0007ca0cedd0	\N	\N	\N	\N	\N	\N	2026-01-22 15:12:48.683225	2026-01-22 15:12:48.683225
+bd600dd2-7157-41d5-a83d-3f87acc928b4	e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	\N	\N	\N	\N	\N	\N	2026-02-14 18:49:40.474637	2026-02-14 18:49:40.474637
+02add7be-94a9-4a87-b69a-6b1ee9ff77e5	5b730865-5196-4455-a3cd-05b4dfd3e744	\N	\N	\N	\N	\N	\N	2026-02-14 20:57:14.486014	2026-02-14 20:57:14.486014
+2d5627cd-6c8c-4882-ba7f-e64ec46d1272	7b4b4593-cd73-4ce8-aa28-cf091d3e9cd3	\N	\N	\N	\N	\N	\N	2026-02-14 21:21:05.078082	2026-02-14 21:21:05.078082
 \.
 
 
 --
--- TOC entry 3892 (class 0 OID 17790)
--- Dependencies: 240
+-- TOC entry 5495 (class 0 OID 34992)
+-- Dependencies: 243
 -- Data for Name: platform_analytics; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -2159,8 +2177,8 @@ COPY public.platform_analytics (id, analytics_date, total_users, new_users, acti
 
 
 --
--- TOC entry 3893 (class 0 OID 17807)
--- Dependencies: 241
+-- TOC entry 5496 (class 0 OID 35011)
+-- Dependencies: 244
 -- Data for Name: security_authentication_tokens; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -2169,8 +2187,8 @@ COPY public.security_authentication_tokens (id, user_id, token_type, token, expi
 
 
 --
--- TOC entry 3894 (class 0 OID 17814)
--- Dependencies: 242
+-- TOC entry 5497 (class 0 OID 35022)
+-- Dependencies: 245
 -- Data for Name: system_settings; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -2189,8 +2207,8 @@ c450b560-c3f7-4c75-92b3-601a05e89e1c	doctor_verification_questions	[{"key": "lic
 
 
 --
--- TOC entry 3895 (class 0 OID 17823)
--- Dependencies: 243
+-- TOC entry 5498 (class 0 OID 35033)
+-- Dependencies: 246
 -- Data for Name: url_shortcuts; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -2199,8 +2217,8 @@ COPY public.url_shortcuts (id, user_id, url, label, short_code, visit_count, exp
 
 
 --
--- TOC entry 3896 (class 0 OID 17831)
--- Dependencies: 244
+-- TOC entry 5499 (class 0 OID 35045)
+-- Dependencies: 247
 -- Data for Name: user_management_metrics; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -2209,30 +2227,34 @@ COPY public.user_management_metrics (id, user_id, metric_name, metric_value, rec
 
 
 --
--- TOC entry 3897 (class 0 OID 17840)
--- Dependencies: 245
+-- TOC entry 5500 (class 0 OID 35057)
+-- Dependencies: 248
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.users (id, email, password_hash, first_name, last_name, phone, timezone, email_verified_at, phone_verified_at, is_active, last_login_at, mfa_enabled, created_at, updated_at, deleted_at, language, activity_status, last_activity_check, email_verification_required, failed_verification_attempts, verification_locked_until, email_verification_sent_at) FROM stdin;
-425357c8-7f55-4851-9129-4b97aaad84bd	doctor@example.com	$2a$10$Dp9r0q.VlUak7y.idHmLV.2tUceD7CFGH1zA/0gOvuZsiWU4awg5u	Dr. Sarah	Johnson	\N	UTC	\N	\N	t	\N	f	2026-02-09 17:43:48.274005	2026-02-09 17:43:48.274005	\N	en	active	2026-02-09 17:43:48.250424	t	0	\N	\N
-4e1bd976-626a-45a2-84ce-e306b9c23108	doctor@test.com	$2a$10$nJu9zspotzE.NKFcryH.KuOzrHyKNrLC7IN06Pwe5.wOGbP3MMHAy	ahmed	adel	\N	UTC	\N	\N	t	2026-02-09 19:37:49.929387	f	2026-01-22 15:12:17.683385	2026-02-09 19:37:49.826946	\N	en	active	2026-01-27 17:07:46.08543	t	0	\N	\N
-66574cc8-3141-4468-8b4f-0007ca0cedd0	patient@test.com	$2a$10$X6uyO7JlEnEoeFhV0xnLw.ArCaVCVenNtseDAKK.x4WpAyGhM76XS	abdallah	ahmed	\N	UTC	\N	\N	t	2026-02-14 01:12:44.949507	f	2026-01-22 15:12:48.680639	2026-02-13 23:14:20.985666	\N	en	active	2026-01-27 17:07:46.08543	t	0	\N	\N
-8ad37331-0cd4-482d-bb84-3403a460e87c	anmedadel16@gmail.com	$2a$10$lsV1D0sBx.keg2hx/uhgn.oV5G1LT1dQoRprssO4TFDnWAw.IPcU.	Dr. Sarah	Johnson	\N	UTC	\N	\N	t	\N	f	2026-02-14 05:19:10.838946	2026-02-14 05:19:10.838946	\N	en	active	2026-02-14 05:19:10.838439	t	0	\N	\N
+425357c8-7f55-4851-9129-4b97aaad84bd	doctor@example.com	$2a$10$Dp9r0q.VlUak7y.idHmLV.2tUceD7CFGH1zA/0gOvuZsiWU4awg5u	Dr. Sarah	Johnson	\N	UTC	\N	\N	t	\N	f	2026-02-09 17:43:48.274005	2026-02-14 03:43:25.157999	\N	en	active	2026-02-09 17:43:48.250424	f	0	\N	\N
+4e1bd976-626a-45a2-84ce-e306b9c23108	doctor@test.com	$2a$10$nJu9zspotzE.NKFcryH.KuOzrHyKNrLC7IN06Pwe5.wOGbP3MMHAy	ahmed	adel	\N	UTC	\N	\N	t	2026-02-09 19:37:49.929387	f	2026-01-22 15:12:17.683385	2026-02-14 03:43:25.157999	\N	en	active	2026-01-27 17:07:46.08543	f	0	\N	\N
+66574cc8-3141-4468-8b4f-0007ca0cedd0	patient@test.com	$2a$10$X6uyO7JlEnEoeFhV0xnLw.ArCaVCVenNtseDAKK.x4WpAyGhM76XS	abdallah	ahmed	\N	UTC	\N	\N	t	2026-02-14 15:26:37.97625	f	2026-01-22 15:12:48.680639	2026-02-14 13:28:16.088105	\N	en	active	2026-01-27 17:07:46.08543	f	0	\N	\N
+d586a997-039e-48d2-81ed-cb1b695a7631	neuralback@gmail.com	$2a$10$Vb4/67Kf5hBbv33B1Z4Tpuw4wtDLMRDEHMhQxn/8giwAqLRRWVfbi	Dr. Sarah	Johnson	\N	UTC	2026-02-14 16:02:33.866094	\N	t	2026-02-14 16:03:00.946725	f	2026-02-14 06:30:29.044575	2026-02-14 14:04:39.225097	\N	en	active	2026-02-14 06:30:29.017792	f	0	\N	2026-02-14 16:01:42.811495
+7b4b4593-cd73-4ce8-aa28-cf091d3e9cd3	muhamedabdelraheem22@gmail.com	$2a$10$eO.O4M8zMoXXIf2k71ZuU.YAD8wtqCkip354RhhsS5pbG34vs.nfq	Muhammed 	Ashraf	\N	UTC	2026-02-14 21:22:01.743544	\N	t	2026-02-14 21:22:32.515954	f	2026-02-14 21:21:05.076905	2026-02-14 19:22:32.207549	\N	en	active	2026-02-14 21:21:05.073997	f	0	\N	2026-02-14 21:21:07.400514
+88c1dd52-e4e8-4b15-a482-d7e4fdef0d2e	abdallah.araafat@gmail.com	$2a$10$0HnTjQNYTiOp41D0DxYKt.GsktNrLgdaU9D2ncZAFsuyeS/dsgEiK	Abdallah	Ahmed	\N	UTC	2026-02-14 18:48:08.874747	\N	t	2026-02-14 22:43:29.055564	f	2026-02-14 18:47:31.192003	2026-02-14 20:43:28.428836	\N	en	active	2026-02-14 18:47:31.187636	f	0	\N	2026-02-14 18:47:33.833772
+e460d3b6-b6a7-44ed-8b48-bdad9ed143b3	abdallahsport1@gmail.com	$2a$10$FbP6g0zMU/yggXpmOvqUIuKI1UwQbZPPXIxz.Eizdr9HWI9l2suNa	Abdallah	Ahmed	\N	UTC	2026-02-14 18:50:06.823953	\N	t	2026-02-14 22:52:02.412509	f	2026-02-14 18:49:40.472122	2026-02-14 20:52:02.088731	\N	en	active	2026-02-14 18:49:40.471771	f	0	\N	2026-02-14 18:49:42.770652
+5b730865-5196-4455-a3cd-05b4dfd3e744	karima.ahmed93@hotmail.com	$2a$10$sPA4A7ojbjz.hSB5SXOpzuXtXDp1Mus.iFYzOwMh.QO5OQt2wge.C	Karima	Ahmed	\N	UTC	\N	\N	t	\N	f	2026-02-14 20:57:14.482465	2026-02-14 18:57:14.824755	\N	en	active	2026-02-14 20:57:14.482035	t	0	\N	2026-02-14 20:57:17.099395
 \.
 
 
 --
--- TOC entry 3920 (class 0 OID 0)
--- Dependencies: 230
+-- TOC entry 5522 (class 0 OID 0)
+-- Dependencies: 233
 -- Name: engagement_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.engagement_id_seq', 12, true);
+SELECT pg_catalog.setval('public.engagement_id_seq', 13, true);
 
 
 --
--- TOC entry 3544 (class 2606 OID 17856)
+-- TOC entry 5145 (class 2606 OID 35079)
 -- Name: active_service_subscriptions active_service_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2241,7 +2263,7 @@ ALTER TABLE ONLY public.active_service_subscriptions
 
 
 --
--- TOC entry 3546 (class 2606 OID 17858)
+-- TOC entry 5147 (class 2606 OID 35081)
 -- Name: ai_chat_messages ai_chat_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2250,7 +2272,7 @@ ALTER TABLE ONLY public.ai_chat_messages
 
 
 --
--- TOC entry 3550 (class 2606 OID 17860)
+-- TOC entry 5151 (class 2606 OID 35083)
 -- Name: ai_chat_sessions ai_chat_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2259,7 +2281,7 @@ ALTER TABLE ONLY public.ai_chat_sessions
 
 
 --
--- TOC entry 3555 (class 2606 OID 17862)
+-- TOC entry 5156 (class 2606 OID 35085)
 -- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2268,7 +2290,7 @@ ALTER TABLE ONLY public.audit_log
 
 
 --
--- TOC entry 3559 (class 2606 OID 17864)
+-- TOC entry 5160 (class 2606 OID 35087)
 -- Name: doctor_patients doctor_patients_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2277,7 +2299,7 @@ ALTER TABLE ONLY public.doctor_patients
 
 
 --
--- TOC entry 3567 (class 2606 OID 17866)
+-- TOC entry 5168 (class 2606 OID 35089)
 -- Name: doctor_profiles doctor_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2286,7 +2308,7 @@ ALTER TABLE ONLY public.doctor_profiles
 
 
 --
--- TOC entry 3577 (class 2606 OID 17868)
+-- TOC entry 5178 (class 2606 OID 35091)
 -- Name: doctor_reviews doctor_reviews_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2295,7 +2317,7 @@ ALTER TABLE ONLY public.doctor_reviews
 
 
 --
--- TOC entry 3579 (class 2606 OID 17870)
+-- TOC entry 5180 (class 2606 OID 35093)
 -- Name: doctor_verification_questions doctor_verification_questions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2304,7 +2326,7 @@ ALTER TABLE ONLY public.doctor_verification_questions
 
 
 --
--- TOC entry 3667 (class 2606 OID 18202)
+-- TOC entry 5186 (class 2606 OID 35095)
 -- Name: email_verification_otps email_verification_otps_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2313,7 +2335,7 @@ ALTER TABLE ONLY public.email_verification_otps
 
 
 --
--- TOC entry 3585 (class 2606 OID 17872)
+-- TOC entry 5191 (class 2606 OID 35097)
 -- Name: engagement_access_rules engagement_access_rules_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2322,7 +2344,7 @@ ALTER TABLE ONLY public.engagement_access_rules
 
 
 --
--- TOC entry 3587 (class 2606 OID 17874)
+-- TOC entry 5193 (class 2606 OID 35099)
 -- Name: engagement_access_rules engagement_access_rules_rule_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2331,7 +2353,7 @@ ALTER TABLE ONLY public.engagement_access_rules
 
 
 --
--- TOC entry 3589 (class 2606 OID 17876)
+-- TOC entry 5195 (class 2606 OID 35101)
 -- Name: engagement_analytics engagement_analytics_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2340,7 +2362,7 @@ ALTER TABLE ONLY public.engagement_analytics
 
 
 --
--- TOC entry 3591 (class 2606 OID 17878)
+-- TOC entry 5197 (class 2606 OID 35103)
 -- Name: engagement_events engagement_events_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2349,7 +2371,7 @@ ALTER TABLE ONLY public.engagement_events
 
 
 --
--- TOC entry 3593 (class 2606 OID 17880)
+-- TOC entry 5199 (class 2606 OID 35105)
 -- Name: engagement_messages engagement_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2358,7 +2380,7 @@ ALTER TABLE ONLY public.engagement_messages
 
 
 --
--- TOC entry 3598 (class 2606 OID 17882)
+-- TOC entry 5204 (class 2606 OID 35107)
 -- Name: engagement_sessions engagement_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2367,7 +2389,7 @@ ALTER TABLE ONLY public.engagement_sessions
 
 
 --
--- TOC entry 3600 (class 2606 OID 17884)
+-- TOC entry 5206 (class 2606 OID 35109)
 -- Name: engagement_sessions engagement_sessions_session_token_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2376,7 +2398,7 @@ ALTER TABLE ONLY public.engagement_sessions
 
 
 --
--- TOC entry 3602 (class 2606 OID 17886)
+-- TOC entry 5208 (class 2606 OID 35111)
 -- Name: engagement_verification_tokens engagement_verification_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2385,7 +2407,7 @@ ALTER TABLE ONLY public.engagement_verification_tokens
 
 
 --
--- TOC entry 3604 (class 2606 OID 17888)
+-- TOC entry 5210 (class 2606 OID 35113)
 -- Name: engagement_verification_tokens engagement_verification_tokens_token_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2394,7 +2416,7 @@ ALTER TABLE ONLY public.engagement_verification_tokens
 
 
 --
--- TOC entry 3606 (class 2606 OID 17890)
+-- TOC entry 5212 (class 2606 OID 35115)
 -- Name: engagements engagements_engagement_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2403,7 +2425,7 @@ ALTER TABLE ONLY public.engagements
 
 
 --
--- TOC entry 3608 (class 2606 OID 17892)
+-- TOC entry 5214 (class 2606 OID 35117)
 -- Name: engagements engagements_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2412,7 +2434,7 @@ ALTER TABLE ONLY public.engagements
 
 
 --
--- TOC entry 3617 (class 2606 OID 17894)
+-- TOC entry 5223 (class 2606 OID 35119)
 -- Name: message_queues message_queues_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2421,7 +2443,7 @@ ALTER TABLE ONLY public.message_queues
 
 
 --
--- TOC entry 3620 (class 2606 OID 17896)
+-- TOC entry 5226 (class 2606 OID 35121)
 -- Name: notification_message_templates notification_message_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2430,7 +2452,7 @@ ALTER TABLE ONLY public.notification_message_templates
 
 
 --
--- TOC entry 3624 (class 2606 OID 17898)
+-- TOC entry 5230 (class 2606 OID 35123)
 -- Name: notification_templates notification_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2439,7 +2461,7 @@ ALTER TABLE ONLY public.notification_templates
 
 
 --
--- TOC entry 3626 (class 2606 OID 17900)
+-- TOC entry 5232 (class 2606 OID 35125)
 -- Name: notification_templates notification_templates_type_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2448,7 +2470,7 @@ ALTER TABLE ONLY public.notification_templates
 
 
 --
--- TOC entry 3633 (class 2606 OID 17902)
+-- TOC entry 5239 (class 2606 OID 35127)
 -- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2457,7 +2479,7 @@ ALTER TABLE ONLY public.notifications
 
 
 --
--- TOC entry 3636 (class 2606 OID 17904)
+-- TOC entry 5242 (class 2606 OID 35129)
 -- Name: patient_profiles patient_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2466,7 +2488,7 @@ ALTER TABLE ONLY public.patient_profiles
 
 
 --
--- TOC entry 3638 (class 2606 OID 17906)
+-- TOC entry 5244 (class 2606 OID 35131)
 -- Name: platform_analytics platform_analytics_analytics_date_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2475,7 +2497,7 @@ ALTER TABLE ONLY public.platform_analytics
 
 
 --
--- TOC entry 3640 (class 2606 OID 17908)
+-- TOC entry 5246 (class 2606 OID 35133)
 -- Name: platform_analytics platform_analytics_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2484,7 +2506,7 @@ ALTER TABLE ONLY public.platform_analytics
 
 
 --
--- TOC entry 3644 (class 2606 OID 17910)
+-- TOC entry 5250 (class 2606 OID 35135)
 -- Name: security_authentication_tokens security_authentication_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2493,7 +2515,7 @@ ALTER TABLE ONLY public.security_authentication_tokens
 
 
 --
--- TOC entry 3646 (class 2606 OID 17912)
+-- TOC entry 5252 (class 2606 OID 35137)
 -- Name: security_authentication_tokens security_authentication_tokens_token_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2502,7 +2524,7 @@ ALTER TABLE ONLY public.security_authentication_tokens
 
 
 --
--- TOC entry 3648 (class 2606 OID 17914)
+-- TOC entry 5254 (class 2606 OID 35139)
 -- Name: system_settings system_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2511,7 +2533,7 @@ ALTER TABLE ONLY public.system_settings
 
 
 --
--- TOC entry 3650 (class 2606 OID 17916)
+-- TOC entry 5256 (class 2606 OID 35141)
 -- Name: system_settings system_settings_setting_key_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2520,7 +2542,7 @@ ALTER TABLE ONLY public.system_settings
 
 
 --
--- TOC entry 3565 (class 2606 OID 17918)
+-- TOC entry 5166 (class 2606 OID 35143)
 -- Name: doctor_patients unique_doctor_patient; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2529,7 +2551,7 @@ ALTER TABLE ONLY public.doctor_patients
 
 
 --
--- TOC entry 3583 (class 2606 OID 17920)
+-- TOC entry 5184 (class 2606 OID 35145)
 -- Name: doctor_verification_questions unique_doctor_question; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2538,7 +2560,7 @@ ALTER TABLE ONLY public.doctor_verification_questions
 
 
 --
--- TOC entry 3622 (class 2606 OID 17922)
+-- TOC entry 5228 (class 2606 OID 35147)
 -- Name: notification_message_templates unique_template_lang_context; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2547,7 +2569,7 @@ ALTER TABLE ONLY public.notification_message_templates
 
 
 --
--- TOC entry 3652 (class 2606 OID 17924)
+-- TOC entry 5258 (class 2606 OID 35149)
 -- Name: url_shortcuts url_shortcuts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2556,7 +2578,7 @@ ALTER TABLE ONLY public.url_shortcuts
 
 
 --
--- TOC entry 3654 (class 2606 OID 17926)
+-- TOC entry 5260 (class 2606 OID 35151)
 -- Name: url_shortcuts url_shortcuts_short_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2565,7 +2587,7 @@ ALTER TABLE ONLY public.url_shortcuts
 
 
 --
--- TOC entry 3656 (class 2606 OID 17928)
+-- TOC entry 5262 (class 2606 OID 35153)
 -- Name: user_management_metrics user_management_metrics_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2574,7 +2596,7 @@ ALTER TABLE ONLY public.user_management_metrics
 
 
 --
--- TOC entry 3663 (class 2606 OID 17930)
+-- TOC entry 5269 (class 2606 OID 35155)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2583,7 +2605,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3665 (class 2606 OID 17932)
+-- TOC entry 5271 (class 2606 OID 35157)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2592,7 +2614,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3547 (class 1259 OID 17933)
+-- TOC entry 5148 (class 1259 OID 35158)
 -- Name: idx_ai_chat_messages_created_at; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2600,7 +2622,7 @@ CREATE INDEX idx_ai_chat_messages_created_at ON public.ai_chat_messages USING bt
 
 
 --
--- TOC entry 3548 (class 1259 OID 17934)
+-- TOC entry 5149 (class 1259 OID 35159)
 -- Name: idx_ai_chat_messages_session_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2608,7 +2630,7 @@ CREATE INDEX idx_ai_chat_messages_session_id ON public.ai_chat_messages USING bt
 
 
 --
--- TOC entry 3551 (class 1259 OID 17935)
+-- TOC entry 5152 (class 1259 OID 35160)
 -- Name: idx_ai_chat_sessions_is_active; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2616,7 +2638,7 @@ CREATE INDEX idx_ai_chat_sessions_is_active ON public.ai_chat_sessions USING btr
 
 
 --
--- TOC entry 3552 (class 1259 OID 17936)
+-- TOC entry 5153 (class 1259 OID 35161)
 -- Name: idx_ai_chat_sessions_patient_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2624,7 +2646,7 @@ CREATE INDEX idx_ai_chat_sessions_patient_id ON public.ai_chat_sessions USING bt
 
 
 --
--- TOC entry 3553 (class 1259 OID 17937)
+-- TOC entry 5154 (class 1259 OID 35162)
 -- Name: idx_ai_chat_sessions_patient_started; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2632,7 +2654,7 @@ CREATE INDEX idx_ai_chat_sessions_patient_started ON public.ai_chat_sessions USI
 
 
 --
--- TOC entry 3556 (class 1259 OID 17938)
+-- TOC entry 5157 (class 1259 OID 35163)
 -- Name: idx_audit_log_created_at; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2640,7 +2662,7 @@ CREATE INDEX idx_audit_log_created_at ON public.audit_log USING btree (created_a
 
 
 --
--- TOC entry 3557 (class 1259 OID 17939)
+-- TOC entry 5158 (class 1259 OID 35164)
 -- Name: idx_audit_log_user_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2648,7 +2670,7 @@ CREATE INDEX idx_audit_log_user_id ON public.audit_log USING btree (user_id);
 
 
 --
--- TOC entry 3641 (class 1259 OID 17940)
+-- TOC entry 5247 (class 1259 OID 35165)
 -- Name: idx_auth_tokens_expires_at; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2656,7 +2678,7 @@ CREATE INDEX idx_auth_tokens_expires_at ON public.security_authentication_tokens
 
 
 --
--- TOC entry 3642 (class 1259 OID 17941)
+-- TOC entry 5248 (class 1259 OID 35166)
 -- Name: idx_auth_tokens_user_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2664,7 +2686,7 @@ CREATE INDEX idx_auth_tokens_user_id ON public.security_authentication_tokens US
 
 
 --
--- TOC entry 3568 (class 1259 OID 17942)
+-- TOC entry 5169 (class 1259 OID 35167)
 -- Name: idx_doctor_availability; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2672,7 +2694,7 @@ CREATE INDEX idx_doctor_availability ON public.doctor_profiles USING btree (avai
 
 
 --
--- TOC entry 3569 (class 1259 OID 17943)
+-- TOC entry 5170 (class 1259 OID 35168)
 -- Name: idx_doctor_coordinates; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2680,8 +2702,8 @@ CREATE INDEX idx_doctor_coordinates ON public.doctor_profiles USING btree (latit
 
 
 --
--- TOC entry 3921 (class 0 OID 0)
--- Dependencies: 3569
+-- TOC entry 5523 (class 0 OID 0)
+-- Dependencies: 5170
 -- Name: INDEX idx_doctor_coordinates; Type: COMMENT; Schema: public; Owner: postgres
 --
 
@@ -2689,7 +2711,7 @@ COMMENT ON INDEX public.idx_doctor_coordinates IS 'Optimizes geolocation-based d
 
 
 --
--- TOC entry 3570 (class 1259 OID 17944)
+-- TOC entry 5171 (class 1259 OID 35169)
 -- Name: idx_doctor_location; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2697,7 +2719,7 @@ CREATE INDEX idx_doctor_location ON public.doctor_profiles USING btree (location
 
 
 --
--- TOC entry 3560 (class 1259 OID 17945)
+-- TOC entry 5161 (class 1259 OID 35170)
 -- Name: idx_doctor_patients_current_engagement; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2705,7 +2727,7 @@ CREATE INDEX idx_doctor_patients_current_engagement ON public.doctor_patients US
 
 
 --
--- TOC entry 3561 (class 1259 OID 17946)
+-- TOC entry 5162 (class 1259 OID 35171)
 -- Name: idx_doctor_patients_doctor_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2713,7 +2735,7 @@ CREATE INDEX idx_doctor_patients_doctor_id ON public.doctor_patients USING btree
 
 
 --
--- TOC entry 3562 (class 1259 OID 17947)
+-- TOC entry 5163 (class 1259 OID 35172)
 -- Name: idx_doctor_patients_is_active; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2721,7 +2743,7 @@ CREATE INDEX idx_doctor_patients_is_active ON public.doctor_patients USING btree
 
 
 --
--- TOC entry 3563 (class 1259 OID 17948)
+-- TOC entry 5164 (class 1259 OID 35173)
 -- Name: idx_doctor_patients_patient_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2729,7 +2751,7 @@ CREATE INDEX idx_doctor_patients_patient_id ON public.doctor_patients USING btre
 
 
 --
--- TOC entry 3571 (class 1259 OID 17949)
+-- TOC entry 5172 (class 1259 OID 35174)
 -- Name: idx_doctor_profiles_user_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2737,7 +2759,7 @@ CREATE INDEX idx_doctor_profiles_user_id ON public.doctor_profiles USING btree (
 
 
 --
--- TOC entry 3572 (class 1259 OID 17950)
+-- TOC entry 5173 (class 1259 OID 35175)
 -- Name: idx_doctor_profiles_verified; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2745,7 +2767,7 @@ CREATE INDEX idx_doctor_profiles_verified ON public.doctor_profiles USING btree 
 
 
 --
--- TOC entry 3573 (class 1259 OID 17951)
+-- TOC entry 5174 (class 1259 OID 35176)
 -- Name: idx_doctor_rating; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2753,7 +2775,7 @@ CREATE INDEX idx_doctor_rating ON public.doctor_profiles USING btree (rating DES
 
 
 --
--- TOC entry 3574 (class 1259 OID 17952)
+-- TOC entry 5175 (class 1259 OID 35177)
 -- Name: idx_doctor_specialization; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2761,7 +2783,7 @@ CREATE INDEX idx_doctor_specialization ON public.doctor_profiles USING btree (sp
 
 
 --
--- TOC entry 3575 (class 1259 OID 17953)
+-- TOC entry 5176 (class 1259 OID 35178)
 -- Name: idx_doctor_verification_status; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2769,7 +2791,7 @@ CREATE INDEX idx_doctor_verification_status ON public.doctor_profiles USING btre
 
 
 --
--- TOC entry 3594 (class 1259 OID 17954)
+-- TOC entry 5200 (class 1259 OID 35179)
 -- Name: idx_engagement_messages_created_at; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2777,7 +2799,7 @@ CREATE INDEX idx_engagement_messages_created_at ON public.engagement_messages US
 
 
 --
--- TOC entry 3595 (class 1259 OID 17955)
+-- TOC entry 5201 (class 1259 OID 35180)
 -- Name: idx_engagement_messages_engagement_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2785,7 +2807,7 @@ CREATE INDEX idx_engagement_messages_engagement_id ON public.engagement_messages
 
 
 --
--- TOC entry 3596 (class 1259 OID 17956)
+-- TOC entry 5202 (class 1259 OID 35181)
 -- Name: idx_engagement_messages_sender; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2793,7 +2815,7 @@ CREATE INDEX idx_engagement_messages_sender ON public.engagement_messages USING 
 
 
 --
--- TOC entry 3609 (class 1259 OID 17957)
+-- TOC entry 5215 (class 1259 OID 35182)
 -- Name: idx_engagements_dates; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2801,7 +2823,7 @@ CREATE INDEX idx_engagements_dates ON public.engagements USING btree (start_at, 
 
 
 --
--- TOC entry 3610 (class 1259 OID 17958)
+-- TOC entry 5216 (class 1259 OID 35183)
 -- Name: idx_engagements_doctor_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2809,7 +2831,7 @@ CREATE INDEX idx_engagements_doctor_id ON public.engagements USING btree (doctor
 
 
 --
--- TOC entry 3611 (class 1259 OID 17959)
+-- TOC entry 5217 (class 1259 OID 35184)
 -- Name: idx_engagements_doctor_patient_status; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2817,7 +2839,7 @@ CREATE INDEX idx_engagements_doctor_patient_status ON public.engagements USING b
 
 
 --
--- TOC entry 3612 (class 1259 OID 18176)
+-- TOC entry 5218 (class 1259 OID 35185)
 -- Name: idx_engagements_initiated_by; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2825,7 +2847,7 @@ CREATE INDEX idx_engagements_initiated_by ON public.engagements USING btree (ini
 
 
 --
--- TOC entry 3613 (class 1259 OID 17960)
+-- TOC entry 5219 (class 1259 OID 35186)
 -- Name: idx_engagements_patient_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2833,7 +2855,7 @@ CREATE INDEX idx_engagements_patient_id ON public.engagements USING btree (patie
 
 
 --
--- TOC entry 3614 (class 1259 OID 17961)
+-- TOC entry 5220 (class 1259 OID 35187)
 -- Name: idx_engagements_status; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2841,7 +2863,7 @@ CREATE INDEX idx_engagements_status ON public.engagements USING btree (status);
 
 
 --
--- TOC entry 3618 (class 1259 OID 17962)
+-- TOC entry 5224 (class 1259 OID 35188)
 -- Name: idx_message_templates_key_lang; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2849,7 +2871,7 @@ CREATE INDEX idx_message_templates_key_lang ON public.notification_message_templ
 
 
 --
--- TOC entry 3627 (class 1259 OID 17963)
+-- TOC entry 5233 (class 1259 OID 35189)
 -- Name: idx_notifications_is_read; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2857,7 +2879,7 @@ CREATE INDEX idx_notifications_is_read ON public.notifications USING btree (is_r
 
 
 --
--- TOC entry 3628 (class 1259 OID 17964)
+-- TOC entry 5234 (class 1259 OID 35190)
 -- Name: idx_notifications_priority; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2865,7 +2887,7 @@ CREATE INDEX idx_notifications_priority ON public.notifications USING btree (pri
 
 
 --
--- TOC entry 3629 (class 1259 OID 17965)
+-- TOC entry 5235 (class 1259 OID 35191)
 -- Name: idx_notifications_unpushed; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2873,7 +2895,7 @@ CREATE INDEX idx_notifications_unpushed ON public.notifications USING btree (use
 
 
 --
--- TOC entry 3630 (class 1259 OID 17966)
+-- TOC entry 5236 (class 1259 OID 35192)
 -- Name: idx_notifications_user_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2881,7 +2903,7 @@ CREATE INDEX idx_notifications_user_id ON public.notifications USING btree (user
 
 
 --
--- TOC entry 3631 (class 1259 OID 17967)
+-- TOC entry 5237 (class 1259 OID 35193)
 -- Name: idx_notifications_user_sentat; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2889,7 +2911,7 @@ CREATE INDEX idx_notifications_user_sentat ON public.notifications USING btree (
 
 
 --
--- TOC entry 3668 (class 1259 OID 18215)
+-- TOC entry 5187 (class 1259 OID 35194)
 -- Name: idx_otp_code; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2897,7 +2919,7 @@ CREATE INDEX idx_otp_code ON public.email_verification_otps USING btree (otp_cod
 
 
 --
--- TOC entry 3669 (class 1259 OID 18214)
+-- TOC entry 5188 (class 1259 OID 35195)
 -- Name: idx_otp_expires_at; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2905,7 +2927,7 @@ CREATE INDEX idx_otp_expires_at ON public.email_verification_otps USING btree (e
 
 
 --
--- TOC entry 3670 (class 1259 OID 18213)
+-- TOC entry 5189 (class 1259 OID 35196)
 -- Name: idx_otp_user_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2913,7 +2935,7 @@ CREATE INDEX idx_otp_user_id ON public.email_verification_otps USING btree (user
 
 
 --
--- TOC entry 3634 (class 1259 OID 17968)
+-- TOC entry 5240 (class 1259 OID 35197)
 -- Name: idx_patient_profiles_user_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2921,15 +2943,15 @@ CREATE INDEX idx_patient_profiles_user_id ON public.patient_profiles USING btree
 
 
 --
--- TOC entry 3615 (class 1259 OID 17969)
+-- TOC entry 5221 (class 1259 OID 35198)
 -- Name: idx_queue_pending; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX idx_queue_pending ON public.message_queues USING btree (job_type, status, priority DESC, created_at) WHERE (status = 'pending'::public.job_status);
+CREATE INDEX idx_queue_pending ON public.message_queues USING btree (job_type, status, created_at) WHERE (status = 'pending'::public.job_status);
 
 
 --
--- TOC entry 3657 (class 1259 OID 17970)
+-- TOC entry 5263 (class 1259 OID 35199)
 -- Name: idx_users_activity_status; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2937,7 +2959,7 @@ CREATE INDEX idx_users_activity_status ON public.users USING btree (activity_sta
 
 
 --
--- TOC entry 3658 (class 1259 OID 17971)
+-- TOC entry 5264 (class 1259 OID 35200)
 -- Name: idx_users_deleted_at; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2945,7 +2967,7 @@ CREATE INDEX idx_users_deleted_at ON public.users USING btree (deleted_at);
 
 
 --
--- TOC entry 3659 (class 1259 OID 17972)
+-- TOC entry 5265 (class 1259 OID 35201)
 -- Name: idx_users_email; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2953,7 +2975,7 @@ CREATE INDEX idx_users_email ON public.users USING btree (email);
 
 
 --
--- TOC entry 3660 (class 1259 OID 17973)
+-- TOC entry 5266 (class 1259 OID 35202)
 -- Name: idx_users_is_active; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2961,7 +2983,7 @@ CREATE INDEX idx_users_is_active ON public.users USING btree (is_active);
 
 
 --
--- TOC entry 3661 (class 1259 OID 17974)
+-- TOC entry 5267 (class 1259 OID 35203)
 -- Name: idx_users_language; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2969,7 +2991,7 @@ CREATE INDEX idx_users_language ON public.users USING btree (language);
 
 
 --
--- TOC entry 3580 (class 1259 OID 17975)
+-- TOC entry 5181 (class 1259 OID 35204)
 -- Name: idx_verification_questions_doctor; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2977,7 +2999,7 @@ CREATE INDEX idx_verification_questions_doctor ON public.doctor_verification_que
 
 
 --
--- TOC entry 3581 (class 1259 OID 17976)
+-- TOC entry 5182 (class 1259 OID 35205)
 -- Name: idx_verification_questions_verified; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -2985,7 +3007,7 @@ CREATE INDEX idx_verification_questions_verified ON public.doctor_verification_q
 
 
 --
--- TOC entry 3717 (class 2620 OID 17977)
+-- TOC entry 5317 (class 2620 OID 35206)
 -- Name: engagements engagement_notification_trigger; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -2993,7 +3015,7 @@ CREATE TRIGGER engagement_notification_trigger AFTER UPDATE OF status ON public.
 
 
 --
--- TOC entry 3718 (class 2620 OID 17978)
+-- TOC entry 5318 (class 2620 OID 35207)
 -- Name: engagements engagement_status_change; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3001,7 +3023,7 @@ CREATE TRIGGER engagement_status_change AFTER INSERT OR UPDATE OF status ON publ
 
 
 --
--- TOC entry 3711 (class 2620 OID 17979)
+-- TOC entry 5311 (class 2620 OID 35208)
 -- Name: doctor_patients relationship_access_change; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3009,7 +3031,7 @@ CREATE TRIGGER relationship_access_change AFTER UPDATE OF relationship_status ON
 
 
 --
--- TOC entry 3719 (class 2620 OID 17980)
+-- TOC entry 5319 (class 2620 OID 35209)
 -- Name: engagements set_engagement_id; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3017,7 +3039,7 @@ CREATE TRIGGER set_engagement_id BEFORE INSERT ON public.engagements FOR EACH RO
 
 
 --
--- TOC entry 3721 (class 2620 OID 18238)
+-- TOC entry 5321 (class 2620 OID 35210)
 -- Name: notifications trg_auto_queue_email; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3025,7 +3047,7 @@ CREATE TRIGGER trg_auto_queue_email AFTER INSERT ON public.notifications FOR EAC
 
 
 --
--- TOC entry 3715 (class 2620 OID 17982)
+-- TOC entry 5315 (class 2620 OID 35211)
 -- Name: doctor_reviews trg_update_doctor_rating; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3033,7 +3055,7 @@ CREATE TRIGGER trg_update_doctor_rating AFTER INSERT OR DELETE OR UPDATE ON publ
 
 
 --
--- TOC entry 3713 (class 2620 OID 17983)
+-- TOC entry 5313 (class 2620 OID 35212)
 -- Name: doctor_profiles trg_update_profile_completion; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3041,7 +3063,7 @@ CREATE TRIGGER trg_update_profile_completion BEFORE INSERT OR UPDATE ON public.d
 
 
 --
--- TOC entry 3709 (class 2620 OID 17984)
+-- TOC entry 5309 (class 2620 OID 35213)
 -- Name: active_service_subscriptions update_active_service_subscriptions_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3049,7 +3071,7 @@ CREATE TRIGGER update_active_service_subscriptions_updated_at BEFORE UPDATE ON p
 
 
 --
--- TOC entry 3710 (class 2620 OID 17985)
+-- TOC entry 5310 (class 2620 OID 35214)
 -- Name: ai_chat_sessions update_ai_chat_sessions_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3057,7 +3079,7 @@ CREATE TRIGGER update_ai_chat_sessions_updated_at BEFORE UPDATE ON public.ai_cha
 
 
 --
--- TOC entry 3712 (class 2620 OID 17986)
+-- TOC entry 5312 (class 2620 OID 35215)
 -- Name: doctor_patients update_doctor_patients_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3065,7 +3087,7 @@ CREATE TRIGGER update_doctor_patients_updated_at BEFORE UPDATE ON public.doctor_
 
 
 --
--- TOC entry 3714 (class 2620 OID 17987)
+-- TOC entry 5314 (class 2620 OID 35216)
 -- Name: doctor_profiles update_doctor_profiles_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3073,7 +3095,7 @@ CREATE TRIGGER update_doctor_profiles_updated_at BEFORE UPDATE ON public.doctor_
 
 
 --
--- TOC entry 3716 (class 2620 OID 17988)
+-- TOC entry 5316 (class 2620 OID 35217)
 -- Name: engagement_access_rules update_engagement_access_rules_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3081,7 +3103,7 @@ CREATE TRIGGER update_engagement_access_rules_updated_at BEFORE UPDATE ON public
 
 
 --
--- TOC entry 3720 (class 2620 OID 17989)
+-- TOC entry 5320 (class 2620 OID 35218)
 -- Name: engagements update_engagements_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3089,7 +3111,7 @@ CREATE TRIGGER update_engagements_updated_at BEFORE UPDATE ON public.engagements
 
 
 --
--- TOC entry 3722 (class 2620 OID 17990)
+-- TOC entry 5322 (class 2620 OID 35219)
 -- Name: patient_profiles update_patient_profiles_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3097,7 +3119,7 @@ CREATE TRIGGER update_patient_profiles_updated_at BEFORE UPDATE ON public.patien
 
 
 --
--- TOC entry 3723 (class 2620 OID 17991)
+-- TOC entry 5323 (class 2620 OID 35220)
 -- Name: system_settings update_system_settings_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3105,7 +3127,7 @@ CREATE TRIGGER update_system_settings_updated_at BEFORE UPDATE ON public.system_
 
 
 --
--- TOC entry 3724 (class 2620 OID 17992)
+-- TOC entry 5324 (class 2620 OID 35221)
 -- Name: users update_users_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3113,7 +3135,7 @@ CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON public.users FOR EACH RO
 
 
 --
--- TOC entry 3725 (class 2620 OID 17993)
+-- TOC entry 5325 (class 2620 OID 35222)
 -- Name: users user_welcome_notification; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -3121,7 +3143,7 @@ CREATE TRIGGER user_welcome_notification AFTER UPDATE OF email_verified_at ON pu
 
 
 --
--- TOC entry 3671 (class 2606 OID 17994)
+-- TOC entry 5272 (class 2606 OID 35223)
 -- Name: active_service_subscriptions active_service_subscriptions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3130,7 +3152,7 @@ ALTER TABLE ONLY public.active_service_subscriptions
 
 
 --
--- TOC entry 3672 (class 2606 OID 17999)
+-- TOC entry 5273 (class 2606 OID 35228)
 -- Name: ai_chat_messages ai_chat_messages_sender_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3139,7 +3161,7 @@ ALTER TABLE ONLY public.ai_chat_messages
 
 
 --
--- TOC entry 3673 (class 2606 OID 18004)
+-- TOC entry 5274 (class 2606 OID 35233)
 -- Name: ai_chat_messages ai_chat_messages_session_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3148,7 +3170,7 @@ ALTER TABLE ONLY public.ai_chat_messages
 
 
 --
--- TOC entry 3674 (class 2606 OID 18009)
+-- TOC entry 5275 (class 2606 OID 35238)
 -- Name: ai_chat_sessions ai_chat_sessions_patient_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3157,7 +3179,7 @@ ALTER TABLE ONLY public.ai_chat_sessions
 
 
 --
--- TOC entry 3675 (class 2606 OID 18014)
+-- TOC entry 5276 (class 2606 OID 35243)
 -- Name: audit_log audit_log_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3166,7 +3188,7 @@ ALTER TABLE ONLY public.audit_log
 
 
 --
--- TOC entry 3676 (class 2606 OID 18019)
+-- TOC entry 5277 (class 2606 OID 35248)
 -- Name: doctor_patients doctor_patients_current_engagement_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3175,7 +3197,7 @@ ALTER TABLE ONLY public.doctor_patients
 
 
 --
--- TOC entry 3677 (class 2606 OID 18024)
+-- TOC entry 5278 (class 2606 OID 35253)
 -- Name: doctor_patients doctor_patients_doctor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3184,7 +3206,7 @@ ALTER TABLE ONLY public.doctor_patients
 
 
 --
--- TOC entry 3678 (class 2606 OID 18029)
+-- TOC entry 5279 (class 2606 OID 35258)
 -- Name: doctor_patients doctor_patients_patient_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3193,7 +3215,7 @@ ALTER TABLE ONLY public.doctor_patients
 
 
 --
--- TOC entry 3679 (class 2606 OID 18034)
+-- TOC entry 5280 (class 2606 OID 35263)
 -- Name: doctor_patients doctor_patients_relationship_status_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3202,7 +3224,7 @@ ALTER TABLE ONLY public.doctor_patients
 
 
 --
--- TOC entry 3680 (class 2606 OID 18039)
+-- TOC entry 5281 (class 2606 OID 35268)
 -- Name: doctor_profiles doctor_profiles_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3211,7 +3233,7 @@ ALTER TABLE ONLY public.doctor_profiles
 
 
 --
--- TOC entry 3682 (class 2606 OID 18044)
+-- TOC entry 5283 (class 2606 OID 35273)
 -- Name: doctor_reviews doctor_reviews_doctor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3220,7 +3242,7 @@ ALTER TABLE ONLY public.doctor_reviews
 
 
 --
--- TOC entry 3683 (class 2606 OID 18049)
+-- TOC entry 5284 (class 2606 OID 35278)
 -- Name: doctor_reviews doctor_reviews_patient_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3229,7 +3251,7 @@ ALTER TABLE ONLY public.doctor_reviews
 
 
 --
--- TOC entry 3684 (class 2606 OID 18054)
+-- TOC entry 5285 (class 2606 OID 35283)
 -- Name: doctor_verification_questions doctor_verification_questions_doctor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3238,16 +3260,7 @@ ALTER TABLE ONLY public.doctor_verification_questions
 
 
 --
--- TOC entry 3707 (class 2606 OID 18203)
--- Name: email_verification_otps email_verification_otps_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.email_verification_otps
-    ADD CONSTRAINT email_verification_otps_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
-
-
---
--- TOC entry 3685 (class 2606 OID 18059)
+-- TOC entry 5287 (class 2606 OID 35288)
 -- Name: engagement_analytics engagement_analytics_engagement_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3256,7 +3269,7 @@ ALTER TABLE ONLY public.engagement_analytics
 
 
 --
--- TOC entry 3686 (class 2606 OID 18064)
+-- TOC entry 5288 (class 2606 OID 35293)
 -- Name: engagement_events engagement_events_engagement_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3265,7 +3278,7 @@ ALTER TABLE ONLY public.engagement_events
 
 
 --
--- TOC entry 3687 (class 2606 OID 18069)
+-- TOC entry 5289 (class 2606 OID 35298)
 -- Name: engagement_events engagement_events_triggered_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3274,7 +3287,7 @@ ALTER TABLE ONLY public.engagement_events
 
 
 --
--- TOC entry 3688 (class 2606 OID 18074)
+-- TOC entry 5290 (class 2606 OID 35303)
 -- Name: engagement_messages engagement_messages_engagement_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3283,7 +3296,7 @@ ALTER TABLE ONLY public.engagement_messages
 
 
 --
--- TOC entry 3689 (class 2606 OID 18079)
+-- TOC entry 5291 (class 2606 OID 35308)
 -- Name: engagement_messages engagement_messages_recipient_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3292,7 +3305,7 @@ ALTER TABLE ONLY public.engagement_messages
 
 
 --
--- TOC entry 3690 (class 2606 OID 18084)
+-- TOC entry 5292 (class 2606 OID 35313)
 -- Name: engagement_messages engagement_messages_sender_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3301,7 +3314,7 @@ ALTER TABLE ONLY public.engagement_messages
 
 
 --
--- TOC entry 3691 (class 2606 OID 18089)
+-- TOC entry 5293 (class 2606 OID 35318)
 -- Name: engagement_sessions engagement_sessions_engagement_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3310,7 +3323,7 @@ ALTER TABLE ONLY public.engagement_sessions
 
 
 --
--- TOC entry 3692 (class 2606 OID 18094)
+-- TOC entry 5294 (class 2606 OID 35323)
 -- Name: engagement_sessions engagement_sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3319,7 +3332,7 @@ ALTER TABLE ONLY public.engagement_sessions
 
 
 --
--- TOC entry 3693 (class 2606 OID 18099)
+-- TOC entry 5295 (class 2606 OID 35328)
 -- Name: engagement_verification_tokens engagement_verification_tokens_doctor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3328,7 +3341,7 @@ ALTER TABLE ONLY public.engagement_verification_tokens
 
 
 --
--- TOC entry 3694 (class 2606 OID 18104)
+-- TOC entry 5296 (class 2606 OID 35333)
 -- Name: engagement_verification_tokens engagement_verification_tokens_engagement_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3337,7 +3350,7 @@ ALTER TABLE ONLY public.engagement_verification_tokens
 
 
 --
--- TOC entry 3695 (class 2606 OID 18109)
+-- TOC entry 5297 (class 2606 OID 35338)
 -- Name: engagement_verification_tokens engagement_verification_tokens_patient_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3346,7 +3359,7 @@ ALTER TABLE ONLY public.engagement_verification_tokens
 
 
 --
--- TOC entry 3696 (class 2606 OID 18114)
+-- TOC entry 5298 (class 2606 OID 35343)
 -- Name: engagement_verification_tokens engagement_verification_tokens_verified_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3355,7 +3368,7 @@ ALTER TABLE ONLY public.engagement_verification_tokens
 
 
 --
--- TOC entry 3697 (class 2606 OID 18119)
+-- TOC entry 5299 (class 2606 OID 35348)
 -- Name: engagements engagements_access_rule_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3364,7 +3377,7 @@ ALTER TABLE ONLY public.engagements
 
 
 --
--- TOC entry 3698 (class 2606 OID 18124)
+-- TOC entry 5300 (class 2606 OID 35353)
 -- Name: engagements engagements_doctor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3373,7 +3386,7 @@ ALTER TABLE ONLY public.engagements
 
 
 --
--- TOC entry 3699 (class 2606 OID 18129)
+-- TOC entry 5301 (class 2606 OID 35358)
 -- Name: engagements engagements_ended_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3382,7 +3395,7 @@ ALTER TABLE ONLY public.engagements
 
 
 --
--- TOC entry 3700 (class 2606 OID 18134)
+-- TOC entry 5302 (class 2606 OID 35363)
 -- Name: engagements engagements_patient_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3391,7 +3404,7 @@ ALTER TABLE ONLY public.engagements
 
 
 --
--- TOC entry 3681 (class 2606 OID 18139)
+-- TOC entry 5282 (class 2606 OID 35368)
 -- Name: doctor_profiles fk_doctor_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3400,7 +3413,7 @@ ALTER TABLE ONLY public.doctor_profiles
 
 
 --
--- TOC entry 3708 (class 2606 OID 18208)
+-- TOC entry 5286 (class 2606 OID 35373)
 -- Name: email_verification_otps fk_otp_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3409,7 +3422,7 @@ ALTER TABLE ONLY public.email_verification_otps
 
 
 --
--- TOC entry 3702 (class 2606 OID 18144)
+-- TOC entry 5304 (class 2606 OID 35378)
 -- Name: patient_profiles fk_patient_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3418,7 +3431,7 @@ ALTER TABLE ONLY public.patient_profiles
 
 
 --
--- TOC entry 3701 (class 2606 OID 18149)
+-- TOC entry 5303 (class 2606 OID 35383)
 -- Name: notifications notifications_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3427,7 +3440,7 @@ ALTER TABLE ONLY public.notifications
 
 
 --
--- TOC entry 3703 (class 2606 OID 18154)
+-- TOC entry 5305 (class 2606 OID 35388)
 -- Name: patient_profiles patient_profiles_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3436,7 +3449,7 @@ ALTER TABLE ONLY public.patient_profiles
 
 
 --
--- TOC entry 3704 (class 2606 OID 18159)
+-- TOC entry 5306 (class 2606 OID 35393)
 -- Name: security_authentication_tokens security_authentication_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3445,7 +3458,7 @@ ALTER TABLE ONLY public.security_authentication_tokens
 
 
 --
--- TOC entry 3705 (class 2606 OID 18164)
+-- TOC entry 5307 (class 2606 OID 35398)
 -- Name: url_shortcuts url_shortcuts_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3454,7 +3467,7 @@ ALTER TABLE ONLY public.url_shortcuts
 
 
 --
--- TOC entry 3706 (class 2606 OID 18169)
+-- TOC entry 5308 (class 2606 OID 35403)
 -- Name: user_management_metrics user_management_metrics_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3462,11 +3475,11 @@ ALTER TABLE ONLY public.user_management_metrics
     ADD CONSTRAINT user_management_metrics_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
--- Completed on 2026-02-14 05:30:39
+-- Completed on 2026-02-15 01:17:43
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict MtVGBaywtJ9cEi5dmvWSbWefiuAyrh0zWxeG9uDcRiR8QE60jxS1vPsevm4NJPi
+\unrestrict icvtM6AeHlKx1vIbknrBqzJyQd4zVffgge51DnfTbjnpPJfe8tAs5cwjQbqaq4h
 
