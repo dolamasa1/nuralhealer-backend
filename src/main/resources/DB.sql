@@ -1201,7 +1201,7 @@ CREATE TABLE public.audit_log (
     resource_type character varying(100),
     resource_id character varying(255),
     change_data jsonb,
-    ip_address inet,
+    ip_address character varying(45),
     user_agent text,
     created_at timestamp without time zone DEFAULT now()
 );
@@ -1344,7 +1344,7 @@ CREATE TABLE public.email_verification_otps (
     verified_at timestamp without time zone,
     attempts integer DEFAULT 0,
     is_used boolean DEFAULT false,
-    ip_address inet,
+    ip_address character varying(45),
     user_agent text
 );
 
@@ -1482,7 +1482,7 @@ CREATE TABLE public.engagement_sessions (
     session_token character varying(255) NOT NULL,
     session_start timestamp without time zone DEFAULT now(),
     session_end timestamp without time zone,
-    ip_address inet,
+    ip_address character varying(45),
     user_agent text,
     device_info jsonb,
     created_at timestamp without time zone DEFAULT now()

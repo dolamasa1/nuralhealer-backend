@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+import org.springframework.scheduling.annotation.Scheduled;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,9 +20,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Scheduled job that processes the message_queues table for email
- * notifications.
- * Runs every 15 seconds to send queued emails via Gmail SMTP.
+ * Polling based email processor.
+ * Runs every 5 seconds to check for new jobs in the message_queues table.
  */
 @Component
 @RequiredArgsConstructor
@@ -40,18 +41,12 @@ public class EmailQueueProcessor {
     // Prevent scheduling same job multiple times in memory
     private final Map<UUID, Boolean> scheduledRetries = new ConcurrentHashMap<>();
 
-    /**
-     * Triggered by PostgresNotificationListener when a NEW email job is created.
-     * This is purely event-driven. No polling.
-     */
-    // @Scheduled removed - purely event driven as requested
+    @Scheduled(fixedDelay = 5000)
     public void processPendingEmails() {
         log.debug("📬 Polling for pending email notifications...");
 
         // Fetch pending email jobs (no transactional needed for read)
-        List<MessageQueue> pendingJobs = messageQueueRepository.findByJobTypeAndStatus(
-                "EMAIL_NOTIFICATION",
-                "pending",
+        List<MessageQueue> pendingJobs = messageQueueRepository.findByJobTypeAndStatus("EMAIL_NOTIFICATION", "pending",
                 PageRequest.of(0, BATCH_SIZE));
 
         if (pendingJobs.isEmpty()) {
@@ -166,6 +161,9 @@ public class EmailQueueProcessor {
             emailBody = renderTemplate("engagement-started.html", userName, doctorName);
         } else if ("ENGAGEMENT_CANCELLED".equals(templateKey)) {
             emailBody = renderTemplate("engagement-cancelled.html", userName, doctorName);
+        } else if ("EMAIL_VERIFICATION".equals(templateKey)) {
+            String otpCode = extractString(payload, "otpCode");
+            emailBody = renderOtpTemplate(userName, otpCode);
         }
 
         log.info("📤 Sending email to {} for job {}", email, jobId);
@@ -215,6 +213,24 @@ public class EmailQueueProcessor {
     /**
      * Fallback email template.
      */
+    /**
+     * Render OTP email template.
+     */
+    private String renderOtpTemplate(String userName, String otpCode) {
+        try (var is = getClass().getClassLoader().getResourceAsStream("templates/emails/OTP.html")) {
+            if (is == null) {
+                log.warn("OTP.html template not found, using fallback");
+                return "Your verification code is: " + otpCode;
+            }
+            String template = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            return template.replace("{USER_NAME}", userName).replace("{OTP_CODE}", otpCode)
+                    .replace("{EXPIRY_MINUTES}", "15").replace("{SUPPORT_EMAIL}", "support@neuralhealer.com");
+        } catch (Exception e) {
+            log.error("Error loading OTP template: {}", e.getMessage());
+            return "Your verification code is: " + otpCode;
+        }
+    }
+
     private String getFallbackTemplate(String userName) {
         return """
                 <!DOCTYPE html>
@@ -295,9 +311,7 @@ public class EmailQueueProcessor {
             java.util.UUID userId = java.util.UUID.fromString(userIdObj.toString());
             if (userId == null)
                 return null;
-            return userRepository.findById(userId)
-                    .map(user -> user.getEmail())
-                    .orElse(null);
+            return userRepository.findById(userId).map(user -> user.getEmail()).orElse(null);
         } catch (Exception e) {
             log.error("Failed to extract user email from userId: {}", e.getMessage());
             return null;

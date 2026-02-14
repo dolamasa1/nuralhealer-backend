@@ -23,7 +23,7 @@ public interface MessageQueueRepository extends JpaRepository<MessageQueue, UUID
          * @param pageable Pagination parameters
          * @return List of matching message queue jobs
          */
-        @Query(value = "SELECT * FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = :status ORDER BY created_at ASC", countQuery = "SELECT count(*) FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = :status", nativeQuery = true)
+        @Query(value = "SELECT * FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = :status ORDER BY CASE priority WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'normal' THEN 3 WHEN 'low' THEN 4 ELSE 5 END ASC, created_at ASC", countQuery = "SELECT count(*) FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = :status", nativeQuery = true)
         List<MessageQueue> findByJobTypeAndStatus(@Param("jobType") String jobType, @Param("status") String status,
                         Pageable pageable);
 
@@ -36,7 +36,7 @@ public interface MessageQueueRepository extends JpaRepository<MessageQueue, UUID
          * @param pageable   Pagination parameters
          * @return List of failed jobs with retry count below max
          */
-        @Query(value = "SELECT * FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = 'failed' AND retry_count < :maxRetries ORDER BY created_at ASC", countQuery = "SELECT count(*) FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = 'failed' AND retry_count < :maxRetries", nativeQuery = true)
+        @Query(value = "SELECT * FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = 'failed' AND retry_count < :maxRetries ORDER BY CASE priority WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'normal' THEN 3 WHEN 'low' THEN 4 ELSE 5 END ASC, created_at ASC", countQuery = "SELECT count(*) FROM message_queues WHERE job_type = :jobType AND CAST(status AS TEXT) = 'failed' AND retry_count < :maxRetries", nativeQuery = true)
         List<MessageQueue> findFailedJobsForRetry(@Param("jobType") String jobType, @Param("maxRetries") int maxRetries,
                         Pageable pageable);
 

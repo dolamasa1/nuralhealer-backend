@@ -123,7 +123,7 @@ public class GlobalExceptionHandler {
                                 .status(HttpStatus.UNAUTHORIZED)
                                 .body(ErrorResponse.of(
                                                 HttpStatus.UNAUTHORIZED.value(),
-                                                "Invalid email or password",
+                                                ex.getMessage(),
                                                 request.getRequestURI()));
         }
 

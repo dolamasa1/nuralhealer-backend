@@ -68,6 +68,28 @@ public class DirectEmailService {
     }
 
     /**
+     * Send OTP verification email using the OTP.html template.
+     *
+     * @param email    User's email address
+     * @param userName User's first name
+     * @param otpCode  6-digit OTP code
+     * @throws EmailSendException if email fails to send
+     */
+    public void sendOtpVerificationEmail(String email, String userName, String otpCode) {
+        try {
+            String subject = "Verify Your Email - NeuralHealer";
+            String htmlBody = renderOtpTemplate(userName, otpCode);
+
+            gmailSmtpService.sendEmail(email, subject, htmlBody);
+            log.info("OTP verification email sent to: {}", email);
+
+        } catch (Exception e) {
+            log.error("Error sending OTP email to {}: {}", email, e.getMessage());
+            throw new EmailSendException(e.getMessage(), e);
+        }
+    }
+
+    /**
      * Send a special thanks email with custom messages.
      *
      * @param email          Recipient email address
@@ -273,6 +295,19 @@ public class DirectEmailService {
             log.error("Error loading template {}: {}", templateName, e.getMessage());
             return getFallbackTemplate(templateName);
         }
+    }
+
+    /**
+     * Render the OTP email HTML template.
+     */
+    private String renderOtpTemplate(String userName, String otpCode) {
+        String template = loadTemplate("OTP.html");
+
+        return template
+                .replace("{USER_NAME}", userName)
+                .replace("{OTP_CODE}", otpCode)
+                .replace("{EXPIRY_MINUTES}", "15")
+                .replace("{SUPPORT_EMAIL}", "support@neuralhealer.com");
     }
 
     /**

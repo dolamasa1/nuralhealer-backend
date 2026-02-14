@@ -44,6 +44,10 @@ public class MessageQueue {
     @Builder.Default
     private Integer retryCount = 0;
 
+    @Column(name = "priority", length = 20)
+    @Builder.Default
+    private String priority = "normal";
+
     @Column(name = "error_message", columnDefinition = "text")
     private String errorMessage;
 

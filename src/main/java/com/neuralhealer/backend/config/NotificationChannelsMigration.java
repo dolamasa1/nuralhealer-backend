@@ -119,6 +119,7 @@ public class NotificationChannelsMigration implements CommandLineRunner {
                     "                'templateKey', NEW.type, " +
                     "                'userName', COALESCE(NEW.payload->>'userName', 'User'), " +
                     "                'doctorName', COALESCE(NEW.payload->>'doctorName', 'Doctor'), " +
+                    "                'otpCode', NEW.payload->>'otpCode', " +
                     "                'title', NEW.title, " +
                     "                'body', NEW.message " +
                     "            ), " +
@@ -139,6 +140,33 @@ public class NotificationChannelsMigration implements CommandLineRunner {
                             "EXECUTE FUNCTION trigger_queue_email_job()");
 
             System.out.println("✅ Trigger 'trg_auto_queue_email' recreated with pg_notify support");
+
+            // Step 5: Ensure User table has OTP columns
+            System.out.println("\nEnsuring 'users' table has OTP columns...");
+
+            String[] userColumns = { "email_verification_required", "email_verification_sent_at",
+                    "failed_verification_attempts", "verification_locked_until" };
+            String[] userColumnTypes = {
+                    "BOOLEAN DEFAULT TRUE",
+                    "TIMESTAMP WITHOUT TIME ZONE",
+                    "INTEGER DEFAULT 0",
+                    "TIMESTAMP WITHOUT TIME ZONE"
+            };
+
+            for (int i = 0; i < userColumns.length; i++) {
+                String col = userColumns[i];
+                String type = userColumnTypes[i];
+
+                String checkUserColSql = "SELECT column_name FROM information_schema.columns " +
+                        "WHERE table_name = 'users' AND column_name = '" + col + "'";
+
+                var userCols = jdbcTemplate.queryForList(checkUserColSql, String.class);
+                if (userCols.isEmpty()) {
+                    System.out.println("   Adding missing column: " + col);
+                    jdbcTemplate.execute("ALTER TABLE users ADD COLUMN " + col + " " + type);
+                }
+            }
+            System.out.println("✅ User table columns verified");
 
             if (emailEnabled == results.size()) {
                 System.out.println("\n✅ SUCCESS: All notification templates are correctly configured!");
