@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - NeuralHealer</title>
+</head>
+
+<body
+    style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+
+    <!-- Main Container -->
+    <table role="presentation"
+        style="width: 100%; border-collapse: collapse; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px;">
+        <tr>
+            <td align="center">
+
+                <!-- Email Card -->
+                <table role="presentation"
+                    style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden;">
+
+                    <!-- Header Section -->
+                    <tr>
+                        <td
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
+                            <h1
+                                style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600; letter-spacing: -0.5px;">
+                                🧠 NeuralHealer
+                            </h1>
+                            <p
+                                style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 400;">
+                                AI-Powered Healthcare Platform
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Content Section -->
+                    <tr>
+                        <td style="padding: 50px 40px;">
+
+                            <!-- Welcome Message -->
+                            <h2
+                                style="margin: 0 0 20px 0; color: #1a202c; font-size: 24px; font-weight: 600; text-align: center;">
+                                Welcome, {USER_NAME}! 👋
+                            </h2>
+
+                            <p
+                                style="margin: 0 0 30px 0; color: #4a5568; font-size: 16px; line-height: 1.6; text-align: center;">
+                                Thank you for joining NeuralHealer. To complete your registration and secure your
+                                account, please verify your email address using the code below.
+                            </p>
+
+                            <!-- OTP Code Box -->
+                            <table role="presentation" style="width: 100%; margin: 30px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <div
+                                            style="background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border: 3px dashed #667eea; border-radius: 12px; padding: 30px; display: inline-block;">
+                                            <p
+                                                style="margin: 0 0 10px 0; color: #718096; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                                                Your Verification Code
+                                            </p>
+                                            <div
+                                                style="font-size: 48px; font-weight: 700; color: #667eea; letter-spacing: 8px; font-family: 'Courier New', monospace; text-align: center;">
+                                                {OTP_CODE}
+                                            </div>
+                                            <p style="margin: 10px 0 0 0; color: #a0aec0; font-size: 12px;">
+                                                Valid for {EXPIRY_MINUTES} minutes
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Instructions -->
+                            <div
+                                style="background-color: #f7fafc; border-left: 4px solid #667eea; padding: 20px; margin: 30px 0; border-radius: 4px;">
+                                <p style="margin: 0 0 10px 0; color: #2d3748; font-size: 14px; font-weight: 600;">
+                                    📋 How to verify:
+                                </p>
+                                <ol
+                                    style="margin: 0; padding-left: 20px; color: #4a5568; font-size: 14px; line-height: 1.8;">
+                                    <li>Return to the verification page</li>
+                                    <li>Enter the 6-digit code shown above</li>
+                                    <li>Click "Verify Email" to complete setup</li>
+                                </ol>
+                            </div>
+
+                            <!-- Security Notice -->
+                            <div
+                                style="background-color: #fff5f5; border-left: 4px solid #fc8181; padding: 20px; margin: 30px 0; border-radius: 4px;">
+                                <p style="margin: 0 0 10px 0; color: #c53030; font-size: 14px; font-weight: 600;">
+                                    🔒 Security Notice
+                                </p>
+                                <p style="margin: 0; color: #742a2a; font-size: 13px; line-height: 1.6;">
+                                    <strong>Never share this code</strong> with anyone. NeuralHealer staff will never
+                                    ask for your verification code. If you didn't request this email, please ignore it
+                                    or contact our support team.
+                                </p>
+                            </div>
+
+                            <!-- Didn't Receive Code -->
+                            <p
+                                style="margin: 30px 0 0 0; color: #718096; font-size: 14px; text-align: center; line-height: 1.6;">
+                                Didn't receive the code or it expired?<br>
+                                <a href="#" style="color: #667eea; text-decoration: none; font-weight: 600;">Request a
+                                    new verification code →</a>
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <!-- Footer Section -->
+                    <tr>
+                        <td style="background-color: #f7fafc; padding: 30px 40px; border-top: 1px solid #e2e8f0;">
+
+                            <!-- Support Info -->
+                            <p
+                                style="margin: 0 0 15px 0; color: #4a5568; font-size: 13px; text-align: center; line-height: 1.6;">
+                                Need help? Contact us at<br>
+                                <a href="mailto:{SUPPORT_EMAIL}"
+                                    style="color: #667eea; text-decoration: none; font-weight: 600;">{SUPPORT_EMAIL}</a>
+                            </p>
+
+                            <!-- Social Links -->
+                            <table role="presentation" style="margin: 20px auto 0 auto;">
+                                <tr>
+                                    <td style="padding: 0 10px;">
+                                        <a href="#"
+                                            style="color: #718096; text-decoration: none; font-size: 12px;">Privacy
+                                            Policy</a>
+                                    </td>
+                                    <td style="padding: 0 10px; color: #cbd5e0;">|</td>
+                                    <td style="padding: 0 10px;">
+                                        <a href="#"
+                                            style="color: #718096; text-decoration: none; font-size: 12px;">Terms of
+                                            Service</a>
+                                    </td>
+                                    <td style="padding: 0 10px; color: #cbd5e0;">|</td>
+                                    <td style="padding: 0 10px;">
+                                        <a href="#" style="color: #718096; text-decoration: none; font-size: 12px;">Help
+                                            Center</a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Copyright -->
+                            <p style="margin: 20px 0 0 0; color: #a0aec0; font-size: 12px; text-align: center;">
+                                © 2026 NeuralHealer. All rights reserved.<br>
+                                AI-Powered Healthcare Platform
+                            </p>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+
+</html>

@@ -109,7 +109,38 @@ curl -X POST http://localhost:8080/api/test/email/password-reset \
 
 ---
 
-## 3. Configuration
+### C. Test Engagement Refreshed Email
+
+**Endpoint**: `POST /api/engagements/{id}/refresh-token` (Production usage)
+
+**Method**: `directEmailService.sendEngagementRefreshedToken`
+
+**Template**: `engagement-refreshed.html`
+
+**Variables**:
+- `{RECIPIENT_NAME}`: Name of verifier
+- `{INITIATOR_NAME}`: Name of person who refreshed
+- `{NEW_TOKEN}`: The code (e.g. NH-123456)
+- `{EXPIRY_MINUTES}`: Time until expiry
+- `{VERIFICATION_URL}`: Direct link to verify
+
+---
+
+## 3. Email Templates List
+
+All templates are located in `src/main/resources/templates/emails/`:
+
+| File | Type | Description |
+|------|------|-------------|
+| `welcome.html` | Queue | Standard user welcome |
+| `email-verification.html` | Direct | 6-digit registration code |
+| `password-reset.html` | Direct | Reset link |
+| `engagement-request-from-patient.html` | Direct | Initial request notification |
+| `engagement-activated-by-doctor.html` | Direct | Activation confirmation |
+| `engagement-refreshed.html` | Direct | **NEW**: Notification of refreshed START token |
+| `engagement-cancelled.html` | Queue | Notification of unilateral termination |
+| `engagement-started.html` | Queue | General activation notification |
+| `special-thanks.html` | Direct | Personalized appreciation |
 
 The system uses the following environment variables:
 - `GMAIL_USERNAME`: Your Gmail address.

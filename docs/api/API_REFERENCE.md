@@ -27,11 +27,14 @@ Base URL: `http://localhost:8080/api`
 
 | Method | Endpoint | Description | Auth | Response |
 | :--- | :--- | :--- | :--- | :--- |
-| `POST` | `/engagements/initiate` | Start Pending Engagement | Doctor | Verification Token |
-| `POST` | `/engagements/verify-start` | Activate Engagement | Patient | Engagement Object |
+| `POST` | `/engagements/initiate` | Start Engagement Request | Yes | Verification Token |
+| `POST` | `/engagements/verify-start` | Activate Engagement | Yes | Engagement Object |
 | `GET` | `/engagements/my-engagements` | List My Engagements | Yes | Array of Engagements |
-| `DELETE` | `/engagements/{id}` | Cancel Pending Engagement | Doctor | 204 No Content |
-| `POST` | `/engagements/{id}/end-request` | Request Engagement End | Yes | Termination Token |
+| `POST` | `/engagements/{id}/refresh-token` | Regenerate START Token | Initiator | New Token Object |
+| `GET` | `/engagements/{id}/token` | Get Current Valid Token | Initiator | Token Object |
+| `DELETE` | `/engagements/{id}` | Cancel/Hard Delete (cleanup) | Participant| Success Message |
+| `POST` | `/engagements/{id}/cancel` | Soft Cancel with Reason | Participant| Success Message |
+| `POST` | `/engagements/{id}/end-request` | Request Mutual Termination | Yes | Termination Token |
 | `POST` | `/engagements/{id}/verify-end` | Conclude Engagement | Yes | Status Object |
 
 > [!TIP]

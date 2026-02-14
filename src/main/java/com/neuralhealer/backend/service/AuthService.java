@@ -13,6 +13,7 @@ import com.neuralhealer.backend.repository.UserRepository;
 import com.neuralhealer.backend.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,6 +48,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final OtpService otpService;
+    private final jakarta.servlet.http.HttpServletRequest httpRequest;
 
     /**
      * Register a new user.
@@ -71,6 +74,7 @@ public class AuthService {
                 .phone(request.phone())
                 .isActive(true)
                 .mfaEnabled(false)
+                .emailVerificationRequired(true)
                 .build();
 
         // Save user first to get ID
@@ -134,6 +138,17 @@ public class AuthService {
     }
 
     /**
+     * Completes registration by generating and sending OTP.
+     * Note: Removed @Async to ensure transaction propagation works correctly.
+     * The OTP must be saved to the database before the email is sent.
+     */
+    @Transactional
+    public void postRegisterProcessing(User user, String ipAddress, String userAgent) {
+        log.info("Post-registration processing for user: {}", user.getEmail());
+        otpService.generateAndSendOtp(user, ipAddress, userAgent);
+    }
+
+    /**
      * Authenticate user and return JWT token.
      * 
      * @param request Login credentials
@@ -155,6 +170,17 @@ public class AuthService {
         // Update last login timestamp
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
+
+        // Check if email verification is required and completed
+        if (Boolean.TRUE.equals(user.getEmailVerificationRequired()) && user.getEmailVerifiedAt() == null) {
+            log.warn("Login blocked: Email not verified for user {}", user.getEmail());
+            // We still return a partial response or throw exception?
+            // In many systems, we allow login but restrict access.
+            // But here the user asked "after registration is it verified... or what is
+            // next?"
+            // I'll throw an exception to force verification.
+            throw new BadCredentialsException("Email not verified. Please verify your email first.");
+        }
 
         // Determine user role
         UserRole role = determineUserRole(user);

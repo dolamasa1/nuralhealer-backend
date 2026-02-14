@@ -59,12 +59,6 @@ public class User implements UserDetails {
     @Builder.Default
     private String timezone = "UTC";
 
-    @Column(name = "email_verified_at")
-    private LocalDateTime emailVerifiedAt;
-
-    @Column(name = "phone_verified_at")
-    private LocalDateTime phoneVerifiedAt;
-
     @Column(name = "is_active")
     @Builder.Default
     private Boolean isActive = true;
@@ -72,9 +66,29 @@ public class User implements UserDetails {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
+
+    @Column(name = "phone_verified_at")
+    private LocalDateTime phoneVerifiedAt;
+
     @Column(name = "mfa_enabled")
     @Builder.Default
     private Boolean mfaEnabled = false;
+
+    @Column(name = "email_verification_required")
+    @Builder.Default
+    private Boolean emailVerificationRequired = true;
+
+    @Column(name = "email_verification_sent_at")
+    private LocalDateTime emailVerificationSentAt;
+
+    @Column(name = "failed_verification_attempts")
+    @Builder.Default
+    private Integer failedVerificationAttempts = 0;
+
+    @Column(name = "verification_locked_until")
+    private LocalDateTime verificationLockedUntil;
 
     @Column(name = "activity_status", length = 20)
     @Builder.Default

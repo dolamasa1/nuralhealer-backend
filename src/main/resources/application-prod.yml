@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${GLOBAL_DB_URL}
-    username: ${GLOBAL_DB_USERNAME}
-    password: ${GLOBAL_DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/neuralhealer}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:aaa}
     hikari:
       maximum-pool-size: 4 # Limited for Supabase Session Mode
       minimum-idle: 2 # Keep 2 warm connections ready

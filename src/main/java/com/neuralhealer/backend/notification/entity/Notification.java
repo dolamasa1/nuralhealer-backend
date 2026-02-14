@@ -65,6 +65,10 @@ public class Notification {
     @Builder.Default
     private Boolean isRead = false;
 
+    @Column(name = "send_email")
+    @Builder.Default
+    private Boolean sendEmail = false;
+
     @Column(name = "sent_at")
     @Builder.Default
     private LocalDateTime sentAt = LocalDateTime.now();

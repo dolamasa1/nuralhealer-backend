@@ -20,5 +20,6 @@ public enum NotificationType {
     // User Lifecycle
     USER_WELCOME,
     USER_REENGAGE_ACTIVE,
-    USER_INACTIVITY_WARNING;
+    USER_INACTIVITY_WARNING,
+    EMAIL_VERIFICATION;
 }

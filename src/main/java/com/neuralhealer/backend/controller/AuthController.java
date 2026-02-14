@@ -3,7 +3,12 @@ package com.neuralhealer.backend.controller;
 import com.neuralhealer.backend.model.dto.AuthResponse;
 import com.neuralhealer.backend.model.dto.LoginRequest;
 import com.neuralhealer.backend.model.dto.RegisterRequest;
+import com.neuralhealer.backend.model.dto.ResendOtpRequest;
+import com.neuralhealer.backend.model.dto.VerifyEmailRequest;
 import com.neuralhealer.backend.service.AuthService;
+import com.neuralhealer.backend.service.OtpService;
+import com.neuralhealer.backend.repository.UserRepository;
+import com.neuralhealer.backend.model.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,6 +38,8 @@ import java.util.Map;
 public class AuthController {
 
         private final AuthService authService;
+        private final OtpService otpService;
+        private final UserRepository userRepository;
 
         /**
          * Register a new user.
@@ -50,15 +57,23 @@ public class AuthController {
         })
         public ResponseEntity<Map<String, Object>> register(
                         @Valid @RequestBody RegisterRequest request,
+                        jakarta.servlet.http.HttpServletRequest requestContext,
                         jakarta.servlet.http.HttpServletResponse response) {
                 log.info("Registration request for email: {}", request.email());
 
                 AuthResponse authResponse = authService.register(request, response);
 
+                // Trigger OTP email processing
+                String ipAddress = requestContext.getRemoteAddr();
+                String userAgent = requestContext.getHeader("User-Agent");
+                userRepository.findByEmailAndDeletedAtIsNull(request.email())
+                                .ifPresent(user -> authService.postRegisterProcessing(user, ipAddress, userAgent));
+
                 // Return in format expected by frontend
                 return ResponseEntity.ok(Map.of(
                                 "data", authResponse,
-                                "message", "Registration successful"));
+                                "message",
+                                "Registration successful. Please check your email for the verification code."));
         }
 
         /**
@@ -102,5 +117,49 @@ public class AuthController {
                 response.addCookie(cookie);
 
                 return ResponseEntity.ok(Map.of("message", "Logout successful"));
+        }
+
+        /**
+         * Verify email with OTP.
+         */
+        @PostMapping("/verify-email")
+        @Operation(summary = "Verify email", description = "Verify user email using the 6-digit OTP code sent via email")
+        public ResponseEntity<Map<String, Object>> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+                log.info("Email verification request for: {}", request.email());
+                otpService.verifyOtp(request.email(), request.otpCode());
+                return ResponseEntity.ok(Map.of("message", "Email verified successfully"));
+        }
+
+        /**
+         * Resend verification OTP.
+         */
+        @PostMapping("/resend-otp")
+        @Operation(summary = "Resend OTP", description = "Resend a new verification code to the user's email")
+        public ResponseEntity<Map<String, Object>> resendOtp(
+                        @Valid @RequestBody ResendOtpRequest request,
+                        jakarta.servlet.http.HttpServletRequest requestContext) {
+                log.info("Resend OTP request for: {}", request.email());
+                User user = userRepository.findByEmailAndDeletedAtIsNull(request.email())
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                String ipAddress = requestContext.getRemoteAddr();
+                String userAgent = requestContext.getHeader("User-Agent");
+                authService.postRegisterProcessing(user, ipAddress, userAgent);
+
+                return ResponseEntity.ok(Map.of("message", "New verification code sent to your email"));
+        }
+
+        /**
+         * Check verification status.
+         */
+        @GetMapping("/verification-status/{email}")
+        @Operation(summary = "Check verification status", description = "Check if a user's email is already verified")
+        public ResponseEntity<Map<String, Object>> checkStatus(@PathVariable String email) {
+                User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                return ResponseEntity.ok(Map.of(
+                                "verified", !user.getEmailVerificationRequired(),
+                                "email", email));
         }
 }

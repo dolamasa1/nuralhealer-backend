@@ -13,25 +13,32 @@ public class NeuralhealerBackendApplication {
 
 	public static void main(String[] args) {
 		// Load environment variables from .env file
+		System.out.println("🌱 Starting NeuralHealer Backend...");
 		Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
-		System.out.println("🌱 Loading Environment Variables from .env...");
 
 		dotenv.entries().forEach(entry -> {
 			String key = entry.getKey();
 			String value = entry.getValue();
 
-			// Set as system property if not already set
+			// Precedence: System Property > .env > Environment (usually)
+			// But for developer convenience we often want .env to definitely be set
+			// if it's there.
 			if (System.getProperty(key) == null) {
 				System.setProperty(key, value);
 			}
 
-			// Explicitly map SPRING_PROFILES_ACTIVE to spring.profiles.active for Spring
-			// Boot
+			// Core Profile Logic
 			if ("SPRING_PROFILES_ACTIVE".equals(key)) {
 				System.setProperty("spring.profiles.active", value);
-				System.out.println("🚀 Active Profile set to: " + value);
+				System.out.println("🚀 Active Profile set from .env: " + value);
 			}
 		});
+
+		// Fallback for profile
+		if (System.getProperty("spring.profiles.active") == null) {
+			System.setProperty("spring.profiles.active", "dev");
+			System.out.println("⚠️ No profile found in .env, defaulting to: dev");
+		}
 
 		SpringApplication.run(NeuralhealerBackendApplication.class, args);
 	}
