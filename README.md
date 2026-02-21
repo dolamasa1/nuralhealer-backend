@@ -4,7 +4,7 @@
 
 ## 📋 Overview
 
-NeuralHealer is a comprehensive, secure healthcare platform that bridges AI-powered mental health support with regulated doctor-patient engagements. Built with **Spring Boot 3.3+** and **PostgreSQL 15**, it delivers enterprise-grade security, real-time communication, and intelligent healthcare workflows.
+NeuralHealer is a comprehensive, secure healthcare platform that bridges AI-powered mental health support with regulated doctor-patient engagements. Built with **Spring Boot 3.2.5** and **PostgreSQL 15**, it delivers enterprise-grade security, real-time communication, and intelligent healthcare workflows.
 
 ### ✨ Core Capabilities
 - 🔐 **Advanced Security**: HTTPOnly Cookie-based JWT, 2FA engagements, encrypted communications
@@ -191,6 +191,7 @@ GMAIL_APP_PASSWORD=16-char-app-password
 |------|-----------|------------------|----------|
 | **IPIP-120** | 120 | 2 hours | `/api/quizzes/ipip120` |
 | **IPIP-50** | 50 | 1 hour | `/api/quizzes/ipip50` |
+| **PHQ-9** | 9 | 30 minutes | `/api/quizzes/phq9` |
 
 #### Features
 - **Session Management**: Cookie-based progress tracking
@@ -204,9 +205,8 @@ GMAIL_APP_PASSWORD=16-char-app-password
 
 ### Backend Framework
 - **Java 21** with modern language features
-- **Spring Boot 3.3+** with auto-configuration
+- **Spring Boot 3.2.5** with auto-configuration
 - **Spring Security 6** with JWT cookie authentication
-- **Spring WebFlux** for reactive endpoints
 - **Spring Data JPA** with PostgreSQL
 - **Spring WebSocket** with STOMP protocol
 
@@ -256,7 +256,11 @@ GMAIL_APP_PASSWORD=your-16-char-app-password
 
 # AI Integration
 AI_SERVICE_URL=https://your-ai-service.com
+AI_API_KEY=your-ai-api-key
 AI_SERVICE_TIMEOUT_SECONDS=90
+
+# Frontend
+FRONTEND_URL=http://localhost:3000
 
 # Application
 SERVER_PORT=8080
@@ -271,6 +275,16 @@ REDIS_PORT=6379
 
 # CORS (for frontend development)
 ALLOWED_ORIGINS=http://localhost:3000,https://app.neuralhealer.com
+
+# File Storage
+FILE_STORAGE_BASE_PATH=/app/storage
+PROFILE_PICTURES_PATH=doctors/profiles
+MAX_FILE_SIZE_MB=10
+ALLOWED_IMAGE_FORMATS=jpg,jpeg,png,webp
+PROFILE_IMAGE_MIN_DIMENSION=512
+PROFILE_IMAGE_MAX_DIMENSION=2048
+IMAGE_COMPRESSION_QUALITY=85
+THUMBNAIL_SIZE=256
 
 # Monitoring
 METRICS_ENABLED=true
@@ -344,7 +358,11 @@ curl -X POST http://localhost:8080/api/ai/ask \
 | `POST` | `/auth/register` | Register new user | No |
 | `POST` | `/auth/login` | Login (sets HTTPOnly cookie) | No |
 | `POST` | `/auth/logout` | Logout (clears cookie) | Yes |
+| `POST` | `/auth/verify-email` | Verify email with OTP code | No |
+| `POST` | `/auth/resend-otp` | Resend email OTP | No |
+| `GET` | `/auth/verification-status/{email}` | Check email verification status | No |
 | `GET` | `/users/me` | Current user profile | Yes |
+| `GET` | `/users/by-email` | Look up user by email | Yes |
 
 ### Engagements (Doctor-Patient)
 | Method | Endpoint | Description | Role |
@@ -352,10 +370,15 @@ curl -X POST http://localhost:8080/api/ai/ask \
 | `POST` | `/engagements/initiate` | Start new engagement | Doctor |
 | `POST` | `/engagements/verify-start` | Activate with token | Patient |
 | `GET` | `/engagements/my-engagements` | List user's engagements | Any |
+| `GET` | `/engagements/{id}` | Get engagement details | Both |
+| `DELETE` | `/engagements/{id}` | Delete engagement record | Both |
 | `POST` | `/engagements/{id}/cancel` | Cancel engagement | Both |
 | `POST` | `/engagements/{id}/end-request` | Request termination | Both |
 | `POST` | `/engagements/{id}/verify-end` | Confirm termination | Both |
 | `POST` | `/engagements/{id}/refresh-token` | Regenerate token | Doctor |
+| `GET` | `/engagements/{id}/token` | View current token | Doctor |
+| `POST` | `/engagements/{id}/messages` | Send engagement message | Both |
+| `GET` | `/engagements/{id}/messages` | Get engagement messages | Both |
 
 ### AI Chat System
 | Method | Endpoint | Description | Auth |
@@ -373,22 +396,59 @@ curl -X POST http://localhost:8080/api/ai/ask \
 | `GET` | `/notifications/stream` | SSE event stream | Yes |
 | `GET` | `/notifications` | Notification history | Yes |
 | `PUT` | `/notifications/{id}/read` | Mark as read | Yes |
+| `POST` | `/notifications/mark-all-read` | Mark all as read | Yes |
+| `DELETE` | `/notifications/{id}` | Delete a notification | Yes |
 | `GET` | `/notifications/unread-count` | Unread counts | Yes |
+| `GET` | `/notifications/stats` | Delivery statistics | Yes |
 
-### Personality Quizzes
+### Personality & Clinical Assessments
 | Method | Endpoint | Description | Headers |
-|--------|----------|-------------|---------|
+|--------|----------|-------------|--------|
 | `POST` | `/quizzes/ipip120/start` | Start IPIP-120 | None |
 | `GET` | `/quizzes/ipip120/questions` | Get questions | `X-Quiz-Session-120` |
+| `GET` | `/quizzes/ipip120/responses` | Get saved responses | `X-Quiz-Session-120` |
+| `POST` | `/quizzes/ipip120/submit-question` | Save single answer | `X-Quiz-Session-120` |
 | `POST` | `/quizzes/ipip120/submit-quiz` | Final submission | `X-Quiz-Session-120` |
 | `POST` | `/quizzes/ipip50/start` | Start IPIP-50 | None |
+| `GET` | `/quizzes/ipip50/questions` | Get questions | `X-Quiz-Session` |
+| `POST` | `/quizzes/ipip50/submit-question` | Save single answer | `X-Quiz-Session` |
 | `GET` | `/quizzes/ipip50/progress` | Get progress | `X-Quiz-Session` |
+| `GET` | `/quizzes/ipip50/responses` | Get saved responses | `X-Quiz-Session` |
+| `POST` | `/quizzes/ipip50/submit-quiz` | Final submission | `X-Quiz-Session` |
+| `DELETE` | `/quizzes/ipip50/reset` | Reset session | `X-Quiz-Session` |
+| `POST` | `/quizzes/phq9/start` | Start PHQ-9 assessment | None |
+| `GET` | `/quizzes/phq9/questions` | Get PHQ-9 questions | `X-Quiz-Session` |
+| `POST` | `/quizzes/phq9/submit-question` | Save single answer | `X-Quiz-Session` |
+| `GET` | `/quizzes/phq9/responses` | Get saved responses | `X-Quiz-Session` |
+| `POST` | `/quizzes/phq9/submit-quiz` | Final submission | `X-Quiz-Session` |
+
+### Doctor Profile & Lobby
+| Method | Endpoint | Description | Role |
+|--------|----------|-------------|------|
+| `GET` | `/doctors/lobby` | Browse available doctors | Patient |
+| `GET` | `/doctors/search` | Search doctors by criteria | Patient |
+| `GET` | `/doctors/nearby` | Find doctors by location | Patient |
+| `GET` | `/doctors/{doctorId}/profile` | View a doctor's public profile | Any |
+| `GET` | `/doctors/me/profile` | View own profile | Doctor |
+| `PUT` | `/doctors/me/profile` | Update own profile | Doctor |
+| `POST` | `/doctors/me/profile-picture` | Upload profile picture | Doctor |
+| `DELETE` | `/doctors/me/profile-picture` | Remove profile picture | Doctor |
+| `PATCH` | `/doctors/me/availability` | Toggle availability status | Doctor |
+| `PUT` | `/doctors/me/social-media` | Update social media links | Doctor |
+
+### Doctor Verification
+| Method | Endpoint | Description | Role |
+|--------|----------|-------------|------|
+| `GET` | `/doctors/verification/questions` | Get verification questions | Doctor |
+| `POST` | `/doctors/verification/me/submit` | Submit verification answers | Doctor |
+| `GET` | `/doctors/verification/me/answers` | View submitted answers | Doctor |
 
 ### Testing & Utilities
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/test/email/verification` | Test verification email |
 | `POST` | `/test/email/password-reset` | Test password reset email |
+| `POST` | `/test/email/special-thanks` | Test special thanks email |
 | `GET` | `/actuator/health` | System health check |
 | `GET` | `/actuator/metrics` | Application metrics |
 
@@ -672,7 +732,7 @@ For licensing inquiries, contact: licensing@neuralhealer.com
 2. **Configure Variables**: Copy `.env.example` to `.env`
 3. **Start Services**: `docker-compose up -d`
 4. **Run Application**: `./mvnw spring-boot:run`
-5. **Explore APIs**: Visit `http://localhost:8080/api/swagger-ui.html`
+5. **Explore APIs**: Visit `http://localhost:8080/api/swagger`
 
 ### For Integrators
 1. **Authentication**: Use `/auth/login` to get HTTPOnly cookie
@@ -694,4 +754,4 @@ For licensing inquiries, contact: licensing@neuralhealer.com
 
 We're committed to building technology that makes mental healthcare more accessible, intelligent, and effective. Your feedback and contributions help us improve lives through better healthcare technology.
 
-*Last Updated: February 7, 2026 | Version: 2.0.0 | Contact: Ahmed Adel | Status: Production Ready*
+*Last Updated: February 21, 2026 | Version: 2.0.0 | Contact: Ahmed Adel | Status: Production Ready*
