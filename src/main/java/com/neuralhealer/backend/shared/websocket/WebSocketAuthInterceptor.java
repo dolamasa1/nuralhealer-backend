@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.websocket.WebSocketAuthInterceptor;
+package com.neuralhealer.backend.shared.websocket;
 
 import com.neuralhealer.backend.shared.websocket.WebSocketService;
 

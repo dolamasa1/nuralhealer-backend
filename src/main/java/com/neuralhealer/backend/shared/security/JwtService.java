@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.security.JwtService;
+package com.neuralhealer.backend.shared.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

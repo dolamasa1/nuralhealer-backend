@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.auth.dto.AuthResponse;
+package com.neuralhealer.backend.feature.auth.dto;
 
 import com.neuralhealer.backend.shared.entity.UserRole;
 import lombok.Builder;

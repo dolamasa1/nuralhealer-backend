@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.auth.dto.ResendOtpRequest;
+package com.neuralhealer.backend.feature.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

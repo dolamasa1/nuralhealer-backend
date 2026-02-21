@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.entity.NotificationType;
+package com.neuralhealer.backend.feature.notification.entity;
 
 public enum NotificationType {
     // Engagement Related

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.auth.controller.AuthController;
+package com.neuralhealer.backend.feature.auth.controller;
 
 import com.neuralhealer.backend.feature.auth.dto.AuthResponse;
 import com.neuralhealer.backend.feature.auth.dto.LoginRequest;

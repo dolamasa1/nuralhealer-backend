@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.websocket.BaseWebSocketHandler;
+package com.neuralhealer.backend.shared.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neuralhealer.backend.shared.websocket.WebSocketService;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.dto.AiChatRequest;
+package com.neuralhealer.backend.feature.ai.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

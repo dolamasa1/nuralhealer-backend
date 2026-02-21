@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.service.EngagementMessageService;
+package com.neuralhealer.backend.feature.engagement.service;
 
 import com.neuralhealer.backend.shared.exception.UnauthorizedException;
 import com.neuralhealer.backend.feature.engagement.dto.MessageResponse;

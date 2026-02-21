@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.service.DoctorProfileServiceImpl;
+package com.neuralhealer.backend.feature.doctor.service;
 
 import com.neuralhealer.backend.shared.exception.DoctorNotFoundException;
 import com.neuralhealer.backend.shared.mapper.DoctorMapper;

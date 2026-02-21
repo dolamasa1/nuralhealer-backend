@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.entity.DoctorProfile;
+package com.neuralhealer.backend.feature.doctor.entity;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
@@ -7,6 +7,7 @@ import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import com.neuralhealer.backend.shared.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.List;

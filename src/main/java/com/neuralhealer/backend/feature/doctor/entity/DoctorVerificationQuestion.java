@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.entity.DoctorVerificationQuestion;
+package com.neuralhealer.backend.feature.doctor.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

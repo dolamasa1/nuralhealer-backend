@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.entity.Notification;
+package com.neuralhealer.backend.feature.notification.entity;
 
 import com.neuralhealer.backend.shared.entity.User;
 

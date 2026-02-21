@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.mapper.DoctorMapper;
+package com.neuralhealer.backend.shared.mapper;
 
 import com.neuralhealer.backend.feature.doctor.dto.DoctorLobbyCardDTO;
 import com.neuralhealer.backend.feature.doctor.dto.DoctorProfileFullDTO;

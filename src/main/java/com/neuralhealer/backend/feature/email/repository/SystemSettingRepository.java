@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.email.repository.SystemSettingRepository;
+package com.neuralhealer.backend.feature.email.repository;
 
 import com.neuralhealer.backend.feature.email.entity.SystemSetting;
 import org.springframework.data.jpa.repository.JpaRepository;

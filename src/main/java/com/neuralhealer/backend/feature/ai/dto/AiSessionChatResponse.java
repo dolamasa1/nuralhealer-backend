@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.dto.AiSessionChatResponse;
+package com.neuralhealer.backend.feature.ai.dto;
 
 import java.util.List;
 import java.util.UUID;

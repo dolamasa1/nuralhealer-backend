@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.dto.ErrorResponse;
+package com.neuralhealer.backend.shared.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.config.DatabaseConnectionLogger;
+package com.neuralhealer.backend.shared.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

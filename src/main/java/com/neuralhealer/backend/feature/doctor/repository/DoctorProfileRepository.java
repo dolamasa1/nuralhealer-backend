@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.repository.DoctorProfileRepository;
+package com.neuralhealer.backend.feature.doctor.repository;
 
 import com.neuralhealer.backend.feature.doctor.entity.DoctorProfile;
 import org.springframework.data.jpa.repository.JpaRepository;

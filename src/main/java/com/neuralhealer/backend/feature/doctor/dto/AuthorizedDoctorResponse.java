@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.dto.AuthorizedDoctorResponse;
+package com.neuralhealer.backend.feature.doctor.dto;
 
 import java.util.List;
 import java.util.UUID;

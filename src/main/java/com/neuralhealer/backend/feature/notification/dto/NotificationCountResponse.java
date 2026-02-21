@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.dto.NotificationCountResponse;
+package com.neuralhealer.backend.feature.notification.dto;
 
 public record NotificationCountResponse(
         long unreadCount) {

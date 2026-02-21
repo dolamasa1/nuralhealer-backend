@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.entity.UserRole;
+package com.neuralhealer.backend.shared.entity;
 
 /**
  * User roles in the NeuralHealer platform.

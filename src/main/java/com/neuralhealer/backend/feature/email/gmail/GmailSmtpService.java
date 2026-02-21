@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.email.gmail.GmailSmtpService;
+package com.neuralhealer.backend.feature.email.gmail;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

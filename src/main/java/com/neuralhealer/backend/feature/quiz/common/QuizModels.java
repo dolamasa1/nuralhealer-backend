@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.quiz.common.QuizModels;
+package com.neuralhealer.backend.feature.quiz.common;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;

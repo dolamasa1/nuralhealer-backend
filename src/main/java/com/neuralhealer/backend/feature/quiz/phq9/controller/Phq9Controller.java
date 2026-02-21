@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.quiz.phq9.controller.Phq9Controller;
+package com.neuralhealer.backend.feature.quiz.phq9.controller;
 
 import com.neuralhealer.backend.feature.quiz.common.JsonLoader;
 import com.neuralhealer.backend.feature.quiz.common.QuizModels;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.repository.DoctorVerificationQuestionRepository;
+package com.neuralhealer.backend.feature.doctor.repository;
 
 import com.neuralhealer.backend.feature.doctor.entity.DoctorVerificationQuestion;
 import org.springframework.data.jpa.repository.JpaRepository;

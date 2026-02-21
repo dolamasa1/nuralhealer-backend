@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.repository.EngagementMessageRepository;
+package com.neuralhealer.backend.feature.engagement.repository;
 
 import com.neuralhealer.backend.feature.engagement.entity.EngagementMessage;
 import org.springframework.data.jpa.repository.JpaRepository;

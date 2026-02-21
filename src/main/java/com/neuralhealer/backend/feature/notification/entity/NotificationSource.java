@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.entity.NotificationSource;
+package com.neuralhealer.backend.feature.notification.entity;
 
 import lombok.Getter;
 

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.dto.UpdateDoctorProfileRequest;
+package com.neuralhealer.backend.feature.doctor.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.service.NotificationService;
+package com.neuralhealer.backend.feature.notification.service;
 
 import com.neuralhealer.backend.shared.exception.ResourceNotFoundException;
 import com.neuralhealer.backend.shared.exception.UnauthorizedException;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.patient.dto.SessionWithDoctorsResponse;
+package com.neuralhealer.backend.feature.patient.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;

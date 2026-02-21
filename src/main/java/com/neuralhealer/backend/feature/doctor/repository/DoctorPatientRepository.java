@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.repository.DoctorPatientRepository;
+package com.neuralhealer.backend.feature.doctor.repository;
 
 import com.neuralhealer.backend.feature.doctor.entity.DoctorPatient;
 import com.neuralhealer.backend.feature.doctor.entity.DoctorPatientId;

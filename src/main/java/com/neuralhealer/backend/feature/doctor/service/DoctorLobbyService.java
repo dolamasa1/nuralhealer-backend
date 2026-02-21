@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.service.DoctorLobbyService;
+package com.neuralhealer.backend.feature.doctor.service;
 
 import com.neuralhealer.backend.feature.doctor.dto.DoctorLobbyCardDTO;
 import com.neuralhealer.backend.feature.doctor.dto.DoctorLobbyFilterRequest;

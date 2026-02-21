@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.repository.EngagementEventRepository;
+package com.neuralhealer.backend.feature.engagement.repository;
 
 import com.neuralhealer.backend.feature.engagement.entity.EngagementEvent;
 import org.springframework.data.jpa.repository.JpaRepository;

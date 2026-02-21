@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.enums.CancellationRole;
+package com.neuralhealer.backend.feature.engagement.enums;
 
 /**
  * Identifies who cancelled an engagement for audit trail and notifications.

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.config.AsyncConfig;
+package com.neuralhealer.backend.shared.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;

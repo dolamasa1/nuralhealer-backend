@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.dto.SocialMediaDTO;
+package com.neuralhealer.backend.feature.doctor.dto;
 
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;

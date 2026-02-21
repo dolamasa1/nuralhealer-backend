@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.controller.NotificationRestController;
+package com.neuralhealer.backend.feature.notification.controller;
 
 import com.neuralhealer.backend.shared.exception.UnauthorizedException;
 import com.neuralhealer.backend.feature.notification.dto.NotificationCountResponse;

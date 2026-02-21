@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.quiz.phq9.service.Phq9ScoringStrategy;
+package com.neuralhealer.backend.feature.quiz.phq9.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

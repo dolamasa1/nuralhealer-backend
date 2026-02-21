@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.repository.specification.DoctorProfileSpecifications;
+package com.neuralhealer.backend.feature.doctor.repository.specification;
 
 import com.neuralhealer.backend.feature.doctor.dto.DoctorLobbyFilterRequest;
 import com.neuralhealer.backend.feature.doctor.entity.DoctorProfile;

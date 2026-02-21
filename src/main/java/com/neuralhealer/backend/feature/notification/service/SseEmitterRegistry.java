@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.service.SseEmitterRegistry;
+package com.neuralhealer.backend.feature.notification.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.auth.service.OtpService;
+package com.neuralhealer.backend.feature.auth.service;
 
 import com.neuralhealer.backend.feature.auth.entity.EmailVerificationOtp;
 import com.neuralhealer.backend.shared.entity.User;

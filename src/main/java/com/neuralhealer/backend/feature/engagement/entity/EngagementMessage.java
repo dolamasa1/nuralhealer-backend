@@ -1,5 +1,6 @@
-ackage com.neuralhealer.backend.feature.engagement.entity.EngagementMessage;
+package com.neuralhealer.backend.feature.engagement.entity;
 
+import com.neuralhealer.backend.shared.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

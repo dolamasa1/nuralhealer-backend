@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.config.NotificationChannelsMigration;
+package com.neuralhealer.backend.shared.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.websocket.WebSocketService;
+package com.neuralhealer.backend.shared.websocket;
 
 import com.neuralhealer.backend.shared.entity.User;
 import com.neuralhealer.backend.feature.auth.repository.UserRepository;

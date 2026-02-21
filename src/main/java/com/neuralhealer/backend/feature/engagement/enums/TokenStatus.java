@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.enums.TokenStatus;
+package com.neuralhealer.backend.feature.engagement.enums;
 
 /**
  * Status of an engagement verification token.

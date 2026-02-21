@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.auth.repository.UserRepository;
+package com.neuralhealer.backend.feature.auth.repository;
 
 import com.neuralhealer.backend.shared.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

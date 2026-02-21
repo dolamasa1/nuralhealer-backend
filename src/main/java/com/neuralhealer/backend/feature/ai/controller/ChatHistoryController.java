@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.controller.ChatHistoryController;
+package com.neuralhealer.backend.feature.ai.controller;
 
 import com.neuralhealer.backend.feature.ai.entity.AiChatMessage;
 import com.neuralhealer.backend.feature.ai.entity.AiChatSession;

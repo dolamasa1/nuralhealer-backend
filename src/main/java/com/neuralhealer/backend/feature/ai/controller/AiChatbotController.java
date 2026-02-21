@@ -1,6 +1,6 @@
-ackage com.neuralhealer.backend.feature.ai.controller.AiChatbotController;
+package com.neuralhealer.backend.feature.ai.controller;
 
-import com.neuralhealer.backend.model.dto.*;
+import com.neuralhealer.backend.feature.ai.dto.*;
 import com.neuralhealer.backend.shared.entity.User;
 import com.neuralhealer.backend.feature.ai.service.AiChatbotService;
 import com.neuralhealer.backend.feature.ai.service.ChatStorageService;

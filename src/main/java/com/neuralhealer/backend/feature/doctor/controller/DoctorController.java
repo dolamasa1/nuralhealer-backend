@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.controller.DoctorController;
+package com.neuralhealer.backend.feature.doctor.controller;
 
 import com.neuralhealer.backend.feature.doctor.dto.DoctorResponse;
 import com.neuralhealer.backend.feature.doctor.entity.DoctorProfile;

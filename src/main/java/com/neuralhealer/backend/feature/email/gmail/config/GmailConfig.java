@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.email.gmail.config.GmailConfig;
+package com.neuralhealer.backend.feature.email.gmail.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

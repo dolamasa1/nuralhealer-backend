@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.email.gmail.DirectEmailService;
+package com.neuralhealer.backend.feature.email.gmail;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

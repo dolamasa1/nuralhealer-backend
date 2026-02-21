@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.repository.AiChatSessionRepository;
+package com.neuralhealer.backend.feature.ai.repository;
 
 import com.neuralhealer.backend.feature.ai.entity.AiChatSession;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.service.DoctorProfileService;
+package com.neuralhealer.backend.feature.doctor.service;
 
 import com.neuralhealer.backend.feature.doctor.dto.DoctorProfileFullDTO;
 import com.neuralhealer.backend.feature.doctor.dto.SocialMediaDTO;

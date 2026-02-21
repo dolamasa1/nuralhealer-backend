@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.enums.VerificationType;
+package com.neuralhealer.backend.feature.doctor.enums;
 
 /**
  * Type of verification for engagements.

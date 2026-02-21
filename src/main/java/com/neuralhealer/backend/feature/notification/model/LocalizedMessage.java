@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.model.LocalizedMessage;
+package com.neuralhealer.backend.feature.notification.model;
 
 /**
  * Projection for the result of get_notification_message SQL function.

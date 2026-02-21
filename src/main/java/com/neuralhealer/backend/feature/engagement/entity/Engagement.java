@@ -1,6 +1,9 @@
-ackage com.neuralhealer.backend.feature.engagement.entity.Engagement;
+package com.neuralhealer.backend.feature.engagement.entity;
 
 import com.neuralhealer.backend.feature.engagement.enums.EngagementStatus;
+import com.neuralhealer.backend.shared.entity.User;
+import com.neuralhealer.backend.feature.doctor.entity.DoctorProfile;
+import com.neuralhealer.backend.feature.patient.entity.PatientProfile;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;

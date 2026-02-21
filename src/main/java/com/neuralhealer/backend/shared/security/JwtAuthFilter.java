@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.security.JwtAuthFilter;
+package com.neuralhealer.backend.shared.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

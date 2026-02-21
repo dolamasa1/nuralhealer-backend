@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.service.DoctorVerificationServiceImpl;
+package com.neuralhealer.backend.feature.doctor.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

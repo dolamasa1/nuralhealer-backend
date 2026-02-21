@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.quiz.QuizPackageMarker;
+package com.neuralhealer.backend.feature.quiz;
 
 public class QuizPackageMarker {
     

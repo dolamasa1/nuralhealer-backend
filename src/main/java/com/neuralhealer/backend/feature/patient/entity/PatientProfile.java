@@ -1,5 +1,6 @@
-ackage com.neuralhealer.backend.feature.patient.entity.PatientProfile;
+package com.neuralhealer.backend.feature.patient.entity;
 
+import com.neuralhealer.backend.shared.entity.User;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.email.gmail.EmailTestController;
+package com.neuralhealer.backend.feature.email.gmail;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

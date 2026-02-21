@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.dto.StartEngagementResponse;
+package com.neuralhealer.backend.feature.engagement.dto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

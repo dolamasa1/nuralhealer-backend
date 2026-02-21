@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.auth.dto.RegisterRequest;
+package com.neuralhealer.backend.feature.auth.dto;
 
 import com.neuralhealer.backend.shared.entity.UserRole;
 import com.neuralhealer.backend.shared.util.ValidationMessages;

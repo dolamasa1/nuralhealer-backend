@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.controller.DoctorVerificationController;
+package com.neuralhealer.backend.feature.doctor.controller;
 
 import com.neuralhealer.backend.feature.doctor.dto.VerificationSubmissionRequest;
 import com.neuralhealer.backend.feature.doctor.entity.DoctorVerificationQuestion;

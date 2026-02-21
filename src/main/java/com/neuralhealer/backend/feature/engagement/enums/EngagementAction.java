@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.enums.EngagementAction;
+package com.neuralhealer.backend.feature.engagement.enums;
 
 /**
  * Defines all possible actions that can be performed on engagements.

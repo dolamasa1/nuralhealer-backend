@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.websocket.WebSocketConfig;
+package com.neuralhealer.backend.shared.websocket;
 
 import com.neuralhealer.backend.shared.websocket.WebSocketAuthInterceptor;
 import lombok.RequiredArgsConstructor;

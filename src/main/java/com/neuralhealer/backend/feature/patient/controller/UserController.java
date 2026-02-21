@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.patient.controller.UserController;
+package com.neuralhealer.backend.feature.patient.controller;
 
 import com.neuralhealer.backend.shared.entity.User;
 import com.neuralhealer.backend.shared.entity.UserRole;

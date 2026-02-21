@@ -1,8 +1,9 @@
 package com.neuralhealer.backend.validator;
 
-import com.neuralhealer.backend.config.FileStorageProperties;
-import com.neuralhealer.backend.exception.FileSizeExceededException;
-import com.neuralhealer.backend.exception.InvalidImageFormatException;
+import com.neuralhealer.backend.shared.config.FileStorageProperties;
+import com.neuralhealer.backend.shared.validator.ImageValidator;
+import com.neuralhealer.backend.shared.exception.FileSizeExceededException;
+import com.neuralhealer.backend.shared.exception.InvalidImageFormatException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;

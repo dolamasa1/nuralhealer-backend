@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.quiz.common.ScoringStrategy;
+package com.neuralhealer.backend.feature.quiz.common;
 
 import java.util.List;
 

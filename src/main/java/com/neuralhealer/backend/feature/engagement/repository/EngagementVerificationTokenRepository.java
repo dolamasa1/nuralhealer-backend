@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.repository.EngagementVerificationTokenRepository;
+package com.neuralhealer.backend.feature.engagement.repository;
 
 import com.neuralhealer.backend.feature.engagement.entity.EngagementVerificationToken;
 import com.neuralhealer.backend.feature.engagement.enums.TokenStatus;

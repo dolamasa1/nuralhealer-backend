@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.controller.AiStompController;
+package com.neuralhealer.backend.feature.ai.controller;
 
 import com.neuralhealer.backend.feature.ai.dto.AiChatRequest;
 import com.neuralhealer.backend.feature.ai.dto.AiChatResponse;

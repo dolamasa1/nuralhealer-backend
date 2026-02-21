@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.exception.GlobalExceptionHandler;
+package com.neuralhealer.backend.shared.exception;
 
 import com.neuralhealer.backend.shared.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;

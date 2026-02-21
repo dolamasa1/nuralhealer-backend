@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.entity.User;
+package com.neuralhealer.backend.shared.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +8,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.neuralhealer.backend.feature.doctor.entity.DoctorProfile;
+import com.neuralhealer.backend.feature.patient.entity.PatientProfile;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

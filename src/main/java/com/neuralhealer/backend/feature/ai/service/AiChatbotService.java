@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.service.AiChatbotService;
+package com.neuralhealer.backend.feature.ai.service;
 
 import com.neuralhealer.backend.feature.ai.dto.AiChatRequest;
 import com.neuralhealer.backend.feature.ai.dto.AiChatResponse;

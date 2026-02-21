@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.quiz.ipip120.service.Ipip120ScoringStrategy;
+package com.neuralhealer.backend.feature.quiz.ipip120.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

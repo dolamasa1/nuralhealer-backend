@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.service.NotificationCleanupJob;
+package com.neuralhealer.backend.feature.notification.service;
 
 import com.neuralhealer.backend.feature.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.entity.EngagementEvent;
+package com.neuralhealer.backend.feature.engagement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

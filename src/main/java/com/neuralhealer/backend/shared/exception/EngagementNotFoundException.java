@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.exception.EngagementNotFoundException;
+package com.neuralhealer.backend.shared.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.websocket.TypingIndicator;
+package com.neuralhealer.backend.shared.websocket;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

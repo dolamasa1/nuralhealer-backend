@@ -1,6 +1,7 @@
-ackage com.neuralhealer.backend.feature.engagement.controller.EngagementController;
+package com.neuralhealer.backend.feature.engagement.controller;
 
-import com.neuralhealer.backend.model.dto.*;
+import com.neuralhealer.backend.feature.engagement.dto.*;
+import com.neuralhealer.backend.feature.auth.dto.TokenResponse;
 import com.neuralhealer.backend.shared.entity.User;
 import com.neuralhealer.backend.feature.engagement.service.EngagementMessageService;
 import com.neuralhealer.backend.feature.engagement.service.EngagementService;

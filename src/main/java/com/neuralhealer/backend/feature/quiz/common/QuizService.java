@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.quiz.common.QuizService;
+package com.neuralhealer.backend.feature.quiz.common;
 
 import org.springframework.stereotype.Service;
 import java.util.*;

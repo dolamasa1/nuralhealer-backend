@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.quiz.ipip120.controller.Ipip120Controller;
+package com.neuralhealer.backend.feature.quiz.ipip120.controller;
 
 import com.neuralhealer.backend.feature.quiz.common.JsonLoader;
 import com.neuralhealer.backend.feature.quiz.common.QuizModels;

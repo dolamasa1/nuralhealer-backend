@@ -1,7 +1,8 @@
 package com.neuralhealer.backend.service;
 
-import com.neuralhealer.backend.config.FileStorageProperties;
-import com.neuralhealer.backend.validator.ImageValidator;
+import com.neuralhealer.backend.shared.config.FileStorageProperties;
+import com.neuralhealer.backend.shared.service.FileStorageService;
+import com.neuralhealer.backend.shared.validator.ImageValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

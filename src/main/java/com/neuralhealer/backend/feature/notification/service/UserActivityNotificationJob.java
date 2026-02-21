@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.service.UserActivityNotificationJob;
+package com.neuralhealer.backend.feature.notification.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neuralhealer.backend.shared.entity.User;

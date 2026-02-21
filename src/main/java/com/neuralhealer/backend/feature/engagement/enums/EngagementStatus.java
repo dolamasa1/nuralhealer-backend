@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.enums.EngagementStatus;
+package com.neuralhealer.backend.feature.engagement.enums;
 
 /**
  * Status of a doctor-patient engagement.

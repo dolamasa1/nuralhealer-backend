@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.service.FileStorageService;
+package com.neuralhealer.backend.shared.service;
 
 import com.neuralhealer.backend.shared.config.FileStorageProperties;
 import com.neuralhealer.backend.shared.validator.ImageValidator;

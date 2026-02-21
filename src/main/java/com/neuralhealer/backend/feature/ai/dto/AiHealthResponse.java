@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.dto.AiHealthResponse;
+package com.neuralhealer.backend.feature.ai.dto;
 
 import java.time.LocalDateTime;
 

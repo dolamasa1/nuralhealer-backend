@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.service.VerificationService;
+package com.neuralhealer.backend.feature.doctor.service;
 
 import com.neuralhealer.backend.shared.exception.InvalidVerificationException;
 import com.neuralhealer.backend.feature.engagement.entity.Engagement;

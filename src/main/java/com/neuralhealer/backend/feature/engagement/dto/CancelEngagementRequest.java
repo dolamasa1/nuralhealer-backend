@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.dto.CancelEngagementRequest;
+package com.neuralhealer.backend.feature.engagement.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.entity.AiChatMessage;
+package com.neuralhealer.backend.feature.ai.entity;
 
 import com.neuralhealer.backend.feature.ai.enums.ChatSenderType;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.websocket.WebSocketMessageType;
+package com.neuralhealer.backend.shared.websocket;
 
 public enum WebSocketMessageType {
     CHAT_MESSAGE, // Regular message

@@ -1,5 +1,6 @@
-ackage com.neuralhealer.backend.feature.auth.entity.EmailVerificationOtp;
+package com.neuralhealer.backend.feature.auth.entity;
 
+import com.neuralhealer.backend.shared.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 

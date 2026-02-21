@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.websocket.WebSocketMessage;
+package com.neuralhealer.backend.shared.websocket;
 
 import com.neuralhealer.backend.shared.websocket.WebSocketMessageType;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.validator.ImageValidator;
+package com.neuralhealer.backend.shared.validator;
 
 import com.neuralhealer.backend.shared.config.FileStorageProperties;
 import com.neuralhealer.backend.shared.exception.FileSizeExceededException;

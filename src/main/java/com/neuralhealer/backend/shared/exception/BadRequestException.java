@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.exception.BadRequestException;
+package com.neuralhealer.backend.shared.exception;
 
 /**
  * Exception thrown when a client request is invalid or malformed.

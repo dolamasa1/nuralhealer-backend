@@ -1,5 +1,6 @@
-ackage com.neuralhealer.backend.feature.doctor.entity.DoctorPatient;
+package com.neuralhealer.backend.feature.doctor.entity;
 
+import com.neuralhealer.backend.feature.patient.entity.PatientProfile;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

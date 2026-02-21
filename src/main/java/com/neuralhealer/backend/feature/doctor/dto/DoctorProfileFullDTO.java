@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.dto.DoctorProfileFullDTO;
+package com.neuralhealer.backend.feature.doctor.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

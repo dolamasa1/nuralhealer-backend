@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.email.gmail.EmailQueueProcessor;
+package com.neuralhealer.backend.feature.email.gmail;
 
 import com.neuralhealer.backend.feature.email.entity.MessageQueue;
 import com.neuralhealer.backend.feature.email.repository.MessageQueueRepository;

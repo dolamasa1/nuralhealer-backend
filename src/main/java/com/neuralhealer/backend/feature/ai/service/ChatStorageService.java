@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.service.ChatStorageService;
+package com.neuralhealer.backend.feature.ai.service;
 
 import com.neuralhealer.backend.feature.ai.entity.AiChatMessage;
 import com.neuralhealer.backend.feature.ai.entity.AiChatSession;

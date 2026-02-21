@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.quiz.common.JsonLoader;
+package com.neuralhealer.backend.feature.quiz.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.ClassPathResource;

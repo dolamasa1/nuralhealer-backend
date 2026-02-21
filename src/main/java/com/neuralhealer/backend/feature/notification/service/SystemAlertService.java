@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.service.SystemAlertService;
+package com.neuralhealer.backend.feature.notification.service;
 
 import com.neuralhealer.backend.feature.notification.entity.NotificationPriority;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.config.StaticResourceConfig;
+package com.neuralhealer.backend.shared.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

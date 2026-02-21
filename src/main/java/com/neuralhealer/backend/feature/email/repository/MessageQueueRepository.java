@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.email.repository.MessageQueueRepository;
+package com.neuralhealer.backend.feature.email.repository;
 
 import com.neuralhealer.backend.feature.email.entity.MessageQueue;
 import org.springframework.data.domain.Pageable;

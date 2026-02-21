@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.enums.RelationshipStatus;
+package com.neuralhealer.backend.feature.engagement.enums;
 
 /**
  * Defines the access level between a doctor and patient.

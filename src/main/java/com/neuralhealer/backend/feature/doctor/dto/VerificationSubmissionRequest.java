@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.doctor.dto.VerificationSubmissionRequest;
+package com.neuralhealer.backend.feature.doctor.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

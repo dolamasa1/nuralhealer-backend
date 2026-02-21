@@ -1,14 +1,13 @@
 package com.neuralhealer.backend.service;
 
-import com.neuralhealer.backend.exception.DoctorNotFoundException;
-
-import com.neuralhealer.backend.mapper.DoctorMapper;
-import com.neuralhealer.backend.model.dto.DoctorProfileFullDTO;
-import com.neuralhealer.backend.model.entity.DoctorProfile;
-
-import com.neuralhealer.backend.model.entity.User;
-import com.neuralhealer.backend.repository.DoctorProfileRepository;
-import com.neuralhealer.backend.service.impl.DoctorProfileServiceImpl;
+import com.neuralhealer.backend.shared.exception.DoctorNotFoundException;
+import com.neuralhealer.backend.shared.mapper.DoctorMapper;
+import com.neuralhealer.backend.feature.doctor.dto.DoctorProfileFullDTO;
+import com.neuralhealer.backend.feature.doctor.entity.DoctorProfile;
+import com.neuralhealer.backend.shared.entity.User;
+import com.neuralhealer.backend.feature.doctor.repository.DoctorProfileRepository;
+import com.neuralhealer.backend.feature.doctor.service.DoctorProfileServiceImpl;
+import com.neuralhealer.backend.shared.service.FileStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

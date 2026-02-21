@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.websocket.WebSocketController;
+package com.neuralhealer.backend.shared.websocket;
 
 import com.neuralhealer.backend.feature.engagement.dto.MessageResponse;
 import com.neuralhealer.backend.feature.engagement.dto.SendMessageRequest;

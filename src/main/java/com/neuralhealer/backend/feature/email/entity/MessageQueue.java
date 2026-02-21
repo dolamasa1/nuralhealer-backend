@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.email.entity.MessageQueue;
+package com.neuralhealer.backend.feature.email.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

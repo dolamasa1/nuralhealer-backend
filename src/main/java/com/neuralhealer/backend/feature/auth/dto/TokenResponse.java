@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.auth.dto.TokenResponse;
+package com.neuralhealer.backend.feature.auth.dto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

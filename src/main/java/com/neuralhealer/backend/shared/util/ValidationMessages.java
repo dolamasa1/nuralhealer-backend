@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.util.ValidationMessages;
+package com.neuralhealer.backend.shared.util;
 
 /**
  * Simple validation message constants.

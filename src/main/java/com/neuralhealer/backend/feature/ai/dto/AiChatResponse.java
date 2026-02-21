@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.dto.AiChatResponse;
+package com.neuralhealer.backend.feature.ai.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;

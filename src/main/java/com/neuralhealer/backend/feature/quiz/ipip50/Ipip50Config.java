@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.quiz.ipip50.Ipip50Config;
+package com.neuralhealer.backend.feature.quiz.ipip50;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.quiz.ipip50.service.Ipip50ScoringStrategy;
+package com.neuralhealer.backend.feature.quiz.ipip50.service;
 
 import com.neuralhealer.backend.feature.quiz.common.JsonLoader;
 import com.neuralhealer.backend.feature.quiz.common.QuizModels;

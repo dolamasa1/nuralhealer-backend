@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.entity.AiChatSession;
+package com.neuralhealer.backend.feature.ai.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

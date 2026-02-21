@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.security.UserDetailsServiceImpl;
+package com.neuralhealer.backend.shared.security;
 
 import com.neuralhealer.backend.feature.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

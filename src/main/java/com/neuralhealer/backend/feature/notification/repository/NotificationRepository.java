@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.repository.NotificationRepository;
+package com.neuralhealer.backend.feature.notification.repository;
 
 import com.neuralhealer.backend.feature.notification.entity.Notification;
 import org.springframework.data.domain.Page;

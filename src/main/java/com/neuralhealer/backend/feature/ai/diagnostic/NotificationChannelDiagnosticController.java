@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.diagnostic.NotificationChannelDiagnosticController;
+package com.neuralhealer.backend.feature.ai.diagnostic;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

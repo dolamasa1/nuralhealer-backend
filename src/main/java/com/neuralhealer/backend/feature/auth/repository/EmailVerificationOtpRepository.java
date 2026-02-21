@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.auth.repository.EmailVerificationOtpRepository;
+package com.neuralhealer.backend.feature.auth.repository;
 
 import com.neuralhealer.backend.feature.auth.entity.EmailVerificationOtp;
 import org.springframework.data.jpa.repository.JpaRepository;

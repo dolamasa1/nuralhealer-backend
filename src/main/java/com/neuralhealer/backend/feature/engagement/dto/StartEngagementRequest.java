@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.engagement.dto.StartEngagementRequest;
+package com.neuralhealer.backend.feature.engagement.dto;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;

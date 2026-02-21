@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.notification.dto.NotificationResponse;
+package com.neuralhealer.backend.feature.notification.dto;
 
 import com.neuralhealer.backend.feature.notification.entity.NotificationPriority;
 import com.neuralhealer.backend.feature.notification.entity.NotificationSource;

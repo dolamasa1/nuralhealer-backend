@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.ai.enums.ChatSenderType;
+package com.neuralhealer.backend.feature.ai.enums;
 
 public enum ChatSenderType {
     patient,

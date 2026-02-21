@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.shared.config.SecurityConfig;
+package com.neuralhealer.backend.shared.config;
 
 import com.neuralhealer.backend.shared.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;

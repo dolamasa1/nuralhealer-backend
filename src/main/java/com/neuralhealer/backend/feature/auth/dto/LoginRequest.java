@@ -1,4 +1,4 @@
-ackage com.neuralhealer.backend.feature.auth.dto.LoginRequest;
+package com.neuralhealer.backend.feature.auth.dto;
 
 import com.neuralhealer.backend.shared.util.ValidationMessages;
 import jakarta.validation.constraints.Email;
