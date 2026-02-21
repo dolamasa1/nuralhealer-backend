@@ -1,0 +1,11 @@
+ackage com.neuralhealer.backend.shared.exception.InvalidImageFormatException;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class InvalidImageFormatException extends RuntimeException {
+    public InvalidImageFormatException(String message) {
+        super(message);
+    }
+}
