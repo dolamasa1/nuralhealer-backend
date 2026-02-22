@@ -340,7 +340,6 @@ public class GlobalExceptionHandler {
                         HttpServletRequest request) {
 
                 log.error("Unexpected error for request {}: {}", request.getRequestURI(), ex.getMessage(), ex);
-                ex.printStackTrace(); // FORCE PRINT STACK TRACE FOR DEBUGGING
 
                 return ResponseEntity
                                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

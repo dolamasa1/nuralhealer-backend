@@ -17,7 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +32,7 @@ public class DoctorProfileServiceImpl implements DoctorProfileService {
 
     private final DoctorMapper doctorMapper;
 
-    private final java.util.Map<UUID, java.time.LocalDateTime> lastUploadTimes = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<UUID, LocalDateTime> lastUploadTimes = new ConcurrentHashMap<>();
 
     @Override
 
@@ -71,30 +75,7 @@ public class DoctorProfileServiceImpl implements DoctorProfileService {
         }
 
         if (request.getSocialMedia() != null) {
-            // Convert SocialMediaDTO to Map for JSONB storage
-            profile.setSocialMedia(java.util.Map.of(
-                    "linkedin",
-                    StringUtils.hasText(request.getSocialMedia().getLinkedin()) ? request.getSocialMedia().getLinkedin()
-                            : "",
-                    "twitter",
-                    StringUtils.hasText(request.getSocialMedia().getTwitter()) ? request.getSocialMedia().getTwitter()
-                            : "",
-                    "facebook",
-                    StringUtils.hasText(request.getSocialMedia().getFacebook()) ? request.getSocialMedia().getFacebook()
-                            : "",
-                    "instagram",
-                    StringUtils.hasText(request.getSocialMedia().getInstagram())
-                            ? request.getSocialMedia().getInstagram()
-                            : "",
-                    "website",
-                    StringUtils.hasText(request.getSocialMedia().getWebsite()) ? request.getSocialMedia().getWebsite()
-                            : "",
-                    "whatsapp",
-                    StringUtils.hasText(request.getSocialMedia().getWhatsapp()) ? request.getSocialMedia().getWhatsapp()
-                            : "",
-                    "phone",
-                    StringUtils.hasText(request.getSocialMedia().getPhone()) ? request.getSocialMedia().getPhone()
-                            : ""));
+            profile.setSocialMedia(toSocialMediaMap(request.getSocialMedia()));
         }
 
         profile.setProfileCompletionPercentage(calculateProfileCompletion(profile.getId()));
@@ -111,8 +92,8 @@ public class DoctorProfileServiceImpl implements DoctorProfileService {
                 .orElseThrow(() -> new DoctorNotFoundException("User id", userId.toString()));
 
         // Rate limit: 1 upload per minute
-        java.time.LocalDateTime now = java.time.LocalDateTime.now();
-        java.time.LocalDateTime lastUpload = lastUploadTimes.get(profile.getId());
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime lastUpload = lastUploadTimes.get(profile.getId());
         if (lastUpload != null && lastUpload.plusMinutes(1).isAfter(now)) {
             throw new IllegalStateException("Please wait at least 1 minute between profile picture uploads.");
         }
@@ -147,7 +128,7 @@ public class DoctorProfileServiceImpl implements DoctorProfileService {
                 .orElseThrow(() -> new DoctorNotFoundException("User id", userId.toString()));
 
         // Simple validation
-        if (!java.util.List.of("online", "offline", "busy").contains(status.toLowerCase())) {
+        if (!List.of("online", "offline", "busy").contains(status.toLowerCase())) {
             throw new IllegalArgumentException("Invalid status. Must be online, offline, or busy.");
         }
 
@@ -162,14 +143,7 @@ public class DoctorProfileServiceImpl implements DoctorProfileService {
         DoctorProfile profile = doctorProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new DoctorNotFoundException("User id", userId.toString()));
 
-        profile.setSocialMedia(java.util.Map.of(
-                "linkedin", socialMedia.getLinkedin() != null ? socialMedia.getLinkedin() : "",
-                "twitter", socialMedia.getTwitter() != null ? socialMedia.getTwitter() : "",
-                "facebook", socialMedia.getFacebook() != null ? socialMedia.getFacebook() : "",
-                "instagram", socialMedia.getInstagram() != null ? socialMedia.getInstagram() : "",
-                "website", socialMedia.getWebsite() != null ? socialMedia.getWebsite() : "",
-                "whatsapp", socialMedia.getWhatsapp() != null ? socialMedia.getWhatsapp() : "",
-                "phone", socialMedia.getPhone() != null ? socialMedia.getPhone() : ""));
+        profile.setSocialMedia(toSocialMediaMap(socialMedia));
 
         profile.setProfileCompletionPercentage(calculateProfileCompletion(profile.getId()));
         doctorProfileRepository.save(profile);
@@ -226,5 +200,20 @@ public class DoctorProfileServiceImpl implements DoctorProfileService {
         String fullUrl = fileStorageService.getPublicUrl(profile.getProfilePicturePath(), false);
         String thumbUrl = fileStorageService.getPublicUrl(profile.getProfilePicturePath(), true);
         return doctorMapper.toFullDTO(profile, profile.getUser(), fullUrl, thumbUrl);
+    }
+
+    /**
+     * Convert a SocialMediaDTO to the Map stored in the JSONB column.
+     * Null values are normalised to empty strings.
+     */
+    private Map<String, String> toSocialMediaMap(SocialMediaDTO dto) {
+        return Map.of(
+                "linkedin",  dto.getLinkedin()  != null ? dto.getLinkedin()  : "",
+                "twitter",   dto.getTwitter()   != null ? dto.getTwitter()   : "",
+                "facebook",  dto.getFacebook()  != null ? dto.getFacebook()  : "",
+                "instagram", dto.getInstagram() != null ? dto.getInstagram() : "",
+                "website",   dto.getWebsite()   != null ? dto.getWebsite()   : "",
+                "whatsapp",  dto.getWhatsapp()  != null ? dto.getWhatsapp()  : "",
+                "phone",     dto.getPhone()     != null ? dto.getPhone()     : "");
     }
 }
