@@ -9,12 +9,17 @@ import com.neuralhealer.backend.feature.auth.service.AuthService;
 import com.neuralhealer.backend.feature.auth.service.OtpService;
 import com.neuralhealer.backend.feature.auth.repository.UserRepository;
 import com.neuralhealer.backend.shared.entity.User;
+import com.neuralhealer.backend.shared.exception.ResourceNotFoundException;
+import com.neuralhealer.backend.shared.security.SecurityConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,8 +62,8 @@ public class AuthController {
         })
         public ResponseEntity<Map<String, Object>> register(
                         @Valid @RequestBody RegisterRequest request,
-                        jakarta.servlet.http.HttpServletRequest requestContext,
-                        jakarta.servlet.http.HttpServletResponse response) {
+                        HttpServletRequest requestContext,
+                        HttpServletResponse response) {
                 log.info("Registration request for email: {}", request.email());
 
                 AuthResponse authResponse = authService.register(request, response);
@@ -67,7 +72,7 @@ public class AuthController {
                 String ipAddress = requestContext.getRemoteAddr();
                 String userAgent = requestContext.getHeader("User-Agent");
                 userRepository.findByEmailAndDeletedAtIsNull(request.email())
-                                .ifPresent(user -> authService.postRegisterProcessing(user, ipAddress, userAgent));
+                        .ifPresent(user -> authService.postRegisterProcessing(user, ipAddress, userAgent));
 
                 // Return in format expected by frontend
                 return ResponseEntity.ok(Map.of(
@@ -92,7 +97,7 @@ public class AuthController {
         })
         public ResponseEntity<Map<String, Object>> login(
                         @Valid @RequestBody LoginRequest request,
-                        jakarta.servlet.http.HttpServletResponse response) {
+                        HttpServletResponse response) {
                 log.info("Login request for email: {}", request.email());
 
                 AuthResponse authResponse = authService.login(request, response);
@@ -108,8 +113,8 @@ public class AuthController {
          */
         @PostMapping("/logout")
         @Operation(summary = "Logout user", description = "Clears the authentication cookie")
-        public ResponseEntity<Map<String, Object>> logout(jakarta.servlet.http.HttpServletResponse response) {
-                jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("neuralhealer_token", null);
+        public ResponseEntity<Map<String, Object>> logout(HttpServletResponse response) {
+                Cookie cookie = new Cookie(SecurityConstants.AUTH_COOKIE_NAME, null);
                 cookie.setHttpOnly(true);
                 cookie.setSecure(false);
                 cookie.setPath("/api");
@@ -137,10 +142,10 @@ public class AuthController {
         @Operation(summary = "Resend OTP", description = "Resend a new verification code to the user's email")
         public ResponseEntity<Map<String, Object>> resendOtp(
                         @Valid @RequestBody ResendOtpRequest request,
-                        jakarta.servlet.http.HttpServletRequest requestContext) {
+                        HttpServletRequest requestContext) {
                 log.info("Resend OTP request for: {}", request.email());
                 User user = userRepository.findByEmailAndDeletedAtIsNull(request.email())
-                                .orElseThrow(() -> new RuntimeException("User not found"));
+                                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
                 String ipAddress = requestContext.getRemoteAddr();
                 String userAgent = requestContext.getHeader("User-Agent");

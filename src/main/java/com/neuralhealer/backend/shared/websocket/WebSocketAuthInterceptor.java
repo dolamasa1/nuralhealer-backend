@@ -1,6 +1,7 @@
 package com.neuralhealer.backend.shared.websocket;
 
 import com.neuralhealer.backend.shared.websocket.WebSocketService;
+import com.neuralhealer.backend.shared.security.SecurityConstants;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +75,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             String[] cookiePairs = cookieHeader.split(";");
             for (String cookie : cookiePairs) {
                 String[] parts = cookie.trim().split("=");
-                if (parts.length == 2 && "neuralhealer_token".equals(parts[0])) {
+                if (parts.length == 2 && SecurityConstants.AUTH_COOKIE_NAME.equals(parts[0])) {
                     return parts[1];
                 }
             }

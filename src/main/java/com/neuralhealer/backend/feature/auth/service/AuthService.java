@@ -11,15 +11,19 @@ import com.neuralhealer.backend.feature.doctor.repository.DoctorProfileRepositor
 import com.neuralhealer.backend.feature.patient.repository.PatientProfileRepository;
 import com.neuralhealer.backend.feature.auth.repository.UserRepository;
 import com.neuralhealer.backend.shared.security.JwtService;
+import com.neuralhealer.backend.shared.security.SecurityConstants;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -49,7 +53,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final OtpService otpService;
-    private final jakarta.servlet.http.HttpServletRequest httpRequest;
+    private final HttpServletRequest httpRequest;
 
     /**
      * Register a new user.
@@ -59,7 +63,7 @@ public class AuthService {
      * @throws IllegalArgumentException if email already exists
      */
     @Transactional
-    public AuthResponse register(RegisterRequest request, jakarta.servlet.http.HttpServletResponse response) {
+    public AuthResponse register(RegisterRequest request, HttpServletResponse response) {
         // Check if email already exists
         if (userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email already registered");
@@ -85,9 +89,9 @@ public class AuthService {
         if (request.role() == UserRole.DOCTOR) {
             int initialCompletion = 0;
             if (Boolean.TRUE.equals(request.quickSetup())) {
-                if (org.springframework.util.StringUtils.hasText(request.title()))
+                if (StringUtils.hasText(request.title()))
                     initialCompletion += 10;
-                if (org.springframework.util.StringUtils.hasText(request.specialization()))
+                if (StringUtils.hasText(request.specialization()))
                     initialCompletion += 10;
             }
 
@@ -120,12 +124,7 @@ public class AuthService {
         String token = jwtService.generateToken(user);
 
         // Set HTTPOnly cookie
-        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("neuralhealer_token", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // TODO: Set to true in production
-        cookie.setPath("/api");
-        cookie.setMaxAge(86400); // 24 hours
-        response.addCookie(cookie);
+        setAuthCookie(response, token, 86400); // 24 hours
 
         return AuthResponse.of(
                 null, // Token not returned in body
@@ -156,7 +155,7 @@ public class AuthService {
      * @throws BadCredentialsException if credentials are invalid
      */
     @Transactional
-    public AuthResponse login(LoginRequest request, jakarta.servlet.http.HttpServletResponse response) {
+    public AuthResponse login(LoginRequest request, HttpServletResponse response) {
         // Authenticate using Spring Security
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -189,12 +188,7 @@ public class AuthService {
         String token = jwtService.generateToken(user);
 
         // Set HTTPOnly cookie
-        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("neuralhealer_token", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // TODO: Set to true in production
-        cookie.setPath("/api");
-        cookie.setMaxAge(86400); // 24 hours
-        response.addCookie(cookie);
+        setAuthCookie(response, token, 86400); // 24 hours
 
         log.info("User logged in: {}", user.getEmail());
 
@@ -218,5 +212,21 @@ public class AuthService {
             return UserRole.PATIENT;
         }
         return UserRole.PATIENT; // Default fallback
+    }
+
+    /**
+     * Write the JWT auth cookie to the response.
+     *
+     * @param response HTTP response to write to
+     * @param token    JWT value (null to clear the cookie)
+     * @param maxAge   Max age in seconds; 0 deletes the cookie
+     */
+    private void setAuthCookie(HttpServletResponse response, String token, int maxAge) {
+        Cookie cookie = new Cookie(SecurityConstants.AUTH_COOKIE_NAME, token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); // TODO: make configurable via property
+        cookie.setPath("/api");
+        cookie.setMaxAge(maxAge);
+        response.addCookie(cookie);
     }
 }

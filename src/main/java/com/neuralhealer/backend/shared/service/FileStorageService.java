@@ -1,6 +1,7 @@
 package com.neuralhealer.backend.shared.service;
 
 import com.neuralhealer.backend.shared.config.FileStorageProperties;
+import com.neuralhealer.backend.shared.exception.BadRequestException;
 import com.neuralhealer.backend.shared.validator.ImageValidator;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -72,7 +73,7 @@ public class FileStorageService {
 
         } catch (IOException e) {
             logger.error("Could not save profile picture for doctor: {}", doctorId, e);
-            throw new RuntimeException("Could not save profile picture", e);
+            throw new BadRequestException("Could not save profile picture");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.neuralhealer.backend.shared.security;
 
+import com.neuralhealer.backend.shared.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,7 +48,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // 1. Try to get JWT from cookie
         if (request.getCookies() != null) {
             for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
-                if ("neuralhealer_token".equals(cookie.getName())) {
+                if (SecurityConstants.AUTH_COOKIE_NAME.equals(cookie.getName())) {
                     jwt = cookie.getValue();
                     break;
                 }

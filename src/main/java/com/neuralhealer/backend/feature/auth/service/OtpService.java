@@ -2,13 +2,13 @@ package com.neuralhealer.backend.feature.auth.service;
 
 import com.neuralhealer.backend.feature.auth.entity.EmailVerificationOtp;
 import com.neuralhealer.backend.shared.entity.User;
-import com.neuralhealer.backend.feature.notification.entity.Notification;
 import com.neuralhealer.backend.feature.notification.entity.NotificationPriority;
-import com.neuralhealer.backend.feature.notification.entity.NotificationSource;
-import com.neuralhealer.backend.feature.notification.entity.NotificationType;
-import com.neuralhealer.backend.feature.notification.repository.NotificationRepository;
+import com.neuralhealer.backend.feature.notification.service.NotificationCreatorService;
 import com.neuralhealer.backend.feature.auth.repository.EmailVerificationOtpRepository;
 import com.neuralhealer.backend.feature.auth.repository.UserRepository;
+import com.neuralhealer.backend.shared.exception.BadRequestException;
+import com.neuralhealer.backend.shared.exception.ForbiddenException;
+import com.neuralhealer.backend.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -30,7 +28,7 @@ public class OtpService {
 
   private final EmailVerificationOtpRepository otpRepository;
   private final UserRepository userRepository;
-  private final NotificationRepository notificationRepository;
+  private final NotificationCreatorService notificationCreatorService;
   private final com.neuralhealer.backend.feature.email.gmail.DirectEmailService directEmailService;
   private final SecureRandom secureRandom = new SecureRandom();
 
@@ -51,7 +49,7 @@ public class OtpService {
 
     if (recentOtps >= RESEND_LIMIT_PER_HOUR) {
       log.warn("Rate limit exceeded for OTP requests: user={}", user.getEmail());
-      throw new RuntimeException("Too many OTP requests. Please wait an hour before trying again.");
+      throw new BadRequestException("Too many OTP requests. Please wait an hour before trying again.");
     }
 
     // Invalidate old OTPs
@@ -60,7 +58,7 @@ public class OtpService {
 
     // Generate 6-digit code
     String code = String.format("%06d", secureRandom.nextInt(1000000));
-    log.info("Generated OTP code: {} for user: {}", code, user.getEmail());
+    log.info("Generated OTP for user: {}", user.getEmail());
 
     // Save new OTP
     EmailVerificationOtp otp = EmailVerificationOtp.builder()
@@ -71,20 +69,19 @@ public class OtpService {
         .userAgent(userAgent)
         .build();
 
-    log.info("Saving OTP to database - Code: {}, Expires: {}", code, otp.getExpiresAt());
+    log.info("Saving OTP to database - Expires: {}", otp.getExpiresAt());
     EmailVerificationOtp savedOtp = otpRepository.save(otp);
     otpRepository.flush(); // Force immediate write to DB
-    log.info("OTP SAVED TO DATABASE - ID: {}, Code: {}, User: {}", savedOtp.getId(), savedOtp.getOtpCode(),
-        user.getEmail());
+    log.info("OTP SAVED TO DATABASE - ID: {}, User: {}", savedOtp.getId(), user.getEmail());
 
-    // Queue notification - this will be picked up by EmailQueueProcessor
+    // Send verification email and create in-app notification
     queueOtpNotification(user, code);
 
     // Update user status
     user.setEmailVerificationSentAt(LocalDateTime.now());
     userRepository.save(user);
 
-    log.info("=== OTP GENERATION COMPLETE === User: {}, Code: {}", user.getEmail(), code);
+    log.info("=== OTP GENERATION COMPLETE === User: {}", user.getEmail());
   }
 
   /**
@@ -93,36 +90,22 @@ public class OtpService {
   @Transactional
   public void verifyOtp(String email, String code) {
     User user = userRepository.findByEmailAndDeletedAtIsNull(email)
-        .orElseThrow(() -> new RuntimeException("User not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
     // Check verification lockout
     if (user.getVerificationLockedUntil() != null
         && user.getVerificationLockedUntil().isAfter(LocalDateTime.now())) {
-      throw new RuntimeException("Account temporarily locked due to too many failed attempts. Try again later.");
+      throw new ForbiddenException("Account temporarily locked due to too many failed attempts. Try again later.");
     }
 
     Optional<EmailVerificationOtp> otpOpt = otpRepository.findValidOtpByUserId(user.getId(), LocalDateTime.now());
 
-    // Diagnostic logging
-    log.info("OTP Verification Debug - User: {}, Provided Code: {}, OTP Found: {}",
-        email, code, otpOpt.isPresent());
-
-    if (otpOpt.isPresent()) {
-      EmailVerificationOtp foundOtp = otpOpt.get();
-      log.info("OTP Details - Stored Code: {}, Expires At: {}, Is Used: {}, Attempts: {}",
-          foundOtp.getOtpCode(), foundOtp.getExpiresAt(), foundOtp.getIsUsed(), foundOtp.getAttempts());
-      log.info("Code Match: {}", foundOtp.getOtpCode().equals(code));
-    }
+    log.debug("OTP verification attempt - User: {}, OTP Present: {}", email, otpOpt.isPresent());
 
     if (otpOpt.isEmpty() || !otpOpt.get().getOtpCode().equals(code)) {
       handleFailedAttempt(user, otpOpt.orElse(null));
-
-      String reason = otpOpt.isEmpty()
-          ? "No valid OTP found for user"
-          : "OTP code mismatch - provided: " + code + ", expected: " + otpOpt.get().getOtpCode();
-      log.warn("OTP verification failed for {}: {}", email, reason);
-
-      throw new RuntimeException("Invalid or expired verification code");
+      log.warn("OTP verification failed for: {}", email);
+      throw new BadRequestException("Invalid or expired verification code");
     }
 
     EmailVerificationOtp otp = otpOpt.get();
@@ -168,26 +151,14 @@ public class OtpService {
       log.info("OTP verification email sent directly to: {}", user.getEmail());
     } catch (Exception e) {
       log.error("Failed to send OTP email to {}: {}", user.getEmail(), e.getMessage());
-      throw new RuntimeException("Failed to send verification email. Please try again.");
+      throw new BadRequestException("Failed to send verification email. Please try again.");
     }
 
-    // Still create notification for in-app display (SSE only)
-    Map<String, Object> metadata = new HashMap<>();
-    metadata.put("otpCode", code);
-    metadata.put("userName", user.getFirstName());
-
-    Notification notification = Notification.builder()
-        .user(user)
-        .type(NotificationType.EMAIL_VERIFICATION)
-        .title("Verify Your Email Address")
-        .message("Your verification code is: " + code)
-        .payload(metadata)
-        .priority(NotificationPriority.high)
-        .source(NotificationSource.system)
-        .sendEmail(false) // Email already sent directly
-        .deliveryStatus(Map.of("sse", true, "email", true))
-        .build();
-
-    notificationRepository.save(notification);
+    // Create in-app notification for display via SSE
+    notificationCreatorService.createSystemNotification(
+        user.getId(),
+        "Verify Your Email Address",
+        "A verification code has been sent to your email address.",
+        NotificationPriority.high);
   }
 }
