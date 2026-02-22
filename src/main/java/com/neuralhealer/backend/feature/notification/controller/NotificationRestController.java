@@ -66,14 +66,14 @@ public class NotificationRestController {
     public ResponseEntity<Void> markAsRead(
             @PathVariable UUID id,
             @AuthenticationPrincipal User user) {
-        notificationService.markAsRead(id, user);
+        notificationService.markAsRead(id, user.getId());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/mark-all-read")
     @Operation(summary = "Mark all notifications for current user as read")
     public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal User user) {
-        notificationService.markAllAsRead(user);
+        notificationService.markAllAsRead(user.getId());
         return ResponseEntity.ok().build();
     }
 

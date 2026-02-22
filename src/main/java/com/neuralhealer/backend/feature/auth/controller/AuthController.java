@@ -161,7 +161,7 @@ public class AuthController {
         @Operation(summary = "Check verification status", description = "Check if a user's email is already verified")
         public ResponseEntity<Map<String, Object>> checkStatus(@PathVariable String email) {
                 User user = userRepository.findByEmailAndDeletedAtIsNull(email)
-                                .orElseThrow(() -> new RuntimeException("User not found"));
+                                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
                 return ResponseEntity.ok(Map.of(
                                 "verified", !user.getEmailVerificationRequired(),

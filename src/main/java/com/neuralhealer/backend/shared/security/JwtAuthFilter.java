@@ -1,6 +1,5 @@
 package com.neuralhealer.backend.shared.security;
 
-import com.neuralhealer.backend.shared.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

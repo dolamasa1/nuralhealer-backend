@@ -9,6 +9,7 @@ import com.neuralhealer.backend.feature.auth.repository.UserRepository;
 import com.neuralhealer.backend.shared.exception.BadRequestException;
 import com.neuralhealer.backend.shared.exception.ForbiddenException;
 import com.neuralhealer.backend.shared.exception.ResourceNotFoundException;
+import com.neuralhealer.backend.feature.email.gmail.DirectEmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class OtpService {
   private final EmailVerificationOtpRepository otpRepository;
   private final UserRepository userRepository;
   private final NotificationCreatorService notificationCreatorService;
-  private final com.neuralhealer.backend.feature.email.gmail.DirectEmailService directEmailService;
+  private final DirectEmailService directEmailService;
   private final SecureRandom secureRandom = new SecureRandom();
 
   private static final int OTP_EXPIRY_MINUTES = 30;

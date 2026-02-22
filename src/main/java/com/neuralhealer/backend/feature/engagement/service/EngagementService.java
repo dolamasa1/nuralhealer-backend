@@ -22,6 +22,8 @@ import com.neuralhealer.backend.shared.websocket.WebSocketMessageType;
 import lombok.RequiredArgsConstructor;
 import com.neuralhealer.backend.feature.notification.entity.NotificationType;
 import com.neuralhealer.backend.feature.notification.service.NotificationService;
+import com.neuralhealer.backend.feature.email.gmail.DirectEmailService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -50,7 +53,8 @@ public class EngagementService {
     private final SimpMessagingTemplate messagingTemplate;
     private final NotificationService notificationService;
     private final EngagementMessageService messageService;
-    private final com.neuralhealer.backend.feature.email.gmail.DirectEmailService directEmailService;
+    private final DirectEmailService directEmailService;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public StartEngagementResponse initiateEngagement(User initiator, StartEngagementRequest request) {
@@ -124,7 +128,7 @@ public class EngagementService {
 
         // Record event
         saveEvent(engagement.getId(), "INITIATED", initiator.getId(),
-                "{\"initiatorRole\":\"" + initiator.getRole() + "\", \"initiatedBy\":\"" + initiatedBy + "\"}");
+                Map.of("initiatorRole", initiator.getRole().name(), "initiatedBy", initiatedBy));
 
         // Generate 2FA Token
         EngagementVerificationToken token = verificationService.generateStartToken(engagement);
@@ -184,7 +188,7 @@ public class EngagementService {
         engagementRepository.save(engagement);
 
         // Record event
-        saveEvent(engagement.getId(), "VERIFIED", verifier.getId(), "{\"role\":\"" + verifier.getRole() + "\"}");
+        saveEvent(engagement.getId(), "VERIFIED", verifier.getId(), Map.of("role", verifier.getRole().name()));
 
         // Explicitly update relationship to ensure started_at immutability
         DoctorPatient dp = doctorPatientRepository
@@ -258,7 +262,7 @@ public class EngagementService {
 
         // Record event
         saveEvent(engagement.getId(), "END_REQUESTED", user.getId(),
-                "{\"reason\":\"" + (reason != null ? reason.replace("\"", "\\\"") : "") + "\"}");
+                Map.of("reason", reason != null ? reason : ""));
 
         return response;
     }
@@ -276,7 +280,7 @@ public class EngagementService {
         engagementRepository.save(engagement);
 
         // Record event
-        saveEvent(engagement.getId(), "ENDED", user.getId(), "{\"reason\":\"Verification completed\"}");
+        saveEvent(engagement.getId(), "ENDED", user.getId(), Map.of("reason", "Verification completed"));
 
         // Update relationship
         DoctorPatient dp = doctorPatientRepository
@@ -444,14 +448,9 @@ public class EngagementService {
         engagementRepository.save(engagement);
 
         // Store event in engagement_events table
-        EngagementEvent event = EngagementEvent.builder()
-                .engagementId(engagementId)
-                .eventType("CANCELLED")
-                .triggeredBy(user.getId())
-                .payload("{\"reason\":\"" + (request.reason() != null ? request.reason().replace("\"", "\\\"") : "")
-                        + "\",\"cancelledBy\":\"" + cancelledBy.name() + "\"}")
-                .build();
-        eventRepository.save(event);
+        saveEvent(engagementId, "CANCELLED", user.getId(),
+                Map.of("reason", request.reason() != null ? request.reason() : "",
+                        "cancelledBy", cancelledBy.name()));
 
         // Update Relationship
         DoctorPatient relationship = doctorPatientRepository
@@ -630,14 +629,19 @@ public class EngagementService {
                 .orElse(false);
     }
 
-    private void saveEvent(UUID engagementId, String type, UUID userId, String payload) {
-        EngagementEvent event = EngagementEvent.builder()
-                .engagementId(engagementId)
-                .eventType(type)
-                .triggeredBy(userId)
-                .payload(payload)
-                .build();
-        eventRepository.save(event);
+    private void saveEvent(UUID engagementId, String type, UUID userId, Map<String, Object> payload) {
+        try {
+            String serialized = objectMapper.writeValueAsString(payload);
+            EngagementEvent event = EngagementEvent.builder()
+                    .engagementId(engagementId)
+                    .eventType(type)
+                    .triggeredBy(userId)
+                    .payload(serialized)
+                    .build();
+            eventRepository.save(event);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize engagement event payload", e);
+        }
     }
 
     private void broadcastEngagementStatus(UUID engagementId, String status, String message) {

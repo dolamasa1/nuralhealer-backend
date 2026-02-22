@@ -131,11 +131,6 @@ public class NotificationService {
         }
     }
 
-    @Transactional
-    public void markAsRead(UUID notificationId, User user) {
-        markAsRead(notificationId, user.getId());
-    }
-
     /**
      * Mark all notifications as read for a user.
      */
@@ -151,11 +146,6 @@ public class NotificationService {
         });
 
         notificationRepository.saveAll(unread);
-    }
-
-    @Transactional
-    public void markAllAsRead(User user) {
-        markAllAsRead(user.getId());
     }
 
     @Transactional
