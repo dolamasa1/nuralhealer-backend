@@ -67,6 +67,7 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/quizzes/**").permitAll() // Quiz endpoints (no auth)
                         .requestMatchers("/test/**").permitAll() // Test endpoints
+                        .requestMatchers("/live-sessions/**").permitAll() // Live video sessions
                         .requestMatchers("/diagnostic/**").permitAll() // Diagnostic endpoints
                         .requestMatchers("/doctors/verification/questions").permitAll() // Public questions
                         .requestMatchers("/error").permitAll()

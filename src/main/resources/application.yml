@@ -135,4 +135,9 @@ file:
 frontend:
   url: ${FRONTEND_URL:http://localhost:3000}
 
+# Live Session Configuration
+livesession:
+  jitsi-domain: ${LIVESESSION_JITSI_DOMAIN:meet.jit.si}
+  room-prefix: ${LIVESESSION_ROOM_PREFIX:neuralhealer-}
+
 
