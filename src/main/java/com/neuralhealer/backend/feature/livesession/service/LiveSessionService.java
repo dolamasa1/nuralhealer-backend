@@ -1,6 +1,7 @@
 package com.neuralhealer.backend.feature.livesession.service;
 
 import com.neuralhealer.backend.feature.livesession.dto.LiveSessionResponse;
+import com.neuralhealer.backend.feature.livesession.provider.LiveSessionProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -13,19 +14,33 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * In-memory live session manager.
- * No database — sessions live only while the server is running.
- * Replace with a persistent store when ready for production.
+ * Delegates actual session generation to the active LiveSessionProvider.
  */
 @Service
 public class LiveSessionService {
 
-    @Value("${livesession.jitsi-domain:meet.jit.si}")
-    private String jitsiDomain;
+    @Value("${livesession.provider:native-webrtc}")
+    private String activeProviderName;
 
     @Value("${livesession.room-prefix:neuralhealer-}")
     private String roomPrefix;
 
+    private final Map<String, LiveSessionProvider> providers = new ConcurrentHashMap<>();
     private final Map<String, SessionData> sessions = new ConcurrentHashMap<>();
+
+    public LiveSessionService(List<LiveSessionProvider> providerList) {
+        for (LiveSessionProvider p : providerList) {
+            this.providers.put(p.getProviderName(), p);
+        }
+    }
+
+    private LiveSessionProvider getActiveProvider() {
+        LiveSessionProvider p = providers.get(activeProviderName);
+        if (p == null) {
+            throw new IllegalStateException("Unknown livesession provider configured: " + activeProviderName);
+        }
+        return p;
+    }
 
     public LiveSessionResponse create(String creatorName) {
         String sessionId = UUID.randomUUID().toString().substring(0, 8);
@@ -35,7 +50,7 @@ public class LiveSessionService {
         data.participants.add(creatorName);
         sessions.put(sessionId, data);
 
-        return toResponse(sessionId, data);
+        return getActiveProvider().create(sessionId, roomName, creatorName);
     }
 
     public LiveSessionResponse join(String sessionId, String participantName) {
@@ -43,10 +58,12 @@ public class LiveSessionService {
         if (data == null) {
             throw new IllegalArgumentException("Session not found: " + sessionId);
         }
+
         if (!data.participants.contains(participantName)) {
             data.participants.add(participantName);
         }
-        return toResponse(sessionId, data);
+
+        return getActiveProvider().join(sessionId, data.roomName, participantName, List.copyOf(data.participants));
     }
 
     public LiveSessionResponse get(String sessionId) {
@@ -54,25 +71,13 @@ public class LiveSessionService {
         if (data == null) {
             throw new IllegalArgumentException("Session not found: " + sessionId);
         }
-        return toResponse(sessionId, data);
+
+        // Treat as a join without a new participant name to just get the current state
+        return getActiveProvider().join(sessionId, data.roomName, null, List.copyOf(data.participants));
     }
 
     public void end(String sessionId) {
         sessions.remove(sessionId);
-    }
-
-    // ── internal ──
-
-    private LiveSessionResponse toResponse(String sessionId, SessionData data) {
-        return LiveSessionResponse.builder()
-                .sessionId(sessionId)
-                .roomName(data.roomName)
-                .jitsiDomain(jitsiDomain)
-                .status("active")
-                .createdBy(data.createdBy)
-                .participants(List.copyOf(data.participants))
-                .createdAt(data.createdAt)
-                .build();
     }
 
     private static class SessionData {

@@ -15,7 +15,9 @@ import java.util.List;
 public class LiveSessionResponse {
     private String sessionId;
     private String roomName;
+    private String provider; // 'jitsi', 'native-webrtc', 'shared-webrtc'
     private String jitsiDomain;
+    private String jitsiJwt; // signed token granting moderator access
     private String status;
     private String createdBy;
     private List<String> participants;

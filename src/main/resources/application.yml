@@ -136,8 +136,12 @@ frontend:
   url: ${FRONTEND_URL:http://localhost:3000}
 
 # Live Session Configuration
+# meet.ffmuc.net = open community Jitsi; first joiner = moderator, no auth needed.
+# To use your own Jitsi server: set LIVESESSION_JITSI_DOMAIN and LIVESESSION_JWT_SECRET
 livesession:
-  jitsi-domain: ${LIVESESSION_JITSI_DOMAIN:meet.jit.si}
+  jitsi-domain: ${LIVESESSION_JITSI_DOMAIN:meet.ffmuc.net}
   room-prefix: ${LIVESESSION_ROOM_PREFIX:neuralhealer-}
+  jwt-secret: ${LIVESESSION_JWT_SECRET:neuralhealer-jitsi-secret-key-32ch}
+  jwt-app-id: ${LIVESESSION_JWT_APP_ID:neuralhealer}
 
 
