@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${LOCAL_DB_URL}
-    username: ${LOCAL_DB_USERNAME}
-    password: ${LOCAL_DB_PASSWORD}
+    url: ${LOCAL_DB_URL:${DB_URL:jdbc:postgresql://localhost:5432/neuralhealer}}
+    username: ${LOCAL_DB_USERNAME:${DB_USERNAME:postgres}}
+    password: ${LOCAL_DB_PASSWORD:${DB_PASSWORD:postgres}}
   jpa:
     hibernate:
       ddl-auto: update # Automatic updates for dev convenience
