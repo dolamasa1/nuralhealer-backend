@@ -62,6 +62,7 @@ public class WebRtcSignalingSocketHandler extends TextWebSocketHandler {
             case "join":
                 handleJoin(session, roomId, payload);
                 break;
+            case "status-update":
             case "offer":
             case "answer":
             case "ice-candidate":

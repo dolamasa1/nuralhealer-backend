@@ -20,7 +20,7 @@ public class LiveSessionController {
 
     @PostMapping
     public ResponseEntity<LiveSessionResponse> create(@RequestBody CreateSessionRequest request) {
-        LiveSessionResponse session = liveSessionService.create(request.getParticipantName());
+        LiveSessionResponse session = liveSessionService.create(request.getParticipantName(), request.getProvider());
         return ResponseEntity.status(HttpStatus.CREATED).body(session);
     }
 
@@ -33,7 +33,8 @@ public class LiveSessionController {
     public ResponseEntity<LiveSessionResponse> join(
             @PathVariable String sessionId,
             @RequestBody JoinSessionRequest request) {
-        return ResponseEntity.ok(liveSessionService.join(sessionId, request.getParticipantName()));
+        return ResponseEntity
+                .ok(liveSessionService.join(sessionId, request.getParticipantName(), request.getProvider()));
     }
 
     @DeleteMapping("/{sessionId}")

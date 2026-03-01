@@ -14,9 +14,12 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @RequiredArgsConstructor
 public class RawWebSocketConfig implements WebSocketConfigurer {
 
+    @NonNull
     private final NotificationWebSocketHandler notificationHandler;
+    @NonNull
     private final WebRtcSignalingSocketHandler webRtcHandler;
 
+    @SuppressWarnings("unchecked")
     @Override
     public void registerWebSocketHandlers(@NonNull WebSocketHandlerRegistry registry) {
         // Register notifications

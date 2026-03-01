@@ -34,46 +34,49 @@ public class LiveSessionService {
         }
     }
 
-    private LiveSessionProvider getActiveProvider() {
-        LiveSessionProvider p = providers.get(activeProviderName);
+    private LiveSessionProvider getProvider(String providerName) {
+        String name = (providerName != null && !providerName.isEmpty()) ? providerName : activeProviderName;
+        LiveSessionProvider p = providers.get(name);
         if (p == null) {
-            throw new IllegalStateException("Unknown livesession provider configured: " + activeProviderName);
+            // Fallback to default if specified provider not found
+            p = providers.get(activeProviderName);
+        }
+        if (p == null) {
+            throw new IllegalStateException("No livesession provider available.");
         }
         return p;
     }
 
-    public LiveSessionResponse create(String creatorName) {
+    public LiveSessionResponse create(String creatorName, String providerName) {
         String sessionId = UUID.randomUUID().toString().substring(0, 8);
         String roomName = roomPrefix + sessionId;
 
-        SessionData data = new SessionData(roomName, creatorName, Instant.now());
+        LiveSessionProvider provider = getProvider(providerName);
+        SessionData data = new SessionData(roomName, creatorName, Instant.now(), provider.getProviderName());
         data.participants.add(creatorName);
         sessions.put(sessionId, data);
 
-        return getActiveProvider().create(sessionId, roomName, creatorName);
+        return provider.create(sessionId, roomName, creatorName);
     }
 
-    public LiveSessionResponse join(String sessionId, String participantName) {
+    public LiveSessionResponse join(String sessionId, String participantName, String providerName) {
         SessionData data = sessions.get(sessionId);
         if (data == null) {
             throw new IllegalArgumentException("Session not found: " + sessionId);
         }
 
-        if (!data.participants.contains(participantName)) {
+        if (participantName != null && !data.participants.contains(participantName)) {
             data.participants.add(participantName);
         }
 
-        return getActiveProvider().join(sessionId, data.roomName, participantName, List.copyOf(data.participants));
+        // Use the provider from the session if it exists, otherwise the one from
+        // request, otherwise default
+        String pName = (data.provider != null) ? data.provider : providerName;
+        return getProvider(pName).join(sessionId, data.roomName, participantName, List.copyOf(data.participants));
     }
 
     public LiveSessionResponse get(String sessionId) {
-        SessionData data = sessions.get(sessionId);
-        if (data == null) {
-            throw new IllegalArgumentException("Session not found: " + sessionId);
-        }
-
-        // Treat as a join without a new participant name to just get the current state
-        return getActiveProvider().join(sessionId, data.roomName, null, List.copyOf(data.participants));
+        return join(sessionId, null, null);
     }
 
     public void end(String sessionId) {
@@ -84,12 +87,14 @@ public class LiveSessionService {
         final String roomName;
         final String createdBy;
         final Instant createdAt;
+        final String provider;
         final CopyOnWriteArrayList<String> participants = new CopyOnWriteArrayList<>();
 
-        SessionData(String roomName, String createdBy, Instant createdAt) {
+        SessionData(String roomName, String createdBy, Instant createdAt, String provider) {
             this.roomName = roomName;
             this.createdBy = createdBy;
             this.createdAt = createdAt;
+            this.provider = provider;
         }
     }
 }
