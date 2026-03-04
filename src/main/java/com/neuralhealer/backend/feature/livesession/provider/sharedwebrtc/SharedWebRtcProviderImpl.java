@@ -32,8 +32,6 @@ public class SharedWebRtcProviderImpl implements LiveSessionProvider {
                 .sessionId(sessionId)
                 .roomName(roomName)
                 .provider(getProviderName())
-                .jitsiDomain(null)
-                .jitsiJwt(null)
                 .status("active")
                 .createdBy(participants.isEmpty() ? displayName : participants.get(0))
                 .participants(participants)

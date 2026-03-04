@@ -4,7 +4,8 @@ import com.neuralhealer.backend.feature.livesession.dto.LiveSessionResponse;
 
 public interface LiveSessionProvider {
     /**
-     * Identifies which provider implementation this is (e.g. jitsi, native-webrtc).
+     * Identifies which provider implementation this is (e.g. native-webrtc,
+     * shared-webrtc).
      */
     String getProviderName();
 

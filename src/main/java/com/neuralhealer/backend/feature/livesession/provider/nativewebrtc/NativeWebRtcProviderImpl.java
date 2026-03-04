@@ -32,9 +32,6 @@ public class NativeWebRtcProviderImpl implements LiveSessionProvider {
                 .sessionId(sessionId)
                 .roomName(roomName)
                 .provider(getProviderName())
-                // We do not need Jitsi domain or JWT for native WebRTC
-                .jitsiDomain(null)
-                .jitsiJwt(null)
                 .status("active")
                 .createdBy(participants.isEmpty() ? displayName : participants.get(0))
                 .participants(participants)
