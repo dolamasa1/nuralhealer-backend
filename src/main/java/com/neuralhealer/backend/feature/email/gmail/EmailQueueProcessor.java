@@ -43,7 +43,6 @@ public class EmailQueueProcessor {
 
     @Scheduled(fixedDelay = 5000)
     public void processPendingEmails() {
-        log.debug("📬 Polling for pending email notifications...");
 
         // Fetch pending email jobs (no transactional needed for read)
         List<MessageQueue> pendingJobs = messageQueueRepository.findByJobTypeAndStatus("EMAIL_NOTIFICATION", "pending",

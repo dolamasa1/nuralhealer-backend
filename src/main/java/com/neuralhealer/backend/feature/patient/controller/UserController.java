@@ -77,12 +77,18 @@ public class UserController {
      * Get current authenticated user information.
      * Requires valid JWT token in Authorization header.
      * 
-     * @param user Current authenticated user (injected by Spring Security)
-     * @return User information
+     * @param user Current authenticated user (injected by Spring Security) - can be null if not authenticated
+     * @return User information if authenticated, 401 if not authenticated
      */
     @GetMapping("/me")
     @Operation(summary = "Get current user", description = "Returns the currently authenticated user's information")
     public ResponseEntity<Map<String, Object>> getCurrentUser(@AuthenticationPrincipal User user) {
+        // Return 401 if user is not authenticated instead of 403
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Not authenticated", "data", Map.of()));
+        }
+
         // Determine user role
         UserRole role = UserRole.PATIENT;
         if (doctorProfileRepository.existsByUserId(user.getId())) {

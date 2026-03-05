@@ -6,9 +6,15 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update # Automatic updates for dev convenience
-    show-sql: true
+    show-sql: false
 
 logging:
   level:
+    root: WARN
     "[com.neuralhealer.backend]": DEBUG
-    "[org.hibernate.SQL]": DEBUG
+    "[com.neuralhealer.backend.feature.email.gmail.EmailQueueProcessor]": INFO
+    "[org.hibernate.SQL]": WARN
+    "[org.hibernate.type.descriptor.sql.BasicBinder]": WARN
+    "[org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver]": ERROR
+    "[org.springframework.web.cors.DefaultCorsProcessor]": ERROR
+    "[org.springframework.security.web.FilterChainProxy]": WARN

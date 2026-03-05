@@ -49,6 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
                 if (SecurityConstants.AUTH_COOKIE_NAME.equals(cookie.getName())) {
                     jwt = cookie.getValue();
+                    log.debug("JWT token found in cookie");
                     break;
                 }
             }
@@ -58,10 +59,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         if (jwt == null && authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
+            log.debug("JWT token found in Authorization header");
         }
 
         // If no token found, continue without authentication
         if (jwt == null) {
+            // Don't log - let Spring Security handle unauthenticated access attempts
             filterChain.doFilter(request, response);
             return;
         }

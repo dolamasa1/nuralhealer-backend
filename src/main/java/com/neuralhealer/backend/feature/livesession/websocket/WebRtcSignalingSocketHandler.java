@@ -34,6 +34,9 @@ public class WebRtcSignalingSocketHandler extends TextWebSocketHandler {
     // disconnect)
     private final Map<String, String> sessionToRoomMap = new ConcurrentHashMap<>();
 
+    // Map: WebSocketSession ID -> PeerId (DisplayName)
+    private final Map<String, String> sessionToPeerIdMap = new ConcurrentHashMap<>();
+
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) {
         log.info("WebRTC signaling connection established: {}", session.getId());
@@ -58,6 +61,11 @@ public class WebRtcSignalingSocketHandler extends TextWebSocketHandler {
         if (roomId == null)
             return;
 
+        String peerId = (String) payload.get("peerId");
+        if (peerId != null) {
+            sessionToPeerIdMap.put(session.getId(), peerId);
+        }
+
         switch (type) {
             case "join":
                 handleJoin(session, roomId, payload);
@@ -67,6 +75,16 @@ public class WebRtcSignalingSocketHandler extends TextWebSocketHandler {
             case "answer":
             case "ice-candidate":
             case "leave":
+            case "join-request":
+                // Guest requests to join: register their session so they can receive the
+                // approval/denial
+                roomSessions.computeIfAbsent(roomId, k -> new CopyOnWriteArrayList<>()).add(session);
+                sessionToRoomMap.put(session.getId(), roomId);
+                log.info("Client {} requesting to join WebRTC room {}", session.getId(), roomId);
+                broadcastToOthers(session, roomId, message);
+                break;
+            case "join-approved":
+            case "join-denied":
                 broadcastToOthers(session, roomId, message);
                 break;
             default:
@@ -108,12 +126,17 @@ public class WebRtcSignalingSocketHandler extends TextWebSocketHandler {
             if (peers != null) {
                 peers.remove(session);
 
-                // Tell remaining peers someone left
+                // Tell remaining peers someone left, using their actual peerId
+                String peerId = sessionToPeerIdMap.remove(session.getId());
+                if (peerId == null) {
+                    peerId = session.getId(); // Fallback
+                }
+
                 try {
                     String leaveMsg = objectMapper.writeValueAsString(Map.of(
                             "type", "leave",
                             "roomId", roomId,
-                            "peerId", session.getId()));
+                            "peerId", peerId));
                     broadcastToOthers(session, roomId, new TextMessage(leaveMsg));
                 } catch (Exception e) {
                     log.error("Failed to broadcast leave message", e);
