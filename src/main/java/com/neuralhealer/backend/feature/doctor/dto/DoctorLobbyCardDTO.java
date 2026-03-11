@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class DoctorLobbyCardDTO {
 
     private String id;
+    private String userId;
     private String fullName;
     private String title;
     private String specialization;

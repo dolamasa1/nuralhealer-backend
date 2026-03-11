@@ -1,6 +1,5 @@
 package com.neuralhealer.backend.shared.websocket;
 
-import com.neuralhealer.backend.shared.websocket.WebSocketMessageType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class WebSocketMessage {
     private WebSocketMessageType type;
+    private UUID sessionId;
     private UUID engagementId;
     private UUID senderId;
     private String senderName;

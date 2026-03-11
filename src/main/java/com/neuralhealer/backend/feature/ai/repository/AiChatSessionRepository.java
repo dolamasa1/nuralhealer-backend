@@ -16,6 +16,8 @@ public interface AiChatSessionRepository extends JpaRepository<AiChatSession, UU
 
     Optional<AiChatSession> findByPatientIdAndIsActiveTrue(UUID patientId);
 
+    boolean existsByIdAndPatientId(UUID id, UUID patientId);
+
     List<AiChatSession> findByPatientIdOrderByStartedAtDesc(UUID patientId);
 
     @Modifying

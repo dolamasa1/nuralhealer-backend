@@ -57,6 +57,7 @@ public class DoctorMapper {
 
         return DoctorLobbyCardDTO.builder()
                 .id(profile.getId().toString())
+            .userId(user.getId().toString())
                 .fullName(fullName)
                 .title(profile.getTitle())
                 .specialization(profile.getSpecialization())

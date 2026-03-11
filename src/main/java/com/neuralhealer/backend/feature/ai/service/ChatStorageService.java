@@ -100,6 +100,10 @@ public class ChatStorageService {
         return sessionRepository.findByPatientIdOrderByStartedAtDesc(patientId);
     }
 
+    public boolean sessionBelongsToPatient(UUID sessionId, UUID patientId) {
+        return sessionRepository.existsByIdAndPatientId(sessionId, patientId);
+    }
+
     public List<AiChatSession> searchSessions(UUID patientId, String query) {
         if (query == null || query.trim().isEmpty()) {
             return getUserSessions(patientId);
