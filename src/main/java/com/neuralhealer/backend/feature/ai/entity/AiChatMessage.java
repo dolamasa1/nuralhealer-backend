@@ -4,8 +4,6 @@ import com.neuralhealer.backend.feature.ai.enums.ChatSenderType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -28,7 +26,6 @@ public class AiChatMessage {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sender_type", nullable = false)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private ChatSenderType senderType;
 
     @Column(name = "sender_id")
