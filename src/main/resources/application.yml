@@ -63,6 +63,13 @@ server:
   error:
     include-message: always
     include-binding-errors: always
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    accept-count: 100
+    max-connections: 8192
+    connection-timeout: 20000
 
 jwt:
   secret: ${JWT_SECRET:bmV1cmFsaGVhbGVyLXNlY3JldC1rZXktZm9yLWp3dC10b2tlbi1nZW5lcmF0aW9uLTI1Ni1iaXRz}
